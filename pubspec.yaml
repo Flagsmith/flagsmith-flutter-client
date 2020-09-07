@@ -1,7 +1,7 @@
 name: bullet_train
 description: >-
   Flutter Clinet SDK for http://bullet-train.io, Bullet Train is 100% Open Source. Host yourself or let us take care of the hosting.
-version: 0.0.1
+version: 0.0.1+1
 homepage: https://github.com/printeastwoodcz
 repository: https://github.com/printeastwoodcz
 
