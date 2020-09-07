@@ -1,25 +1,29 @@
 import 'package:dio/dio.dart';
 
 class BulletTrainConfig {
-  final int defaultConnectTimeout = 2000;
-  final int defaultReceiveTimeout = 5000;
-  final int defaultSendTimeout = 5000;
-  final String defaultBaseUri = 'https://api.bullet-train.io/api/v1/';
   final String baseURI;
   final String flagsURI;
   final String identitiesURI;
   final String traitsURI;
+
+  final int connectTimeout;
+  final int receiveTimeout;
+  final int sendTimeout;
+
   const BulletTrainConfig({
-    this.baseURI,
+    this.baseURI = 'https://api.bullet-train.io/api/v1/',
     this.flagsURI = 'flags/',
     this.identitiesURI = 'identities/',
     this.traitsURI = 'traits/',
+    this.connectTimeout = 2000,
+    this.receiveTimeout = 5000,
+    this.sendTimeout = 5000,
   });
 
   BaseOptions get clientOptions => BaseOptions(
-        baseUrl: baseURI ?? defaultBaseUri,
-        connectTimeout: defaultConnectTimeout,
-        receiveTimeout: defaultReceiveTimeout,
-        sendTimeout: defaultSendTimeout,
+        baseUrl: baseURI,
+        connectTimeout: connectTimeout,
+        receiveTimeout: receiveTimeout,
+        sendTimeout: sendTimeout,
       );
 }
