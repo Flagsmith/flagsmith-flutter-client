@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hexcolor/hexcolor.dart';
 
-import 'bloc/bt_bloc.dart';
-import 'bloc/bt_bloc.dart';
-import 'bloc/bt_bloc.dart';
 import 'bloc/bt_bloc.dart';
 
 class BtScreen extends StatelessWidget {
@@ -26,18 +24,24 @@ class BtScreen extends StatelessWidget {
                       return;
                     },
                     child: ListView.separated(
-                      separatorBuilder: (context, index) => Divider(),
-                      itemCount: state.flags.length,
-                      itemBuilder: (context, index) => ListTile(
-                        title: Padding(
-                          padding: const EdgeInsets.only(top: 0, bottom: 8),
-                          child: Text(
-                              '${state.flags[index].feature.name} | ${state.flags[index].stateValue}'),
-                        ),
-                        subtitle: Text(
-                            '${state.flags[index].enabled ? 'ON' : 'OFF'} ${state.flags[index].toString()}'),
-                      ),
-                    ),
+                        separatorBuilder: (context, index) => Divider(),
+                        itemCount: state.flags.length,
+                        itemBuilder: (context, index) {
+                          var color = state.flags[index].feature.name == 'color'
+                              ? Hexcolor(state.flags[index].stateValue)
+                              : Colors.black;
+                          return ListTile(
+                            title: Padding(
+                              padding: const EdgeInsets.only(top: 0, bottom: 8),
+                              child: Text(
+                                '${state.flags[index].feature.name} | ${state.flags[index].stateValue}',
+                                style: TextStyle(color: color),
+                              ),
+                            ),
+                            subtitle: Text(
+                                '${state.flags[index].enabled ? 'ON' : 'OFF'} ${state.flags[index].toString()}'),
+                          );
+                        }),
                   ),
             floatingActionButton: FloatingActionButton.extended(
               onPressed: () =>

@@ -19,7 +19,7 @@ class _$FlagTearOff {
   _Flag call(
       {@required int id,
       @required Feature feature,
-      @JsonKey(name: 'feature_state_value') int stateValue,
+      @JsonKey(name: 'feature_state_value') String stateValue,
       @required bool enabled}) {
     return _Flag(
       id: id,
@@ -37,7 +37,7 @@ mixin _$Flag {
   int get id;
   Feature get feature;
   @JsonKey(name: 'feature_state_value')
-  int get stateValue;
+  String get stateValue;
   bool get enabled;
 
   Map<String, dynamic> toJson();
@@ -50,7 +50,7 @@ abstract class $FlagCopyWith<$Res> {
   $Res call(
       {int id,
       Feature feature,
-      @JsonKey(name: 'feature_state_value') int stateValue,
+      @JsonKey(name: 'feature_state_value') String stateValue,
       bool enabled});
 
   $FeatureCopyWith<$Res> get feature;
@@ -73,7 +73,8 @@ class _$FlagCopyWithImpl<$Res> implements $FlagCopyWith<$Res> {
     return _then(_value.copyWith(
       id: id == freezed ? _value.id : id as int,
       feature: feature == freezed ? _value.feature : feature as Feature,
-      stateValue: stateValue == freezed ? _value.stateValue : stateValue as int,
+      stateValue:
+          stateValue == freezed ? _value.stateValue : stateValue as String,
       enabled: enabled == freezed ? _value.enabled : enabled as bool,
     ));
   }
@@ -96,7 +97,7 @@ abstract class _$FlagCopyWith<$Res> implements $FlagCopyWith<$Res> {
   $Res call(
       {int id,
       Feature feature,
-      @JsonKey(name: 'feature_state_value') int stateValue,
+      @JsonKey(name: 'feature_state_value') String stateValue,
       bool enabled});
 
   @override
@@ -121,7 +122,8 @@ class __$FlagCopyWithImpl<$Res> extends _$FlagCopyWithImpl<$Res>
     return _then(_Flag(
       id: id == freezed ? _value.id : id as int,
       feature: feature == freezed ? _value.feature : feature as Feature,
-      stateValue: stateValue == freezed ? _value.stateValue : stateValue as int,
+      stateValue:
+          stateValue == freezed ? _value.stateValue : stateValue as String,
       enabled: enabled == freezed ? _value.enabled : enabled as bool,
     ));
   }
@@ -147,7 +149,7 @@ class _$_Flag implements _Flag {
   final Feature feature;
   @override
   @JsonKey(name: 'feature_state_value')
-  final int stateValue;
+  final String stateValue;
   @override
   final bool enabled;
 
@@ -194,7 +196,7 @@ abstract class _Flag implements Flag {
   const factory _Flag(
       {@required int id,
       @required Feature feature,
-      @JsonKey(name: 'feature_state_value') int stateValue,
+      @JsonKey(name: 'feature_state_value') String stateValue,
       @required bool enabled}) = _$_Flag;
 
   factory _Flag.fromJson(Map<String, dynamic> json) = _$_Flag.fromJson;
@@ -205,7 +207,7 @@ abstract class _Flag implements Flag {
   Feature get feature;
   @override
   @JsonKey(name: 'feature_state_value')
-  int get stateValue;
+  String get stateValue;
   @override
   bool get enabled;
   @override

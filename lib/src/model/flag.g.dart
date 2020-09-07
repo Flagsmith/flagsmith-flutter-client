@@ -14,7 +14,7 @@ _$_Flag _$_$_FlagFromJson(Map<String, dynamic> json) {
     feature: json['feature'] == null
         ? null
         : Feature.fromJson(json['feature'] as Map<String, dynamic>),
-    stateValue: json['feature_state_value'] as int,
+    stateValue: json['feature_state_value'] as String,
     enabled: json['enabled'] as bool,
   );
 }

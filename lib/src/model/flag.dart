@@ -23,15 +23,10 @@ abstract class Flag with _$Flag {
           Feature feature,
       @JsonKey(
         name: 'feature_state_value',
-        // fromJson: _stringFromInt,
-        // toJson: _stringToInt,
       )
-          int stateValue,
+          String stateValue,
       @required
           bool enabled}) = _Flag;
 
   factory Flag.fromJson(Map<String, dynamic> json) => _$FlagFromJson(json);
-  // static int _stringToInt(String number) =>
-  //     number == null ? null : int.parse(number);
-  // static String _stringFromInt(int number) => number?.toString();
 }

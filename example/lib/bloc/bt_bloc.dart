@@ -23,7 +23,7 @@ class BtBloc extends Bloc<BtEvent, BtState> {
           FeatureUser(identifier: 'testUser'), Trait(key: 'age', value: '21'));
     }, getFeatures: (_) async* {
       yield state.copyWith(state: LoadingState.isLoding);
-      var result = await bt.getFeatureFlags(null);
+      var result = await bt.getFeatureFlags();
       yield state.copyWith(state: LoadingState.isComplete, flags: result);
     }, hasFeature: (e) async* {
       var result = bt.hasFeatureFlag(e.value);
