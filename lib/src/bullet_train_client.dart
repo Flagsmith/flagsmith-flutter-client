@@ -10,6 +10,10 @@ import 'model/trait.dart';
 import 'store/crud_store.dart';
 import 'store/in_memory_store.dart';
 
+///
+/// Bullet train client initialization
+/// @param config - configuration for http client and endpoints
+/// @param apiKey - api key for your enviornment
 class BulletTrainClient {
   static final String authHeader = 'X-Environment-Key';
   static final String acceptHeader = 'Accept';
@@ -26,6 +30,7 @@ class BulletTrainClient {
     seeds?.map(store.create);
   }
 
+  /// Simple implementation of Http Client
   Dio get _api => Dio(config.clientOptions)
     ..options.headers[authHeader] = apiKey
     ..options.headers[acceptHeader] = 'application/json'
@@ -64,7 +69,6 @@ class BulletTrainClient {
 
         if (response.statusCode == 200) {
           var list = response.data
-              // ignore: lines_longer_than_80_chars
               .map<Flag>(
                   (dynamic e) => Flag.fromJson(e as Map<String, dynamic>))
               .toList();
@@ -85,6 +89,7 @@ class BulletTrainClient {
   /// Check if Feature flag exist and is enabled
   ///
   /// @param featureId an identifier for the feature
+  /// @param user an identifier for the user
   /// @return true if feature flag exist and enabled, false otherwise
   Future<bool> hasFeatureFlag(String featureId, {FeatureUser user}) async {
     try {

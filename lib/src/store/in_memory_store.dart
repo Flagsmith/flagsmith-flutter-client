@@ -1,6 +1,7 @@
 import 'package:bullet_train/src/model/flag.dart';
 import 'package:bullet_train/src/store/crud_store.dart';
 
+/// Custom exception
 class RecordNotFound implements Exception {}
 
 class InMemoryStore<T extends Flag> implements CrudStore<T> {

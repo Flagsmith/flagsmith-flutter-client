@@ -1,8 +1,9 @@
 name: bullet_train
-description: Flutter package for Bullet train
+description: >-
+  Flutter Clinet SDK for http://bullet-train.io, Bullet Train is 100% Open Source. Host yourself or let us take care of the hosting.
 version: 0.0.1
-author: Lukas Svoboda <printeastwoodcz@gmail.com>
-homepage: http://github.com/printeastwoodcz
+homepage: https://github.com/printeastwoodcz
+repository: https://github.com/printeastwoodcz
 
 environment:
   sdk: ">=2.7.0 <3.0.0"

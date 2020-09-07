@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 
+/// Default definition of connection to API
 class BulletTrainConfig {
   final String baseURI;
   final String flagsURI;
