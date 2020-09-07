@@ -99,7 +99,9 @@ class BulletTrainClient {
               element.feature.name == featureId && element.enabled == true,
           orElse: null);
       return feature != null;
-    } on DioError catch (e, s) {} on FormatException catch (e) {
+    } on DioError catch (e, _) {
+      print(e);
+    } on FormatException catch (e) {
       print(e);
     }
     return false;
@@ -113,8 +115,10 @@ class BulletTrainClient {
           (element) =>
               element.feature.name == featureId && element.enabled == true,
           orElse: null);
-      return feature?.stateValue.toString();
-    } on DioError catch (e, s) {} on FormatException catch (e) {
+      return feature?.stateValue;
+    } on DioError catch (e, _) {
+      print(e);
+    } on FormatException catch (e) {
       print(e);
     }
     return null;
@@ -124,7 +128,9 @@ class BulletTrainClient {
     try {
       var result = await getUserTraits(user);
       return result.firstWhere((element) => element.key == key);
-    } on DioError catch (e, s) {} on FormatException catch (e) {
+    } on DioError catch (e, _) {
+      print(e);
+    } on FormatException catch (e) {
       print(e);
     }
     return null;
@@ -137,7 +143,9 @@ class BulletTrainClient {
         return result;
       }
       return result.where((element) => keys.contains(element.key)).toList();
-    } on DioError catch (e, s) {} on FormatException catch (e) {
+    } on DioError catch (e, _) {
+      print(e);
+    } on FormatException catch (e) {
       print(e);
     }
     return [];
@@ -156,7 +164,9 @@ class BulletTrainClient {
         return list;
       }
       print(response);
-    } on DioError catch (e, s) {} on FormatException catch (e) {
+    } on DioError catch (e, _) {
+      print(e);
+    } on FormatException catch (e) {
       print(e);
     }
     return [];

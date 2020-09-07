@@ -14,7 +14,7 @@ The client library is available from the [https://pub.dev](https://pub.dev)
 
 ```dart
 dependencies:
-  bullet_train: ^0.0.1
+  bullet_train:
 ```
 
 ## Usage

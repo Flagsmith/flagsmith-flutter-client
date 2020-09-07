@@ -26,7 +26,7 @@ class BtBloc extends Bloc<BtEvent, BtState> {
       var result = await bt.getFeatureFlags();
       yield state.copyWith(state: LoadingState.isComplete, flags: result);
     }, hasFeature: (e) async* {
-      var result = bt.hasFeatureFlag(e.value);
+      // var result = bt.hasFeatureFlag(e.value);
     });
   }
 }
