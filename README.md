@@ -1,5 +1,7 @@
 <img width="100%" src="https://raw.githubusercontent.com/SolidStateGroup/bullet-train-frontend/master/hero.png"/>
 
+[![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/printeastwoodcz/bullet_train_flutter/master?label=tests&labelColor=333940&logo=github)](https://github.com/printeastwoodcz/bullet_train_flutter/actions) [![Codecov branch](https://img.shields.io/codecov/c/github/printeastwoodcz/bullet_train_flutter/master?labelColor=333940&logo=codecov&logoColor=white)](https://codecov.io/gh/printeastwoodcz/bullet_train_flutter) [![Pub Version](https://img.shields.io/pub/v/hive?label=pub.dev&labelColor=333940&logo=dart)](https://pub.dev/packages/bullet_train_flutter) [![GitHub](https://img.shields.io/github/license/printeastwoodcz/bullet_train_flutter?color=%23007A88&labelColor=333940&logo=apache)](https://github.com/printeastwoodcz/bullet_train_flutter/blob/master/LICENSE)
+
 # Bullet Train SDK for Flutter
 
 > Bullet Train allows you to manage feature flags and remote config across multiple projects, environments and organisations.
