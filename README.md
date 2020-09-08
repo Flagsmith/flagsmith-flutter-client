@@ -33,7 +33,7 @@ var bulletClient = BulletTrainClient(apiKey: 'YOUR_ENV_API_KEY')
 To check if feature flag exist and enabled:
 
 ```dart
-bool featureEnabled = bulletClient.hasFeatureFlag("my_test_feature");
+bool featureEnabled = await bulletClient.hasFeatureFlag("my_test_feature");
 if (featureEnabled) {
     // run the code to execute enabled feature
 } else {
@@ -44,7 +44,7 @@ if (featureEnabled) {
 To get configuration value for feature flag:
 
 ```dart
-var myRemoteConfig = bulletClient.getFeatureFlagValue("my_test_feature");
+var myRemoteConfig = await bulletClient.getFeatureFlagValue("my_test_feature");
 if (myRemoteConfig != null) {    
     // run the code to use remote config value
 } else {
@@ -60,7 +60,7 @@ To check if feature exist for given user context:
 
 ```dart
 var user = FeatureUser(identifier: 'bullet_train_sample_user');
-boolean featureEnabled = bulletClient.hasFeatureFlag('my_test_feature', user);
+bool featureEnabled = await bulletClient.hasFeatureFlag('my_test_feature', user: user);
 if (featureEnabled) {
     // run the code to execute enabled feature for given user
 } else {
@@ -71,7 +71,7 @@ if (featureEnabled) {
 To get configuration value for feature flag for given user context:
 
 ```dart
-var myRemoteConfig = bulletClient.getFeatureFlagValue('my_test_feature', user);
+var myRemoteConfig = await bulletClient.getFeatureFlagValue('my_test_feature', user: user);
 if (myRemoteConfig != null) {    
     // run the code to use remote config value
 } else {
@@ -82,7 +82,7 @@ if (myRemoteConfig != null) {
 To get user traits for given user context:
 
 ```dart
-List<Trait> userTraits = bulletClient.getTraits(user)
+var userTraits = await bulletClient.getTraits(user)
 if (userTraits != null && userTraits) {    
     // run the code to use user traits
 } else {
@@ -93,7 +93,7 @@ if (userTraits != null && userTraits) {
 To get user trait for given user context and specific key:
 
 ```dart
-var userTrait = bulletClient.getTrait(user, 'cookies_key');
+var userTrait = await bulletClient.getTrait(user, 'cookies_key');
 if (userTrait != null) {    
     // run the code to use user trait
 } else {
@@ -104,7 +104,7 @@ if (userTrait != null) {
 Or get user traits for given user context and specific keys:
 
 ```dart
- var userTraits = bulletClient.getTraits(user, 'cookies_key', 'other_trait');
+ var userTraits = await bulletClient.getTraits(user, keys: ['cookies_key', 'other_trait']);
 if (userTraits != null) {    
     // run the code to use user traits
 } else {
@@ -115,11 +115,11 @@ if (userTraits != null) {
 To update value for user traits for given user context and specific keys:
 
 ```dart
- var userTrait = bulletClient.getTrait(user, 'cookies_key');
+ var userTrait = await bulletClient.getTrait(user, 'cookies_key');
 if (userTrait != null) {    
     // update value for user trait
-    userTrait.value = "new value";
-    Trait updated = bulletClient.updateTrait(user, userTrait);
+    var updatedTrait = userTrait.copyWith(value: 'new value');
+    Trait updated = await bulletClient.updateTrait(user, updatedTrait);
 } else {
     // run the code without user trait
 }
