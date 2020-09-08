@@ -8,9 +8,7 @@ The SDK for Flutter applications for [https://bullet-train.io/](https://bullet-t
 
 ## Getting Started
 
-## Quick Setup
-
-The client library is available from the [https://pub.dev](https://pub.dev) 
+The client library is available from the [https://pub.dev](https://https://pub.dev/packages/bullet_train):
 
 ```dart
 dependencies:
@@ -18,19 +16,20 @@ dependencies:
 ```
 
 ## Usage
-**Retrieving feature flags for your project**
+
+### Retrieving feature flags for your project
 
 **For full documentation visit [https://docs.bullet-train.io](https://docs.bullet-train.io)**
 
-Sign Up and create account at [https://bullet-train.io/](https://www.bullet-train.io/)
+Sign Up and create an account at [https://bullet-train.io/](https://www.bullet-train.io/)
 
-In your application initialise BulletTrain client with your API key
+In your application, initialise the BulletTrain client with your API key:
 
 ```dart
 var bulletClient = BulletTrainClient(apiKey: 'YOUR_ENV_API_KEY')
 ```
 
-To check if feature flag exist and enabled:
+To check if a feature flag exists and is enabled:
 
 ```dart
 bool featureEnabled = await bulletClient.hasFeatureFlag("my_test_feature");
@@ -41,22 +40,22 @@ if (featureEnabled) {
 }
 ```
 
-To get configuration value for feature flag:
+To get the configuration value for a feature flag:
 
 ```dart
 var myRemoteConfig = await bulletClient.getFeatureFlagValue("my_test_feature");
-if (myRemoteConfig != null) {    
+if (myRemoteConfig != null) {
     // run the code to use remote config value
 } else {
     // run the code without remote config
 }
 ```
 
-**Identifying users**
+### Identifying users
 
 Identifying users allows you to target specific users from the [Bullet Train dashboard](https://www.bullet-train.io/).
 
-To check if feature exist for given user context:
+To check if a feature exists for a given user Identity:
 
 ```dart
 var user = FeatureUser(identifier: 'bullet_train_sample_user');
@@ -68,55 +67,55 @@ if (featureEnabled) {
 }
 ```
 
-To get configuration value for feature flag for given user context:
+To get the configuration value for a feature flag for given a user Identity:
 
 ```dart
 var myRemoteConfig = await bulletClient.getFeatureFlagValue('my_test_feature', user: user);
-if (myRemoteConfig != null) {    
+if (myRemoteConfig != null) {
     // run the code to use remote config value
 } else {
     // run the code without remote config
 }
 ```
 
-To get user traits for given user context:
+To get the user traits for given user Identity:
 
 ```dart
 var userTraits = await bulletClient.getTraits(user)
-if (userTraits != null && userTraits) {    
+if (userTraits != null && userTraits) {
     // run the code to use user traits
 } else {
     // run the code without user traits
 }
 ```
 
-To get user trait for given user context and specific key:
+To get user trait for given user Identity and specific Trait key:
 
 ```dart
 var userTrait = await bulletClient.getTrait(user, 'cookies_key');
-if (userTrait != null) {    
+if (userTrait != null) {
     // run the code to use user trait
 } else {
     // run the code without user trait
 }
 ```
 
-Or get user traits for given user context and specific keys:
+Or get user traits for given user Identity and specific Trait keys:
 
 ```dart
  var userTraits = await bulletClient.getTraits(user, keys: ['cookies_key', 'other_trait']);
-if (userTraits != null) {    
+if (userTraits != null) {
     // run the code to use user traits
 } else {
     // run the code without user traits
 }
 ```
 
-To update value for user traits for given user context and specific keys:
+To update a user trait for given user Identity:
 
 ```dart
  var userTrait = await bulletClient.getTrait(user, 'cookies_key');
-if (userTrait != null) {    
+if (userTrait != null) {
     // update value for user trait
     var updatedTrait = userTrait.copyWith(value: 'new value');
     Trait updated = await bulletClient.updateTrait(user, updatedTrait);
@@ -127,9 +126,8 @@ if (userTrait != null) {
 
 ## Override default configuration
 
-By default, client is using default configuration. You can override configuration as follows:
+By default, the client uses the default configuration. You can override this configuration as follows:
 
-override just API uri with your own one
 ```dart
 var bulletClient = BulletTrainClient(
       config: BulletTrainConfig(
@@ -137,7 +135,8 @@ var bulletClient = BulletTrainClient(
       ), apiKey: 'YOUR_ENV_API_KEY');
 ```
 
-override full configuration with your own
+Override the default configuration with your own:
+
 ```dart
 var bulletClient = BulletTrainClient(
       config: BulletTrainConfig(
@@ -150,10 +149,8 @@ var bulletClient = BulletTrainClient(
 
 ## Getting Help
 
-If you encounter a bug or feature request we would like to hear about it. Before you submit an issue please search existing issues in order to prevent duplicates. 
+If you encounter a bug or feature request we would like to hear about it. Before you submit an issue please search existing issues in order to prevent duplicates.
 
 ## Get in touch
 
-If you have any questions about our projects you can email <a href="mailto:printeastwoodcz@gmail.com">printeastwoodcz@gmail.com</a>.
-
-
+If you have any questions about our projects you can email [printeastwoodcz@gmail.com](mailto:printeastwoodcz@gmail.com).
