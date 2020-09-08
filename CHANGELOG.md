@@ -1,3 +1,6 @@
+## [0.0.2+4] - 08/08/2020
+* Fixing dartfm
+
 ## [0.0.2+3] - 08/08/2020
 * Fixing control_flow_in_finally
 

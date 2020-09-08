@@ -4,7 +4,7 @@ import 'package:bullet_train/src/model/flag.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('flag test', (){
+  test('flag test', () {
     var testValue = '''{
       "id": 2,
       "feature": {

@@ -9,10 +9,9 @@ part 'flag_and_traits.g.dart';
 /// Holds a list of feature flags and user traits.
 @freezed
 abstract class FlagAndTraits with _$FlagAndTraits {
-  const factory FlagAndTraits({
-    @Default(<Flag>[]) List<Flag> flags,
-    @Default(<Trait>[]) List<Trait> traits
-  }) = _FlagAndTraits;
+  const factory FlagAndTraits(
+      {@Default(<Flag>[]) List<Flag> flags,
+      @Default(<Trait>[]) List<Trait> traits}) = _FlagAndTraits;
   factory FlagAndTraits.fromJson(Map<String, dynamic> json) =>
       _$FlagAndTraitsFromJson(json);
 }

@@ -20,6 +20,7 @@ class BulletTrainConfig {
     this.receiveTimeout = 5000,
     this.sendTimeout = 5000,
   });
+
   /// Client options from config
   BaseOptions get clientOptions => BaseOptions(
         baseUrl: baseURI,
