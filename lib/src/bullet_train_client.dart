@@ -47,13 +47,12 @@ class BulletTrainClient {
   /// [user] a user in context
   /// Returns a list of feature flags
   Future<List<Flag>> getFeatureFlags({FeatureUser user}) async {
-    var returnList = <Flag>[];
     try {
       if (user == null) {
         var params = <String, dynamic>{'page': '1'};
         var response = await _api.get<List<dynamic>>(config.flagsURI,
             queryParameters: params);
-
+        var returnList = <Flag>[];
         if (response.statusCode == 200) {
           var list = response.data
               .map<Flag>(
@@ -64,10 +63,11 @@ class BulletTrainClient {
         } else {
           returnList = store.getAll();
         }
+        return returnList;
       } else {
         var response = await _api
             .get<List<dynamic>>('${config.flagsURI}${'/${user.identifier}'}');
-
+        var returnList = <Flag>[];
         if (response.statusCode == 200) {
           var list = response.data
               .map<Flag>(
@@ -78,6 +78,7 @@ class BulletTrainClient {
         } else {
           returnList = store.getAll();
         }
+        return returnList;
       }
     } on DioError catch (e) {
       print(e);
@@ -85,9 +86,8 @@ class BulletTrainClient {
       print(e);
     } on Exception catch (e) {
       print(e);
-    } finally {
-      return returnList;
     }
+    return null;
   }
 
   /// Check if Feature flag exist and is enabled
@@ -117,66 +117,58 @@ class BulletTrainClient {
   /// Returns String value of Feature Flag
   Future<String> getFeatureFlagValue(String featureId,
       {FeatureUser user}) async {
-    String stateValue;
     try {
       var features = await getFeatureFlags(user: user);
       var feature = features.firstWhere(
           (element) =>
               element.feature.name == featureId && element.enabled == true,
           orElse: () => null);
-      stateValue = feature?.stateValue;
+      return feature?.stateValue;
     } on DioError catch (e, _) {
       print(e);
     } on FormatException catch (e) {
       print(e);
     } on Exception catch (e) {
       print(e);
-    } finally {
-      return stateValue;
     }
+    return null;
   }
 
   /// Get user trait for [user] with by [key]
   Future<Trait> getTrait(FeatureUser user, String key) async {
-    Trait value;
     try {
       var result = await _getUserTraits(user);
-      value = result.firstWhere((element) => element.key == key);
+      return result.firstWhere((element) => element.key == key);
     } on DioError catch (e, _) {
       print(e);
     } on FormatException catch (e) {
       print(e);
     } on Exception catch (e) {
       print(e);
-    } finally {
-      return value;
     }
+    return null;
   }
 
   /// Get all [user] traits with [keys]
   Future<List<Trait>> getTraits(FeatureUser user, {List<String> keys}) async {
-    var values = <Trait>[];
     try {
       var result = await _getUserTraits(user);
       if (keys == null || keys.isEmpty) {
-        values = result;
-      } else {
-        values = result.where((element) => keys.contains(element.key)).toList();
+        return result;
       }
+      return result.where((element) => keys.contains(element.key)).toList();
     } on DioError catch (e, _) {
       print(e);
     } on FormatException catch (e) {
       print(e);
     } on Exception catch (e) {
       print(e);
-    } finally {
-      return values;
     }
+    return null;
   }
 
   /// Internal list of [user] traits
   Future<List<Trait>> _getUserTraits(FeatureUser user) async {
-    var values = <Trait>[];
     try {
       var params = {'identifier': user.identifier};
       var response = await _api.get<dynamic>('${config.identitiesURI}',
@@ -185,7 +177,7 @@ class BulletTrainClient {
       if (response.statusCode == 200) {
         var data =
             FlagAndTraits.fromJson(response.data as Map<String, dynamic>);
-        values = data.traits ?? [];
+        return data.traits ?? [];
       }
     } on DioError catch (e, _) {
       print(e.error);
@@ -193,9 +185,8 @@ class BulletTrainClient {
       print(e.message);
     } on Exception catch (e) {
       print(e.toString());
-    } finally {
-      return values;
     }
+    return [];
   }
 
   /// Update trait for [user] with new value [toUpdate]
@@ -205,20 +196,18 @@ class BulletTrainClient {
 
   /// Internal post of user traits
   Future<Trait> _postUserTraits(FeatureUser user, Trait toUpdate) async {
-    Trait value;
     try {
       var trait = toUpdate.copyWith(identity: user);
       var response =
           await _api.post<dynamic>(config.traitsURI, data: trait.toJson());
-      value = Trait.fromJson(response.data as Map<String, dynamic>);
+      return Trait.fromJson(response.data as Map<String, dynamic>);
     } on DioError catch (e) {
       print(e);
     } on FormatException catch (e) {
       print(e);
     } on Exception catch (e) {
       print(e);
-    } finally {
-      return value;
     }
+    return null;
   }
 }
