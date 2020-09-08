@@ -1,5 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+
 import 'feature_user.dart';
+import 'model_utils.dart';
 
 part 'trait.freezed.dart';
 part 'trait.g.dart';
@@ -10,7 +12,9 @@ part 'trait.g.dart';
 abstract class Trait with _$Trait {
   const factory Trait(
       {FeatureUser identity,
-      @JsonKey(name: 'trait_key') String key,
-      @JsonKey(name: 'trait_value') String value}) = _Trait;
+      @JsonKey(name: 'trait_key')
+          String key,
+      @JsonKey(name: 'trait_value', fromJson: stringFromInt)
+          String value}) = _Trait;
   factory Trait.fromJson(Map<String, dynamic> json) => _$TraitFromJson(json);
 }

@@ -1,8 +1,6 @@
 import 'package:bullet_train/src/model/flag.dart';
 import 'package:bullet_train/src/store/crud_store.dart';
-
-/// Custom exception
-class RecordNotFound implements Exception {}
+import 'package:bullet_train/src/store/exceptions.dart';
 
 class InMemoryStore<T extends Flag> implements CrudStore<T> {
   final Map<String, dynamic> _items = <String, dynamic>{};
@@ -42,5 +40,19 @@ class InMemoryStore<T extends Flag> implements CrudStore<T> {
       create(flag);
       return flag;
     }
+  }
+
+  @override
+  List<Flag> getAll() {
+    var result = <Flag>{};
+    _items.forEach((key, dynamic value) {
+      result.add(Flag.fromJson(value as Map<String, dynamic>));
+    });
+    return result.toList();
+  }
+
+  @override
+  void clear() {
+    _items.clear();
   }
 }

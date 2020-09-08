@@ -14,7 +14,7 @@ _$_Trait _$_$_TraitFromJson(Map<String, dynamic> json) {
         ? null
         : FeatureUser.fromJson(json['identity'] as Map<String, dynamic>),
     key: json['trait_key'] as String,
-    value: json['trait_value'] as String,
+    value: stringFromInt(json['trait_value']),
   );
 }
 

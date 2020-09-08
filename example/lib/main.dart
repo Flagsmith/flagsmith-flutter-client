@@ -33,7 +33,8 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: BlocProvider(
-        create: (context) => getIt<BtBloc>()..add(BtEvent.started()),
+        create: (context) =>
+            getIt<BtBloc>()..add(BtEvent.started())..add(BtEvent.getFeatures()),
         child: BtScreen(title: 'Bullet Train Example'),
       ),
     );

@@ -48,7 +48,7 @@ class BtScreen extends StatelessWidget {
                   context.bloc<BtBloc>().add(BtEvent.getFeatures()),
               tooltip: 'Fetch',
               icon: Icon(Icons.add),
-              label: Text('fetch'),
+              label: Text('Fetch'),
             ), // This trailing comma makes auto-formatting nicer for build methods.
           );
         });

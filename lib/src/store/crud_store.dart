@@ -6,4 +6,6 @@ abstract class CrudStore<T extends Flag> {
   Flag read(String id);
   Flag update(Flag flag);
   void delete(String id);
+  List<Flag> getAll();
+  void clear();
 }

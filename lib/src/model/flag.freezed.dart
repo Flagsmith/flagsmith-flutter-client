@@ -17,10 +17,14 @@ class _$FlagTearOff {
 
 // ignore: unused_element
   _Flag call(
-      {@required int id,
-      @required Feature feature,
-      @JsonKey(name: 'feature_state_value') String stateValue,
-      @required bool enabled}) {
+      {@required
+          int id,
+      @required
+          Feature feature,
+      @JsonKey(name: 'feature_state_value', fromJson: stringFromInt)
+          String stateValue,
+      @required
+          bool enabled}) {
     return _Flag(
       id: id,
       feature: feature,
@@ -36,7 +40,7 @@ const $Flag = _$FlagTearOff();
 mixin _$Flag {
   int get id;
   Feature get feature;
-  @JsonKey(name: 'feature_state_value')
+  @JsonKey(name: 'feature_state_value', fromJson: stringFromInt)
   String get stateValue;
   bool get enabled;
 
@@ -50,7 +54,8 @@ abstract class $FlagCopyWith<$Res> {
   $Res call(
       {int id,
       Feature feature,
-      @JsonKey(name: 'feature_state_value') String stateValue,
+      @JsonKey(name: 'feature_state_value', fromJson: stringFromInt)
+          String stateValue,
       bool enabled});
 
   $FeatureCopyWith<$Res> get feature;
@@ -97,7 +102,8 @@ abstract class _$FlagCopyWith<$Res> implements $FlagCopyWith<$Res> {
   $Res call(
       {int id,
       Feature feature,
-      @JsonKey(name: 'feature_state_value') String stateValue,
+      @JsonKey(name: 'feature_state_value', fromJson: stringFromInt)
+          String stateValue,
       bool enabled});
 
   @override
@@ -132,10 +138,14 @@ class __$FlagCopyWithImpl<$Res> extends _$FlagCopyWithImpl<$Res>
 @JsonSerializable()
 class _$_Flag implements _Flag {
   const _$_Flag(
-      {@required this.id,
-      @required this.feature,
-      @JsonKey(name: 'feature_state_value') this.stateValue,
-      @required this.enabled})
+      {@required
+          this.id,
+      @required
+          this.feature,
+      @JsonKey(name: 'feature_state_value', fromJson: stringFromInt)
+          this.stateValue,
+      @required
+          this.enabled})
       : assert(id != null),
         assert(feature != null),
         assert(enabled != null);
@@ -148,7 +158,7 @@ class _$_Flag implements _Flag {
   @override
   final Feature feature;
   @override
-  @JsonKey(name: 'feature_state_value')
+  @JsonKey(name: 'feature_state_value', fromJson: stringFromInt)
   final String stateValue;
   @override
   final bool enabled;
@@ -194,10 +204,14 @@ class _$_Flag implements _Flag {
 
 abstract class _Flag implements Flag {
   const factory _Flag(
-      {@required int id,
-      @required Feature feature,
-      @JsonKey(name: 'feature_state_value') String stateValue,
-      @required bool enabled}) = _$_Flag;
+      {@required
+          int id,
+      @required
+          Feature feature,
+      @JsonKey(name: 'feature_state_value', fromJson: stringFromInt)
+          String stateValue,
+      @required
+          bool enabled}) = _$_Flag;
 
   factory _Flag.fromJson(Map<String, dynamic> json) = _$_Flag.fromJson;
 
@@ -206,7 +220,7 @@ abstract class _Flag implements Flag {
   @override
   Feature get feature;
   @override
-  @JsonKey(name: 'feature_state_value')
+  @JsonKey(name: 'feature_state_value', fromJson: stringFromInt)
   String get stateValue;
   @override
   bool get enabled;

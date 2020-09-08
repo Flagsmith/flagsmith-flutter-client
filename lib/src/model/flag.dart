@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'feature.dart';
+import 'model_utils.dart';
 
 part 'flag.freezed.dart';
 part 'flag.g.dart';
@@ -23,6 +24,7 @@ abstract class Flag with _$Flag {
           Feature feature,
       @JsonKey(
         name: 'feature_state_value',
+        fromJson: stringFromInt,
       )
           String stateValue,
       @required

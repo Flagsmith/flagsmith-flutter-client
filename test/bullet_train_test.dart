@@ -1,41 +1,85 @@
-import 'dart:convert';
-
-import 'package:bullet_train/src/model/flag.dart';
+import 'package:bullet_train/bullet_train.dart';
+import 'package:bullet_train/src/bullet_train_client.dart';
+import 'package:bullet_train/src/model/feature_user.dart';
+import 'package:bullet_train/src/model/flag_type.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  // test('adds one to input values', () {
-  //   final calculator = Calculator();
-  //   expect(calculator.addOne(2), 3);
-  //   expect(calculator.addOne(-7), -6);
-  //   expect(calculator.addOne(0), 1);
-  //   expect(() => calculator.addOne(null), throwsNoSuchMethodError);
-  // });
-  test('flag test', () {
-    var testValue = '''{
-      "id": 2,
-      "feature": {
-        "id": 2,
-        "name": "font_size",
-        "created_date": "2018-06-04T12:51:18.646762Z",
-        "initial_value": "10",
-        "description": "test description",
-        "type": "CONFIG",
-        "project": 2
-      },
-      "feature_state_value": "10",
-      "enabled": true,
-      "environment": 2,
-      "identity": null
-    }
-    ''';
-    var data = jsonDecode(testValue.toString()) as Map<String, dynamic>;
-    var flag = Flag.fromJson(data);
-    expect(flag.stateValue, isNotNull);
-    expect(flag.enabled, true);
-    expect(flag.feature, isNotNull);
-    expect(flag.feature.name, isNotNull);
-    expect(flag.feature.type, isNotNull);
-    expect(flag.feature.description, isNotNull);
+  final apiKey = '74acvNqePTwZZdUtESiV7f';
+  final seeds = [
+    Flag(
+        id: 2020,
+        feature: Feature(
+            id: 3001,
+            name: 'my_feature',
+            createDate: DateTime.now().add(Duration(days: -5)),
+            type: FlagType.flag),
+        enabled: true)
+  ];
+  var bulletTrain = BulletTrainClient(apiKey: apiKey, seeds: seeds);
+  group('integration', () {
+    test('When has Feature then success', () async {
+      var result = await bulletTrain.getFeatureFlags();
+      expect(result, isNotNull);
+      expect(result, isNotEmpty);
+      for (var flag in result) {
+        expect(flag, isNotNull);
+      }
+    });
+
+    test('When get Features then success', () async {
+      var result = await bulletTrain.hasFeatureFlag('enabled_feature');
+      expect(result, true);
+    });
+
+    test('When get Features for user then success', () async {
+      var user = FeatureUser(identifier: 'test_sample_user');
+      var result = await bulletTrain.getFeatureFlags(user: user);
+
+      expect(result, isNotNull);
+      expect(result, isNotEmpty);
+      for (var flag in result) {
+        expect(flag, isNotNull);
+      }
+    });
+
+    test('When get User traits then success', () async {
+      var user = FeatureUser(identifier: 'test_another_user');
+      var result = await bulletTrain.getTraits(user);
+
+      expect(result, isNotNull);
+      expect(result, isNotEmpty);
+      for (var trait in result) {
+        expect(trait, isNotNull);
+      }
+    });
+
+    test('When get User traits for invalid user then return empty', () async {
+      var user = FeatureUser(identifier: 'invalid_users_another_user');
+      var result = await bulletTrain.getTraits(user);
+
+      expect(result, isNotNull);
+      expect(result, isEmpty);
+    });
+
+    test('When get User trait then success', () async {
+      var user = FeatureUser(identifier: 'test_another_user');
+      var result = await bulletTrain.getTraits(user, keys: ['age']);
+
+      expect(result, isNotNull);
+      expect(result, isNotEmpty);
+    });
+
+    test('When get User trait Update then Updated', () async {
+      var user = FeatureUser(identifier: 'test_another_user');
+      var result = await bulletTrain.getTrait(user, 'age');
+      expect(result, isNotNull);
+      expect(result.value, isNotNull);
+
+      var toUpdate = result.copyWith(value: '25');
+      var updateResult = await bulletTrain.updateTrait(user, toUpdate);
+      expect(updateResult, isNotNull);
+      expect(updateResult.value, '25');
+    });
   });
 }

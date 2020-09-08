@@ -19,7 +19,7 @@ class _$TraitTearOff {
   _Trait call(
       {FeatureUser identity,
       @JsonKey(name: 'trait_key') String key,
-      @JsonKey(name: 'trait_value') String value}) {
+      @JsonKey(name: 'trait_value', fromJson: stringFromInt) String value}) {
     return _Trait(
       identity: identity,
       key: key,
@@ -35,7 +35,7 @@ mixin _$Trait {
   FeatureUser get identity;
   @JsonKey(name: 'trait_key')
   String get key;
-  @JsonKey(name: 'trait_value')
+  @JsonKey(name: 'trait_value', fromJson: stringFromInt)
   String get value;
 
   Map<String, dynamic> toJson();
@@ -48,7 +48,7 @@ abstract class $TraitCopyWith<$Res> {
   $Res call(
       {FeatureUser identity,
       @JsonKey(name: 'trait_key') String key,
-      @JsonKey(name: 'trait_value') String value});
+      @JsonKey(name: 'trait_value', fromJson: stringFromInt) String value});
 
   $FeatureUserCopyWith<$Res> get identity;
 }
@@ -91,7 +91,7 @@ abstract class _$TraitCopyWith<$Res> implements $TraitCopyWith<$Res> {
   $Res call(
       {FeatureUser identity,
       @JsonKey(name: 'trait_key') String key,
-      @JsonKey(name: 'trait_value') String value});
+      @JsonKey(name: 'trait_value', fromJson: stringFromInt) String value});
 
   @override
   $FeatureUserCopyWith<$Res> get identity;
@@ -124,7 +124,7 @@ class _$_Trait implements _Trait {
   const _$_Trait(
       {this.identity,
       @JsonKey(name: 'trait_key') this.key,
-      @JsonKey(name: 'trait_value') this.value});
+      @JsonKey(name: 'trait_value', fromJson: stringFromInt) this.value});
 
   factory _$_Trait.fromJson(Map<String, dynamic> json) =>
       _$_$_TraitFromJson(json);
@@ -135,7 +135,7 @@ class _$_Trait implements _Trait {
   @JsonKey(name: 'trait_key')
   final String key;
   @override
-  @JsonKey(name: 'trait_value')
+  @JsonKey(name: 'trait_value', fromJson: stringFromInt)
   final String value;
 
   @override
@@ -176,8 +176,10 @@ class _$_Trait implements _Trait {
 abstract class _Trait implements Trait {
   const factory _Trait(
       {FeatureUser identity,
-      @JsonKey(name: 'trait_key') String key,
-      @JsonKey(name: 'trait_value') String value}) = _$_Trait;
+      @JsonKey(name: 'trait_key')
+          String key,
+      @JsonKey(name: 'trait_value', fromJson: stringFromInt)
+          String value}) = _$_Trait;
 
   factory _Trait.fromJson(Map<String, dynamic> json) = _$_Trait.fromJson;
 
@@ -187,7 +189,7 @@ abstract class _Trait implements Trait {
   @JsonKey(name: 'trait_key')
   String get key;
   @override
-  @JsonKey(name: 'trait_value')
+  @JsonKey(name: 'trait_value', fromJson: stringFromInt)
   String get value;
   @override
   _$TraitCopyWith<_Trait> get copyWith;
