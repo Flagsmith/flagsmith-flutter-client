@@ -1,7 +1,5 @@
-import 'dart:io';
-
 /// Custom exception
-class RecordNotFound implements IOException {}
+class RecordNotFound implements Exception {}
 
 /// Not deleted excetpion
-class RecordNotDeleted implements IOException {}
+class RecordNotDeleted implements Exception {}

@@ -1,6 +1,7 @@
-import 'package:bullet_train/src/model/flag_type.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+
+import 'flag_type.dart';
+
 part 'feature.freezed.dart';
 part 'feature.g.dart';
 
