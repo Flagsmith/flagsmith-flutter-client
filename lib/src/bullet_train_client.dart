@@ -1,15 +1,10 @@
-import 'dart:io';
-
-import 'package:bullet_train/src/bullet_train_config.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
-import 'model/feature_user.dart';
-import 'model/flag.dart';
-import 'model/flag_and_traits.dart';
-import 'model/trait.dart';
+import 'bullet_train_config.dart';
+import 'model/index.dart';
 import 'store/crud_store.dart';
 import 'store/in_memory_store.dart';
 
@@ -88,7 +83,7 @@ class BulletTrainClient {
       print(e);
     } on FormatException catch (e) {
       print(e);
-    } on IOException catch (e) {
+    } on Exception catch (e) {
       print(e);
     } finally {
       return returnList;
@@ -112,7 +107,7 @@ class BulletTrainClient {
       print(e);
     } on FormatException catch (e) {
       print(e);
-    } on IOException catch (e) {
+    } on Exception catch (e) {
       print(e);
     }
     return false;
@@ -134,7 +129,7 @@ class BulletTrainClient {
       print(e);
     } on FormatException catch (e) {
       print(e);
-    } on IOException catch (e) {
+    } on Exception catch (e) {
       print(e);
     } finally {
       return stateValue;
@@ -151,7 +146,7 @@ class BulletTrainClient {
       print(e);
     } on FormatException catch (e) {
       print(e);
-    } on IOException catch (e) {
+    } on Exception catch (e) {
       print(e);
     } finally {
       return value;
@@ -172,7 +167,7 @@ class BulletTrainClient {
       print(e);
     } on FormatException catch (e) {
       print(e);
-    } on IOException catch (e) {
+    } on Exception catch (e) {
       print(e);
     } finally {
       return values;
@@ -196,7 +191,7 @@ class BulletTrainClient {
       print(e.error);
     } on FormatException catch (e) {
       print(e.message);
-    } on IOException catch (e) {
+    } on Exception catch (e) {
       print(e.toString());
     } finally {
       return values;
@@ -220,7 +215,7 @@ class BulletTrainClient {
       print(e);
     } on FormatException catch (e) {
       print(e);
-    } on IOException catch (e) {
+    } on Exception catch (e) {
       print(e);
     } finally {
       return value;
