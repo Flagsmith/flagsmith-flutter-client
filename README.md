@@ -8,7 +8,7 @@ The SDK for Flutter applications for [https://bullet-train.io/](https://bullet-t
 
 ## Getting Started
 
-The client library is available from the [https://pub.dev](https://https://pub.dev/packages/bullet_train):
+The client library is available from the [https://pub.dev](https://pub.dev/packages/bullet_train):
 
 ```dart
 dependencies:
