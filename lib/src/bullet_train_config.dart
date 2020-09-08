@@ -11,6 +11,13 @@ class BulletTrainConfig {
   final int receiveTimeout;
   final int sendTimeout;
 
+  /// Bullet train config initialization
+  /// change only if you have self-hosted bullet train
+  /// [baseURI], [flagsURI], [identitiesURI], [traitsURI]
+  ///
+  /// Connection settings timeouts in milliseconds
+  /// [connectionTimeout], [connectTimeout], [receiveTimeout], [sendTimeout]
+
   const BulletTrainConfig({
     this.baseURI = 'https://api.bullet-train.io/api/v1/',
     this.flagsURI = 'flags/',

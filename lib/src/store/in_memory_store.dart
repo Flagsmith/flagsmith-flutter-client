@@ -2,15 +2,18 @@ import 'package:bullet_train/src/model/flag.dart';
 import 'package:bullet_train/src/store/crud_store.dart';
 import 'package:bullet_train/src/store/exceptions.dart';
 
+/// InMemoryStore for flags
 class InMemoryStore<T extends Flag> implements CrudStore<T> {
   final Map<String, dynamic> _items = <String, dynamic>{};
 
+  /// save [flag] if missing
   @override
   Flag create(Flag flag) {
     _items.putIfAbsent(flag.id.toString(), () => flag.toJson());
     return flag;
   }
 
+  /// delete by [id]
   @override
   void delete(String id) {
     if (_items.containsKey(id)) {
@@ -19,6 +22,8 @@ class InMemoryStore<T extends Flag> implements CrudStore<T> {
     throw RecordNotFound();
   }
 
+  /// read saved by [id]
+  /// Retruns [Flag] or [null]
   @override
   Flag read(String id) {
     if (_items.containsKey(id)) {
@@ -30,6 +35,8 @@ class InMemoryStore<T extends Flag> implements CrudStore<T> {
     return null;
   }
 
+  /// update or create [flag]
+  /// Retruns [Flag]
   @override
   Flag update(Flag flag) {
     var id = flag.id.toString();
@@ -42,6 +49,7 @@ class InMemoryStore<T extends Flag> implements CrudStore<T> {
     }
   }
 
+  /// regturns all saved flags [List<Flag>]
   @override
   List<Flag> getAll() {
     var result = <Flag>{};
@@ -51,6 +59,7 @@ class InMemoryStore<T extends Flag> implements CrudStore<T> {
     return result.toList();
   }
 
+  /// Clear
   @override
   void clear() {
     _items.clear();
