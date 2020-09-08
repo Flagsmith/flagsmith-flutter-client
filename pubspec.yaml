@@ -4,6 +4,7 @@ description: >-
 version: 0.0.2+1
 homepage: https://github.com/printeastwoodcz/bullet_train_flutter
 repository: https://github.com/printeastwoodcz/bullet_train_flutter
+issue_tracker: https://github.com/printeastwoodcz/bullet_train_flutter/issues
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
