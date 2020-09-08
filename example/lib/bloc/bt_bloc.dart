@@ -19,7 +19,7 @@ class BtBloc extends Bloc<BtEvent, BtState> {
     BtEvent event,
   ) async* {
     yield* event.map(started: (_) async* {
-      await bt.postUserTraits(
+      await bt.updateTrait(
           FeatureUser(identifier: 'testUser'), Trait(key: 'age', value: '21'));
     }, getFeatures: (_) async* {
       yield state.copyWith(state: LoadingState.isLoding);
