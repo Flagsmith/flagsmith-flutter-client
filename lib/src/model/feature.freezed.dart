@@ -125,7 +125,7 @@ class __$FeatureCopyWithImpl<$Res> extends _$FeatureCopyWithImpl<$Res>
   }
 }
 
-@JsonSerializable()
+@JsonSerializable(explicitToJson: true)
 class _$_Feature implements _Feature {
   const _$_Feature(
       {@required this.id,

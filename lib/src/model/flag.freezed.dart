@@ -135,9 +135,9 @@ class __$FlagCopyWithImpl<$Res> extends _$FlagCopyWithImpl<$Res>
   }
 }
 
-@JsonSerializable()
+@JsonSerializable(explicitToJson: true)
 class _$_Flag implements _Flag {
-  const _$_Flag(
+  _$_Flag(
       {@required
           this.id,
       @required
@@ -163,9 +163,21 @@ class _$_Flag implements _Flag {
   @override
   final bool enabled;
 
+  bool _didkey = false;
+  String _key;
+
+  @override
+  String get key {
+    if (_didkey == false) {
+      _didkey = true;
+      _key = id.toString();
+    }
+    return _key;
+  }
+
   @override
   String toString() {
-    return 'Flag(id: $id, feature: $feature, stateValue: $stateValue, enabled: $enabled)';
+    return 'Flag(id: $id, feature: $feature, stateValue: $stateValue, enabled: $enabled, key: $key)';
   }
 
   @override
@@ -203,7 +215,7 @@ class _$_Flag implements _Flag {
 }
 
 abstract class _Flag implements Flag {
-  const factory _Flag(
+  factory _Flag(
       {@required
           int id,
       @required

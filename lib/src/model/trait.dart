@@ -7,7 +7,6 @@ part 'trait.freezed.dart';
 part 'trait.g.dart';
 
 /// Representation of the user trait model.
-
 @freezed
 abstract class Trait with _$Trait {
   const factory Trait(

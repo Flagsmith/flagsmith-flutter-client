@@ -119,7 +119,7 @@ class __$TraitCopyWithImpl<$Res> extends _$TraitCopyWithImpl<$Res>
   }
 }
 
-@JsonSerializable()
+@JsonSerializable(explicitToJson: true)
 class _$_Trait implements _Trait {
   const _$_Trait(
       {this.identity,

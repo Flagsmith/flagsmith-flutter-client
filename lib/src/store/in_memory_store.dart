@@ -5,63 +5,73 @@ import 'package:bullet_train/src/store/exceptions.dart';
 /// InMemoryStore for flags
 class InMemoryStore<T extends Flag> implements CrudStore<T> {
   final Map<String, dynamic> _items = <String, dynamic>{};
-
-  /// save [flag] if missing
+  InMemoryStore() {
+    init();
+  }
   @override
-  Flag create(Flag flag) {
-    _items.putIfAbsent(flag.id.toString(), () => flag.toJson());
-    return flag;
+  Future<void> init() async {
+    return null;
   }
 
-  /// delete by [id]
+  /// save [item] if missing
   @override
-  void delete(String id) {
-    if (_items.containsKey(id)) {
-      _items.remove(id);
+  Future<void> create(T item) async {
+    if (!_items.containsKey(item.key)) {
+      _items[item.key] = item.toJson();
+    } else {
+      throw BulletTrainException(BulletTrainExceptionType.notSaved);
     }
-    throw RecordNotFound();
+    return item;
+  }
+
+  /// delete [item]
+  @override
+  Future<void> delete(T item) async {
+    if (_items.containsKey(item.key)) {
+      _items.remove(item.key);
+      return;
+    }
+    throw BulletTrainException(BulletTrainExceptionType.notDeleted);
   }
 
   /// read saved by [id]
   /// Retruns [Flag] or [null]
   @override
-  Flag read(String id) {
+  Future<T> read(String id) async {
     if (_items.containsKey(id)) {
       var flag = _items[id] as Map<String, dynamic>;
       if (flag != null) {
-        return Flag.fromJson(flag);
+        return Flag.fromJson(flag) as T;
       }
     }
-    return null;
+    throw BulletTrainException(BulletTrainExceptionType.notFound);
   }
 
-  /// update or create [flag]
+  /// update or create [item]
   /// Retruns [Flag]
   @override
-  Flag update(Flag flag) {
-    var id = flag.id.toString();
-    if (_items.containsKey(id)) {
-      _items[id] = flag.toJson();
-      return flag;
-    } else {
-      create(flag);
-      return flag;
+  Future<void> update(T item) async {
+    if (_items.containsKey(item.key)) {
+      _items[item.key] = item.toJson();
+      return null;
     }
+    throw BulletTrainException(BulletTrainExceptionType.notSaved);
   }
 
   /// regturns all saved flags [List<Flag>]
   @override
-  List<Flag> getAll() {
-    var result = <Flag>{};
+  Future<List<T>> getAll() async {
+    var result = <T>{};
     _items.forEach((key, dynamic value) {
-      result.add(Flag.fromJson(value as Map<String, dynamic>));
+      print('\nkey: $key value: $value');
+      result.add(Flag.fromJson(value as Map<String, dynamic>) as T);
     });
     return result.toList();
   }
 
   /// Clear
   @override
-  void clear() {
-    _items.clear();
+  Future<void> clear() async {
+    return await _items.clear();
   }
 }

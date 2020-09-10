@@ -9,6 +9,7 @@ part 'feature.g.dart';
 ///
 @freezed
 abstract class Feature with _$Feature {
+  @JsonSerializable(explicitToJson: true)
   const factory Feature(
       {@required int id,
       @required String name,

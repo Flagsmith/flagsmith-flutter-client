@@ -1,8 +1,10 @@
+import 'package:bullet_train/src/store/persistant_store.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
+import '../bullet_train.dart';
 import 'bullet_train_config.dart';
 import 'model/index.dart';
 import 'store/crud_store.dart';
@@ -18,14 +20,24 @@ class BulletTrainClient {
 
   final String apiKey;
   final BulletTrainConfig config;
-  final CrudStore store = InMemoryStore();
+  CrudStore store = InMemoryStore();
 
   BulletTrainClient(
       {this.config = const BulletTrainConfig(),
       @required this.apiKey,
       List<Flag> seeds})
       : assert(apiKey != null, 'Missing Bullet-train.io apiKey') {
-    seeds?.map(store.create);
+    if (config.usePersistantStorage) {
+      store = PersistantStore();
+    }
+    initStore(seeds: seeds);
+  }
+  Future<void> initStore({List<Flag> seeds}) async {
+    await store.init();
+    for (var seed in seeds ?? <Flag>[]) {
+      var saved = store.create(seed);
+      print('seed: $seed -> $saved');
+    }
   }
 
   /// Simple implementation of Http Client
@@ -46,9 +58,12 @@ class BulletTrainClient {
   ///
   /// [user] a user in context
   /// Returns a list of feature flags
-  Future<List<Flag>> getFeatureFlags({FeatureUser user}) async {
+  Future<List<Flag>> getFeatureFlags(
+      {FeatureUser user, bool reload = true}) async {
     try {
       if (user == null) {
+        if (!reload) return store.getAll();
+
         var params = <String, dynamic>{'page': '1'};
         var response = await _api.get<List<dynamic>>(config.flagsURI,
             queryParameters: params);
@@ -61,10 +76,11 @@ class BulletTrainClient {
           list.map(store.create);
           returnList = list;
         } else {
-          returnList = store.getAll();
+          returnList = await store.getAll();
         }
         return returnList;
       } else {
+        if (!reload) return store.getAll();
         var response = await _api
             .get<List<dynamic>>('${config.flagsURI}${'/${user.identifier}'}');
         var returnList = <Flag>[];
@@ -76,18 +92,17 @@ class BulletTrainClient {
           list.map(store.create);
           returnList = list;
         } else {
-          returnList = store.getAll();
+          returnList = await store.getAll();
         }
         return returnList;
       }
-    } on DioError catch (e) {
-      print(e);
-    } on FormatException catch (e) {
-      print(e);
-    } on Exception catch (e) {
-      print(e);
+    } on DioError catch (_) {
+      throw BulletTrainException(BulletTrainExceptionType.connectionSettings);
+    } on FormatException catch (_) {
+      throw BulletTrainException(BulletTrainExceptionType.wrongFlagFormat);
+    } on Exception catch (_) {
+      throw BulletTrainException(BulletTrainExceptionType.genericError);
     }
-    return null;
   }
 
   /// Check if Feature flag exist and is enabled
@@ -97,20 +112,19 @@ class BulletTrainClient {
   /// Returns true if feature flag exist and enabled, false otherwise
   Future<bool> hasFeatureFlag(String featureId, {FeatureUser user}) async {
     try {
-      var features = await getFeatureFlags(user: user);
+      var features = await getFeatureFlags(user: user, reload: false);
       var feature = features.firstWhere(
           (element) =>
               element.feature.name == featureId && element.enabled == true,
           orElse: () => null);
       return feature != null;
-    } on DioError catch (e, _) {
-      print(e);
-    } on FormatException catch (e) {
-      print(e);
-    } on Exception catch (e) {
-      print(e);
+    } on DioError catch (_) {
+      throw BulletTrainException(BulletTrainExceptionType.connectionSettings);
+    } on FormatException catch (_) {
+      throw BulletTrainException(BulletTrainExceptionType.wrongFlagFormat);
+    } on Exception catch (_) {
+      throw BulletTrainException(BulletTrainExceptionType.genericError);
     }
-    return false;
   }
 
   /// Get feature flag value by [featureId] and optionally for a [user]
@@ -118,20 +132,19 @@ class BulletTrainClient {
   Future<String> getFeatureFlagValue(String featureId,
       {FeatureUser user}) async {
     try {
-      var features = await getFeatureFlags(user: user);
+      var features = await getFeatureFlags(user: user, reload: false);
       var feature = features.firstWhere(
           (element) =>
               element.feature.name == featureId && element.enabled == true,
           orElse: () => null);
       return feature?.stateValue;
-    } on DioError catch (e, _) {
-      print(e);
-    } on FormatException catch (e) {
-      print(e);
-    } on Exception catch (e) {
-      print(e);
+    } on DioError catch (_) {
+      throw BulletTrainException(BulletTrainExceptionType.connectionSettings);
+    } on FormatException catch (_) {
+      throw BulletTrainException(BulletTrainExceptionType.wrongFlagFormat);
+    } on Exception catch (_) {
+      throw BulletTrainException(BulletTrainExceptionType.genericError);
     }
-    return null;
   }
 
   /// Get user trait for [user] with by [key]
@@ -139,14 +152,13 @@ class BulletTrainClient {
     try {
       var result = await _getUserTraits(user);
       return result.firstWhere((element) => element.key == key);
-    } on DioError catch (e, _) {
-      print(e);
-    } on FormatException catch (e) {
-      print(e);
-    } on Exception catch (e) {
-      print(e);
+    } on DioError catch (_) {
+      throw BulletTrainException(BulletTrainExceptionType.connectionSettings);
+    } on FormatException catch (_) {
+      throw BulletTrainException(BulletTrainExceptionType.wrongFlagFormat);
+    } on Exception catch (_) {
+      throw BulletTrainException(BulletTrainExceptionType.genericError);
     }
-    return null;
   }
 
   /// Get all [user] traits with [keys]
@@ -157,14 +169,13 @@ class BulletTrainClient {
         return result;
       }
       return result.where((element) => keys.contains(element.key)).toList();
-    } on DioError catch (e, _) {
-      print(e);
-    } on FormatException catch (e) {
-      print(e);
-    } on Exception catch (e) {
-      print(e);
+    } on DioError catch (_) {
+      throw BulletTrainException(BulletTrainExceptionType.connectionSettings);
+    } on FormatException catch (_) {
+      throw BulletTrainException(BulletTrainExceptionType.wrongFlagFormat);
+    } on Exception catch (_) {
+      throw BulletTrainException(BulletTrainExceptionType.genericError);
     }
-    return null;
   }
 
   /// Internal list of [user] traits
@@ -179,14 +190,14 @@ class BulletTrainClient {
             FlagAndTraits.fromJson(response.data as Map<String, dynamic>);
         return data.traits ?? [];
       }
-    } on DioError catch (e, _) {
-      print(e.error);
-    } on FormatException catch (e) {
-      print(e.message);
-    } on Exception catch (e) {
-      print(e.toString());
+      return [];
+    } on DioError catch (_) {
+      throw BulletTrainException(BulletTrainExceptionType.connectionSettings);
+    } on FormatException catch (_) {
+      throw BulletTrainException(BulletTrainExceptionType.wrongFlagFormat);
+    } on Exception catch (_) {
+      throw BulletTrainException(BulletTrainExceptionType.genericError);
     }
-    return [];
   }
 
   /// Update trait for [user] with new value [toUpdate]
@@ -201,13 +212,12 @@ class BulletTrainClient {
       var response =
           await _api.post<dynamic>(config.traitsURI, data: trait.toJson());
       return Trait.fromJson(response.data as Map<String, dynamic>);
-    } on DioError catch (e) {
-      print(e);
-    } on FormatException catch (e) {
-      print(e);
-    } on Exception catch (e) {
-      print(e);
+    } on DioError catch (_) {
+      throw BulletTrainException(BulletTrainExceptionType.connectionSettings);
+    } on FormatException catch (_) {
+      throw BulletTrainException(BulletTrainExceptionType.wrongFlagFormat);
+    } on Exception catch (_) {
+      throw BulletTrainException(BulletTrainExceptionType.genericError);
     }
-    return null;
   }
 }

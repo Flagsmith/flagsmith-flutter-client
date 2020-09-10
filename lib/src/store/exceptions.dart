@@ -1,5 +1,13 @@
-/// Custom exception
-class RecordNotFound implements Exception {}
+enum BulletTrainExceptionType {
+  notSaved,
+  notFound,
+  notDeleted,
+  connectionSettings,
+  wrongFlagFormat,
+  genericError
+}
 
-/// Not deleted excetpion
-class RecordNotDeleted implements Exception {}
+class BulletTrainException implements Exception {
+  BulletTrainExceptionType type;
+  BulletTrainException(this.type);
+}

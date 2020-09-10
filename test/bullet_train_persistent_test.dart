@@ -2,9 +2,11 @@ import 'package:bullet_train/bullet_train.dart';
 import 'package:bullet_train/src/bullet_train_client.dart';
 import 'package:bullet_train/src/model/feature_user.dart';
 import 'package:bullet_train/src/model/flag_type.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   final apiKey = '74acvNqePTwZZdUtESiV7f';
   final seeds = [
     Flag(
@@ -24,8 +26,11 @@ void main() {
             type: FlagType.flag),
         enabled: true)
   ];
-  var bulletTrain = BulletTrainClient(apiKey: apiKey, seeds: seeds);
-  group('integration', () {
+  var bulletTrain = BulletTrainClient(
+      apiKey: apiKey,
+      seeds: seeds,
+      config: BulletTrainConfig(usePersistantStorage: true));
+  group('persitent_integration', () {
     test('When has seeded Features then success', () async {
       var result = await bulletTrain.getFeatureFlags(reload: false);
       expect(result, isNotNull);

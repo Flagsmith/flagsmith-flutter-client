@@ -17,7 +17,8 @@ part 'flag.g.dart';
 
 @freezed
 abstract class Flag with _$Flag {
-  const factory Flag(
+  @JsonSerializable(explicitToJson: true)
+  factory Flag(
       {@required
           int id,
       @required
@@ -31,4 +32,6 @@ abstract class Flag with _$Flag {
           bool enabled}) = _Flag;
 
   factory Flag.fromJson(Map<String, dynamic> json) => _$FlagFromJson(json);
+  @late
+  String get key => id.toString();
 }

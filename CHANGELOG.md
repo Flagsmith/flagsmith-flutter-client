@@ -1,3 +1,9 @@
+## [0.0.2+6] - 08/08/2020
+* Reading from InMemoryStorage
+* Added persistante storage
+* Handling errors with custom Exception
+* fixing freezed issue
+
 ## [0.0.2+5] - 08/08/2020
 * Fixing readme
 
