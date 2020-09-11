@@ -9,8 +9,9 @@ import 'screen.dart';
 final GetIt getIt = GetIt.instance;
 
 void setup() {
-  getIt.registerSingleton<BulletTrainClient>(
-      BulletTrainClient(apiKey: 'EBnVjhp7xvkT5oTLq4q7Ny'));
+  getIt.registerSingleton<BulletTrainClient>(BulletTrainClient(
+      apiKey: 'EBnVjhp7xvkT5oTLq4q7Ny',
+      config: BulletTrainConfig(usePersistantStorage: true)));
 
   getIt.registerFactory(
       () => BtBloc(bt: GetIt.instance.get<BulletTrainClient>()));

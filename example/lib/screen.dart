@@ -24,22 +24,26 @@ class BtScreen extends StatelessWidget {
                       return;
                     },
                     child: ListView.separated(
-                        separatorBuilder: (context, index) => Divider(),
+                        padding: const EdgeInsets.all(8.0),
+                        separatorBuilder: (context, index) => Divider(
+                              height: 1,
+                              indent: 16,
+                            ),
                         itemCount: state.flags.length,
                         itemBuilder: (context, index) {
                           var color = state.flags[index].feature.name == 'color'
                               ? Hexcolor(state.flags[index].stateValue)
                               : Colors.black;
-                          return ListTile(
-                            title: Padding(
-                              padding: const EdgeInsets.only(top: 0, bottom: 8),
-                              child: Text(
-                                '${state.flags[index].feature.name} | ${state.flags[index].stateValue}',
-                                style: TextStyle(color: color),
-                              ),
+
+                          return SwitchListTile(
+                            title: Text(
+                              '${state.flags[index].feature.name} | ${state.flags[index].stateValue}',
+                              style: TextStyle(color: color),
                             ),
                             subtitle: Text(
                                 '${state.flags[index].enabled ? 'ON' : 'OFF'} ${state.flags[index].toString()}'),
+                            value: state.flags[index].enabled,
+                            onChanged: null,
                           );
                         }),
                   ),

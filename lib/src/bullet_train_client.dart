@@ -1,4 +1,3 @@
-import 'package:bullet_train/src/store/persistant_store.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
@@ -9,6 +8,7 @@ import 'bullet_train_config.dart';
 import 'model/index.dart';
 import 'store/crud_store.dart';
 import 'store/in_memory_store.dart';
+import 'store/persistant_store.dart';
 
 /// Bullet train client initialization
 ///

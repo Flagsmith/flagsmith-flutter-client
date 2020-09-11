@@ -2,7 +2,7 @@ import 'package:bullet_train/src/model/flag.dart';
 import 'package:bullet_train/src/store/crud_store.dart';
 import 'package:bullet_train/src/store/exceptions.dart';
 
-/// InMemoryStore for flags
+/// InMemoryStore storage
 class InMemoryStore<T extends Flag> implements CrudStore<T> {
   final Map<String, dynamic> _items = <String, dynamic>{};
   InMemoryStore() {
@@ -48,7 +48,6 @@ class InMemoryStore<T extends Flag> implements CrudStore<T> {
   }
 
   /// update or create [item]
-  /// Retruns [Flag]
   @override
   Future<void> update(T item) async {
     if (_items.containsKey(item.key)) {
