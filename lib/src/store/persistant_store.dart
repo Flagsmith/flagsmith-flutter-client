@@ -17,7 +17,7 @@ class PersistantStore<T extends Flag> implements CrudStore<T> {
   /// save [item] if missing
   @override
   Future<void> create(T item) async {
-    _store.add(_db, item.toJson());
+    await _store.add(_db, item.toJson());
   }
 
   /// delete [item]

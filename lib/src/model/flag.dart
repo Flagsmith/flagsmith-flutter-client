@@ -17,7 +17,8 @@ part 'flag.g.dart';
 
 @freezed
 abstract class Flag with _$Flag {
-  @JsonSerializable(explicitToJson: true)
+  @JsonSerializable(
+      explicitToJson: true, includeIfNull: true, createToJson: true)
   factory Flag(
       {@required
           int id,

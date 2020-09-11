@@ -62,7 +62,6 @@ class InMemoryStore<T extends Flag> implements CrudStore<T> {
   Future<List<T>> getAll() async {
     var result = <T>{};
     _items.forEach((key, dynamic value) {
-      print('\nkey: $key value: $value');
       result.add(Flag.fromJson(value as Map<String, dynamic>) as T);
     });
     return result.toList();

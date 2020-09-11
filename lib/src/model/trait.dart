@@ -9,6 +9,8 @@ part 'trait.g.dart';
 /// Representation of the user trait model.
 @freezed
 abstract class Trait with _$Trait {
+  @JsonSerializable(
+      explicitToJson: true, includeIfNull: true, createToJson: true)
   const factory Trait(
       {FeatureUser identity,
       @JsonKey(name: 'trait_key')

@@ -135,7 +135,7 @@ class __$FlagCopyWithImpl<$Res> extends _$FlagCopyWithImpl<$Res>
   }
 }
 
-@JsonSerializable(explicitToJson: true)
+@JsonSerializable(explicitToJson: true, includeIfNull: true, createToJson: true)
 class _$_Flag implements _Flag {
   _$_Flag(
       {@required

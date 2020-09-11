@@ -95,7 +95,7 @@ class __$FlagAndTraitsCopyWithImpl<$Res>
   }
 }
 
-@JsonSerializable(explicitToJson: true)
+@JsonSerializable(explicitToJson: true, includeIfNull: true, createToJson: true)
 class _$_FlagAndTraits implements _FlagAndTraits {
   const _$_FlagAndTraits(
       {this.flags = const <Flag>[], this.traits = const <Trait>[]})

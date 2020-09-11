@@ -1,3 +1,6 @@
+## [0.0.3+1] - 08/11/2020
+* switch to pedantic
+
 ## [0.0.3] - 08/11/2020
 * Reading from InMemoryStorage
 * Added persistante storage

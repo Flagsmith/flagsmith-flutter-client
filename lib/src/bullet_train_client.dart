@@ -35,8 +35,7 @@ class BulletTrainClient {
   Future<void> initStore({List<Flag> seeds}) async {
     await store.init();
     for (var seed in seeds ?? <Flag>[]) {
-      var saved = store.create(seed);
-      print('seed: $seed -> $saved');
+      await store.create(seed);
     }
   }
 
@@ -62,7 +61,9 @@ class BulletTrainClient {
       {FeatureUser user, bool reload = true}) async {
     try {
       if (user == null) {
-        if (!reload) return store.getAll();
+        if (!reload) {
+          return store.getAll();
+        }
 
         var params = <String, dynamic>{'page': '1'};
         var response = await _api.get<List<dynamic>>(config.flagsURI,
@@ -80,7 +81,9 @@ class BulletTrainClient {
         }
         return returnList;
       } else {
-        if (!reload) return store.getAll();
+        if (!reload) {
+          return store.getAll();
+        }
         var response = await _api
             .get<List<dynamic>>('${config.flagsURI}${'/${user.identifier}'}');
         var returnList = <Flag>[];
