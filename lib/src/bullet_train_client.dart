@@ -31,11 +31,13 @@ class BulletTrainClient {
     }
     initStore(seeds: seeds);
   }
-  Future<void> initStore({List<Flag> seeds}) async {
+  Future<void> initStore({List<Flag> seeds, bool clear = false}) async {
     await store.init();
-    for (var seed in seeds ?? <Flag>[]) {
-      await store.create(seed);
-    }
+    // if (clear) {
+    //   await store.clear();
+    // }
+    await store.seed(seeds);
+    return null;
   }
 
   /// Simple implementation of Http Client
@@ -212,5 +214,8 @@ class BulletTrainClient {
     }
   }
 
-  Future<void> clearStore() async => await store.clear();
+  Future<void> clearStore() async {
+    await store.clear();
+    return null;
+  }
 }

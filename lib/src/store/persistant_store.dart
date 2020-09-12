@@ -18,6 +18,7 @@ class PersistantStore<T extends Flag> implements CrudStore<T> {
     final databasePath = join(appDir.path, 'bullt_train.db');
     _db = await databaseFactoryIo.openDatabase(databasePath);
     _store = stringMapStoreFactory.store('feature_flags');
+    return null;
   }
 
   /// save [item] if missing
@@ -56,12 +57,27 @@ class PersistantStore<T extends Flag> implements CrudStore<T> {
   /// update or create [item]
   @override
   Future<void> update(T item) async {
-    return await _store.record(item.key)?.update(_db, item.toMap());
+    await _store.record(item.key)?.update(_db, item.toMap());
+    return null;
   }
 
   /// Clear
   @override
   Future<void> clear() async {
-    return await _store.delete(_db);
+    var count = await _store.count(_db);
+    if (count > 0) {
+      await _store.delete(_db);
+    }
+
+    return null;
+  }
+
+  @override
+  Future<void> seed(List<T> items) async {
+    await _db.transaction((transaction) async {
+      var list = items.map((e) => e.toMap()).toList();
+      await _store.addAll(transaction, list);
+    });
+    return null;
   }
 }
