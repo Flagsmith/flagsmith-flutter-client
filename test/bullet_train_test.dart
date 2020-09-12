@@ -2,25 +2,27 @@ import 'package:bullet_train/bullet_train.dart';
 import 'package:bullet_train/src/bullet_train_client.dart';
 import 'package:bullet_train/src/model/feature_user.dart';
 import 'package:bullet_train/src/model/flag_type.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   final apiKey = '74acvNqePTwZZdUtESiV7f';
   final seeds = [
-    Flag(
+    Flag.named(
         id: 2020,
-        feature: Feature(
+        feature: Feature.named(
             id: 3001,
             name: 'my_feature',
-            createDate: DateTime.now().add(Duration(days: -5)),
+            createdDate: DateTime.now().toUtc().add(Duration(days: -5)),
             type: FlagType.flag),
         enabled: true),
-    Flag(
+    Flag.named(
         id: 2021,
-        feature: Feature(
+        feature: Feature.named(
             id: 3002,
             name: 'enabled_feature',
-            createDate: DateTime.now().add(Duration(days: -6)),
+            createdDate: DateTime.now().toUtc().add(Duration(days: -6)),
             type: FlagType.flag),
         enabled: true)
   ];

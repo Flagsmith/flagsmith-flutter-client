@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 
-import 'bloc/bt_bloc.dart';
+import 'flag_bloc.dart';
 import 'screen.dart';
 
 final GetIt getIt = GetIt.instance;
@@ -14,10 +14,11 @@ void setup() {
       config: BulletTrainConfig(usePersistantStorage: true)));
 
   getIt.registerFactory(
-      () => BtBloc(bt: GetIt.instance.get<BulletTrainClient>()));
+      () => FlagBloc(bt: GetIt.instance.get<BulletTrainClient>()));
 }
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   setup();
   runApp(MyApp());
 }
@@ -35,7 +36,7 @@ class MyApp extends StatelessWidget {
       ),
       home: BlocProvider(
         create: (context) =>
-            getIt<BtBloc>()..add(BtEvent.started())..add(BtEvent.getFeatures()),
+            getIt<FlagBloc>()..add(FlagEvent.personalize)..add(FlagEvent.fetch),
         child: BtScreen(title: 'Bullet Train Example'),
       ),
     );

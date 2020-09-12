@@ -17,7 +17,7 @@ class InMemoryStore<T extends Flag> implements CrudStore<T> {
   @override
   Future<void> create(T item) async {
     if (!_items.containsKey(item.key)) {
-      _items[item.key] = item.toJson();
+      _items[item.key] = item.toMap();
     } else {
       throw BulletTrainException(BulletTrainExceptionType.notSaved);
     }
@@ -41,7 +41,7 @@ class InMemoryStore<T extends Flag> implements CrudStore<T> {
     if (_items.containsKey(id)) {
       var flag = _items[id] as Map<String, dynamic>;
       if (flag != null) {
-        return Flag.fromJson(flag) as T;
+        return Flag.fromMap(flag) as T;
       }
     }
     throw BulletTrainException(BulletTrainExceptionType.notFound);
@@ -51,7 +51,7 @@ class InMemoryStore<T extends Flag> implements CrudStore<T> {
   @override
   Future<void> update(T item) async {
     if (_items.containsKey(item.key)) {
-      _items[item.key] = item.toJson();
+      _items[item.key] = item.toMap();
       return null;
     }
     throw BulletTrainException(BulletTrainExceptionType.notSaved);
@@ -61,13 +61,15 @@ class InMemoryStore<T extends Flag> implements CrudStore<T> {
   @override
   Future<List<T>> getAll() async {
     var result = <T>{};
+
     _items.forEach((key, dynamic value) {
-      result.add(Flag.fromJson(value as Map<String, dynamic>) as T);
+      var valuex = Flag.fromMap(value as Map<String, dynamic>);
+      result.add(valuex as T);
     });
     return result.toList();
   }
 
-  /// Clear
+  /// Clear items
   @override
   Future<void> clear() async {
     return await _items.clear();

@@ -1,38 +1,95 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
+import 'dart:convert';
+
+import 'package:flutter/cupertino.dart';
+
 import 'feature.dart';
-import 'model_utils.dart';
 
-part 'flag.freezed.dart';
-part 'flag.g.dart';
+@immutable
+class Flag {
+  final int id;
+  final Feature feature;
+  final String stateValue;
+  final bool enabled;
 
-/// Representation of the Feature Flag in the system.
-///
-/// Feature can be either feature flag or remote config.
-///
-/// Feature flag - is a feature that you can turn on and off
-/// e.g. en endpoint for an API or instant messaging for mobile app
-///
-/// Remote config - is a feature you can configure per env and holds value,
-/// eg font size for image.
+  Flag(
+    this.id,
+    this.feature,
+    this.stateValue,
+    this.enabled,
+  );
+  Flag.named({
+    this.id,
+    this.feature,
+    this.stateValue,
+    this.enabled,
+  });
 
-@freezed
-abstract class Flag with _$Flag {
-  @JsonSerializable(
-      explicitToJson: true, includeIfNull: true, createToJson: true)
-  factory Flag(
-      {@required
-          int id,
-      @required
-          Feature feature,
-      @JsonKey(
-        name: 'feature_state_value',
-        fromJson: stringFromInt,
-      )
-          String stateValue,
-      @required
-          bool enabled}) = _Flag;
+  Flag copyWith({
+    int id,
+    Feature feature,
+    String stateValue,
+    bool enabled,
+  }) {
+    return Flag(
+      id ?? this.id,
+      feature ?? this.feature,
+      stateValue ?? this.stateValue,
+      enabled ?? this.enabled,
+    );
+  }
 
-  factory Flag.fromJson(Map<String, dynamic> json) => _$FlagFromJson(json);
-  @late
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
+      'id': id,
+      'feature': feature?.toMap(),
+      'feature_state_value': stateValue,
+      'enabled': enabled,
+    };
+  }
+
+  factory Flag.fromMap(Map<String, dynamic> map) {
+    if (map == null) {
+      return null;
+    }
+
+    return Flag(
+      map['id'] as int,
+      Feature.fromMap(map['feature'] as Map<String, dynamic>),
+      map['feature_state_value'] as String,
+      map['enabled'] as bool,
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory Flag.fromJson(String source) =>
+      Flag.fromMap(json.decode(source) as Map<String, dynamic>);
+
+  @override
+  String toString() {
+    return 'Flag(id: $id, feature: $feature, stateValue: $stateValue, enabled: $enabled)';
+  }
+
+  @override
+  bool operator ==(Object o) {
+    if (identical(this, o)) {
+      return true;
+    }
+
+    return o is Flag &&
+        o.id == id &&
+        o.feature == feature &&
+        o.stateValue == stateValue &&
+        o.enabled == enabled;
+  }
+
+  @override
+  int get hashCode {
+    return id.hashCode ^
+        feature.hashCode ^
+        stateValue.hashCode ^
+        enabled.hashCode;
+  }
+
   String get key => id.toString();
 }

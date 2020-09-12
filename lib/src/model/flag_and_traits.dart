@@ -1,19 +1,68 @@
-import 'package:bullet_train/src/model/trait.dart';
-import 'package:freezed_annotation/freezed_annotation.dart';
+import 'dart:convert';
+import 'package:collection/collection.dart';
+import 'index.dart';
 
-import 'flag.dart';
+class FlagAndTraits {
+  List<Flag> flags;
+  List<Trait> traits;
+  FlagAndTraits({
+    this.flags,
+    this.traits,
+  });
 
-part 'flag_and_traits.freezed.dart';
-part 'flag_and_traits.g.dart';
+  FlagAndTraits copyWith({
+    List<Flag> flags,
+    List<Trait> traits,
+  }) {
+    return FlagAndTraits(
+      flags: flags ?? this.flags,
+      traits: traits ?? this.traits,
+    );
+  }
 
-/// Holds a list of feature flags and user traits.
-@freezed
-abstract class FlagAndTraits with _$FlagAndTraits {
-  @JsonSerializable(
-      explicitToJson: true, includeIfNull: true, createToJson: true)
-  const factory FlagAndTraits(
-      {@Default(<Flag>[]) List<Flag> flags,
-      @Default(<Trait>[]) List<Trait> traits}) = _FlagAndTraits;
-  factory FlagAndTraits.fromJson(Map<String, dynamic> json) =>
-      _$FlagAndTraitsFromJson(json);
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
+      'flags': flags?.map((x) => x?.toMap())?.toList(),
+      'traits': traits?.map((x) => x?.toMap())?.toList(),
+    };
+  }
+
+  factory FlagAndTraits.fromMap(Map<String, dynamic> map) {
+    if (map == null) {
+      return null;
+    }
+
+    return FlagAndTraits(
+      flags: List<Flag>.from(map['flags']
+              ?.map((dynamic x) => Flag.fromMap(x as Map<String, dynamic>))
+          as Iterable<dynamic>),
+      traits: List<Trait>.from(map['traits']
+              ?.map((dynamic x) => Trait.fromMap(x as Map<String, dynamic>))
+          as Iterable<dynamic>),
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory FlagAndTraits.fromJson(String source) =>
+      FlagAndTraits.fromMap(json.decode(source) as Map<String, dynamic>);
+
+  @override
+  String toString() => 'FlagAndTraits(flags: $flags, traits: $traits)';
+
+  @override
+  bool operator ==(Object o) {
+    if (identical(this, o)) {
+      return true;
+    }
+
+    final listEquals = const DeepCollectionEquality().equals;
+
+    return o is FlagAndTraits &&
+        listEquals(o.flags, flags) &&
+        listEquals(o.traits, traits);
+  }
+
+  @override
+  int get hashCode => flags.hashCode ^ traits.hashCode;
 }

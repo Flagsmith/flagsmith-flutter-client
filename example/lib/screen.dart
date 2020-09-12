@@ -2,26 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hexcolor/hexcolor.dart';
 
-import 'bloc/bt_bloc.dart';
+import 'flag_bloc.dart';
 
 class BtScreen extends StatelessWidget {
   final String title;
   BtScreen({Key key, this.title}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<BtBloc, BtState>(
+    return BlocConsumer<FlagBloc, FlagState>(
         listener: (context, state) {},
         builder: (context, state) {
           return Scaffold(
             appBar: AppBar(
               title: Text(title),
+              centerTitle: true,
             ),
-            body: state.state == LoadingState.isLoding
+            body: state.loading == LoadingState.isLoading
                 ? Center(child: CircularProgressIndicator())
                 : RefreshIndicator(
-                    onRefresh: () {
-                      context.bloc<BtBloc>().add(BtEvent.getFeatures());
-                      return;
+                    onRefresh: () async {
+                      context.bloc<FlagBloc>().add(FlagEvent.fetch);
+                      return null;
                     },
                     child: ListView.separated(
                         padding: const EdgeInsets.all(8.0),
@@ -48,8 +49,7 @@ class BtScreen extends StatelessWidget {
                         }),
                   ),
             floatingActionButton: FloatingActionButton.extended(
-              onPressed: () =>
-                  context.bloc<BtBloc>().add(BtEvent.getFeatures()),
+              onPressed: () => context.bloc<FlagBloc>().add(FlagEvent.fetch),
               tooltip: 'Fetch',
               icon: Icon(Icons.add),
               label: Text('Fetch'),

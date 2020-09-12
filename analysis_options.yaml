@@ -7,9 +7,6 @@ analyzer:
   exclude: 
     - "build/**"
     - "lib/generated/**"
-    - "**/*.g.dart"
-    - "**/*.freezed.dart"
-
 linter:
   rules:
     always_put_control_body_on_new_line: true
