@@ -1,4 +1,4 @@
-import 'package:bullet_train/bullet_train.dart';
+import '../../bullet_train.dart';
 
 extension FlagTypeX on FlagType {
   static FlagType fromMap(String value) {

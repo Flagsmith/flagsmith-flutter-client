@@ -1,6 +1,6 @@
-import 'package:bullet_train/src/model/flag.dart';
-import 'package:bullet_train/src/store/crud_store.dart';
-import 'package:bullet_train/src/store/exceptions.dart';
+import '../model/flag.dart';
+import '../store/crud_store.dart';
+import '../store/exceptions.dart';
 
 /// InMemoryStore storage
 class InMemoryStore<T extends Flag> implements CrudStore<T> {
@@ -73,5 +73,13 @@ class InMemoryStore<T extends Flag> implements CrudStore<T> {
   @override
   Future<void> clear() async {
     return await _items.clear();
+  }
+
+  @override
+  Future<void> seed(List<T> items) async {
+    for (var item in items) {
+      await create(item);
+    }
+    return null;
   }
 }

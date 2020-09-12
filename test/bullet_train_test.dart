@@ -1,33 +1,17 @@
 import 'package:bullet_train/bullet_train.dart';
 import 'package:bullet_train/src/bullet_train_client.dart';
 import 'package:bullet_train/src/model/feature_user.dart';
-import 'package:bullet_train/src/model/flag_type.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'shared.dart';
+
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  final apiKey = '74acvNqePTwZZdUtESiV7f';
-  final seeds = [
-    Flag.named(
-        id: 2020,
-        feature: Feature.named(
-            id: 3001,
-            name: 'my_feature',
-            createdDate: DateTime.now().toUtc().add(Duration(days: -5)),
-            type: FlagType.flag),
-        enabled: true),
-    Flag.named(
-        id: 2021,
-        feature: Feature.named(
-            id: 3002,
-            name: 'enabled_feature',
-            createdDate: DateTime.now().toUtc().add(Duration(days: -6)),
-            type: FlagType.flag),
-        enabled: true)
-  ];
+
   var bulletTrain = BulletTrainClient(apiKey: apiKey, seeds: seeds);
-  group('integration', () {
+
+  group('[Bullet Train: InMemory storage]', () {
     test('When has seeded Features then success', () async {
       var result = await bulletTrain.getFeatureFlags(reload: false);
       expect(result, isNotNull);

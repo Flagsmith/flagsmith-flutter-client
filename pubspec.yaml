@@ -15,8 +15,6 @@ dependencies:
     sdk: flutter
   dio: ^3.0.10
   sembast: ^2.4.7+6
-  path_provider: ^1.6.7
-  path: ^1.7.0
   collection: ^1.14.13
   
 dev_dependencies:

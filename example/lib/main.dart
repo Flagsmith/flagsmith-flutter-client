@@ -3,14 +3,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart';
 
 final GetIt getIt = GetIt.instance;
 
 /// Prepare DI for [BulletTrainSampleApp]
-void setup() {
+Future<void> setup() async {
+  final appDir = await getApplicationDocumentsDirectory();
+  await appDir.create(recursive: true);
+  final databasePath = join(appDir.path, 'bullt_train.db');
+
   getIt.registerSingleton<BulletTrainClient>(BulletTrainClient(
       apiKey: 'EBnVjhp7xvkT5oTLq4q7Ny',
-      config: BulletTrainConfig(usePersistantStorage: true)));
+      config: BulletTrainConfig(
+          usePersistantStorage: true, persistantDatabasePath: databasePath)));
 
   getIt.registerFactory(
       () => FlagBloc(bt: GetIt.instance.get<BulletTrainClient>()));

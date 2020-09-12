@@ -27,15 +27,17 @@ class BulletTrainClient {
       List<Flag> seeds})
       : assert(apiKey != null, 'Missing Bullet-train.io apiKey') {
     if (config.usePersistantStorage) {
-      store = PersistantStore();
+      store = PersistantStore(databasePath: config.persistantDatabasePath);
     }
     initStore(seeds: seeds);
   }
-  Future<void> initStore({List<Flag> seeds}) async {
+  Future<void> initStore({List<Flag> seeds, bool clear = false}) async {
     await store.init();
-    for (var seed in seeds ?? <Flag>[]) {
-      await store.create(seed);
-    }
+    // if (clear) {
+    //   await store.clear();
+    // }
+    await store.seed(seeds);
+    return null;
   }
 
   /// Simple implementation of Http Client
@@ -212,5 +214,8 @@ class BulletTrainClient {
     }
   }
 
-  Future<void> clearStore() async => await store.clear();
+  Future<void> clearStore() async {
+    await store.clear();
+    return null;
+  }
 }
