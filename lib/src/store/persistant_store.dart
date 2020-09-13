@@ -41,7 +41,7 @@ class PersistantStore<T extends Flag> implements CrudStore<T> {
   @override
   Future<void> delete(T item) async {
     final finder = Finder(filter: Filter.byKey(item.key));
-    return await _store.delete(await _db, finder: finder);
+    return await _store.delete(_db, finder: finder);
   }
 
   /// regturns all saved flags [List<Flag>]
