@@ -6,7 +6,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'shared.dart';
 
-void main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
   const channel = MethodChannel('plugins.flutter.io/path_provider');
   channel.setMockMethodCallHandler((MethodCall methodCall) async {
