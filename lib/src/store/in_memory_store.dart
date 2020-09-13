@@ -72,7 +72,7 @@ class InMemoryStore<T extends Flag> implements CrudStore<T> {
   /// Clear items
   @override
   Future<void> clear() async {
-    await _items.clear();
+    _items.clear();
     return null;
   }
 
