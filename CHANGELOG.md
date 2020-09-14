@@ -1,3 +1,6 @@
+## [0.0.4+2] - 09/12/2020
+* dependency package
+
 ## [0.0.4+1] - 09/12/2020
 * path as parameter in Persistent storage
 ## [0.0.4+0] - 09/12/2020
