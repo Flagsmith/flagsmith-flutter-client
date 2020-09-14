@@ -85,8 +85,10 @@ class PersistantStore<T extends Flag> implements CrudStore<T> {
   @override
   Future<void> seed(List<T> items) async {
     await _db.transaction((transaction) async {
-      var list = items.map((e) => e.toMap()).toList();
-      await _store.addAll(transaction, list);
+      var list = items?.map((e) => e.toMap())?.toList() ?? [];
+      if (list.isNotEmpty) {
+        await _store.addAll(transaction, list);
+      }
     });
     return null;
   }

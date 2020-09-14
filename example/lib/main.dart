@@ -2,6 +2,7 @@ import 'package:bullet_train/bullet_train.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
@@ -19,13 +20,13 @@ Future<void> setup() async {
       config: BulletTrainConfig(
           usePersistantStorage: true, persistantDatabasePath: databasePath)));
 
-  getIt.registerFactory(
-      () => FlagBloc(bt: GetIt.instance.get<BulletTrainClient>()));
+  getIt.registerFactory(() => FlagBloc(bt: getIt<BulletTrainClient>()));
+  return null;
 }
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  setup();
+  await setup();
   runApp(BulletTrainSampleApp());
 }
 
@@ -35,8 +36,11 @@ class BulletTrainSampleApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Bullet Train Example',
       theme: ThemeData(
+        textTheme: GoogleFonts.varelaRoundTextTheme(
+          Theme.of(context).textTheme,
+        ),
         primaryColor: Color.fromARGB(255, 35, 61, 83),
         accentColor: Color(0xff1c9997),
         visualDensity: VisualDensity.adaptivePlatformDensity,
@@ -62,7 +66,24 @@ class BulletTrainSampleScreen extends StatelessWidget {
         builder: (context, state) {
           return Scaffold(
             appBar: AppBar(
-              title: Text(title),
+              title: state.isEnabled('show_title_logo')
+                  ? Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Image.network(
+                          'https://docs.bullet-train.io/images/logo.png',
+                          width: 32,
+                          height: 32,
+                          fit: BoxFit.contain,
+                        ),
+                        SizedBox(
+                          width: 8,
+                        ),
+                        Text(title)
+                      ],
+                    )
+                  : Text(title),
               centerTitle: true,
             ),
             body: state.loading == LoadingState.isLoading
@@ -73,28 +94,21 @@ class BulletTrainSampleScreen extends StatelessWidget {
                       return null;
                     },
                     child: ListView.separated(
-                        padding: const EdgeInsets.all(8.0),
-                        separatorBuilder: (context, index) => Divider(
-                              height: 1,
-                              indent: 16,
-                            ),
-                        itemCount: state.flags.length,
-                        itemBuilder: (context, index) {
-                          var color = state.flags[index].feature.name == 'color'
-                              ? Hexcolor(state.flags[index].stateValue)
-                              : Colors.black;
-
-                          return SwitchListTile(
-                            title: Text(
-                              '${state.flags[index].feature.name} | ${state.flags[index].stateValue}',
-                              style: TextStyle(color: color),
-                            ),
-                            subtitle: Text(
-                                '${state.flags[index].enabled ? 'ON' : 'OFF'} ${state.flags[index].toString()}'),
-                            value: state.flags[index].enabled,
-                            onChanged: null,
-                          );
-                        }),
+                      padding: const EdgeInsets.all(8.0),
+                      separatorBuilder: (context, index) => Divider(
+                        height: 1,
+                        indent: 16,
+                      ),
+                      itemCount: state.flags.length,
+                      itemBuilder: (context, index) {
+                        var item = state.flags[index];
+                        return SwitchListTile(
+                            title: Text(item.feature.description),
+                            subtitle: Text('name: ${item.feature.name}'),
+                            value: item.enabled,
+                            onChanged: (bool value) {});
+                      },
+                    ),
                   ),
             floatingActionButton: FloatingActionButton.extended(
               onPressed: () => context.bloc<FlagBloc>().add(FlagEvent.fetch),
@@ -106,6 +120,34 @@ class BulletTrainSampleScreen extends StatelessWidget {
             // This trailing comma makes auto-formatting nicer for build methods.
           );
         });
+  }
+}
+
+extension BuildContextX on BuildContext {
+  TextTheme get textTheme => Theme.of(this).textTheme;
+}
+
+class CardTileWidget extends StatelessWidget {
+  final Flag item;
+  const CardTileWidget({Key key, @required this.item})
+      : assert(item != null, 'missing data'),
+        super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    var color =
+        item.feature.name == 'color' ? Hexcolor(item.stateValue) : Colors.black;
+    return Card(
+      elevation: 1,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            item.feature?.name,
+            style: context.textTheme.headline5.copyWith(color: color),
+          )
+        ],
+      ),
+    );
   }
 }
 
@@ -154,6 +196,15 @@ class FlagState {
   /// Initial state
   factory FlagState.initial() =>
       FlagState(loading: LoadingState.isInitial, flags: []);
+
+  bool isEnabled(String flag) =>
+      flags
+          .firstWhere(
+            (element) => element.feature.name == flag,
+            orElse: () => null,
+          )
+          ?.enabled ??
+      false;
 }
 
 /// A simple [Bloc] which manages an `FlagState` as its state.

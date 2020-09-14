@@ -14,6 +14,8 @@ dependencies:
   hexcolor: ^1.0.4
   path_provider: ^1.6.7
   path: ^1.7.0
+  google_fonts: ^1.1.0
+  
   bullet_train:
     path: ../
 
