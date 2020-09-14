@@ -138,12 +138,18 @@ var bulletClient = BulletTrainClient(
 Override the default configuration with your own:
 
 ```dart
+final appDir = await getApplicationDocumentsDirectory();
+await appDir.create(recursive: true);
+final databasePath = join(appDir.path, 'bullt_train.db');
+
 var bulletClient = BulletTrainClient(
       config: BulletTrainConfig(
           baseURI: 'http://yoururl.com/',
           connectTimeout: 200,
           receiveTimeout: 500,
           sendTimeout: 500,
+          usePersitantStorage: true,
+          persistantDatabasePath: databasePath,
       ), apiKey: 'YOUR_ENV_API_KEY');
 ```
 

@@ -1,4 +1,4 @@
-include: package:pedantic/analysis_options.yaml
+include: package:pedantic/analysis_options.1.9.0.yaml
 
 analyzer:
   strong-mode:
@@ -7,9 +7,6 @@ analyzer:
   exclude: 
     - "build/**"
     - "lib/generated/**"
-    - "**/*.g.dart"
-    - "**/*.freezed.dart"
-
 linter:
   rules:
     always_put_control_body_on_new_line: true
@@ -17,7 +14,9 @@ linter:
     flutter_style_todos: true
     nont_constatnt_identifier_names: false
     public_member_api_docs: false
-    prefer_relative_imports: false
+    prefer_relative_imports: true
     prefer_single_quotes: true
     prefer_void_to_null: true
     avoid_equals_and_hash_code_on_mutable_classes: false
+    avoid_relative_lib_imports: true
+    prefer_bool_in_asserts: true

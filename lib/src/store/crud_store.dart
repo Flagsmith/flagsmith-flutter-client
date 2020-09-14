@@ -9,4 +9,5 @@ abstract class CrudStore<T extends Flag> {
   Future<List<T>> getAll();
   Future<void> clear();
   Future<void> init();
+  Future<void> seed(List<T> items);
 }

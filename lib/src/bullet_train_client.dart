@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
-import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
 import '../bullet_train.dart';
 import 'bullet_train_config.dart';
@@ -28,30 +27,23 @@ class BulletTrainClient {
       List<Flag> seeds})
       : assert(apiKey != null, 'Missing Bullet-train.io apiKey') {
     if (config.usePersistantStorage) {
-      store = PersistantStore();
+      store = PersistantStore(databasePath: config.persistantDatabasePath);
     }
     initStore(seeds: seeds);
   }
-  Future<void> initStore({List<Flag> seeds}) async {
+  Future<void> initStore({List<Flag> seeds, bool clear = false}) async {
     await store.init();
-    for (var seed in seeds ?? <Flag>[]) {
-      await store.create(seed);
-    }
+    // if (clear) {
+    //   await store.clear();
+    // }
+    await store.seed(seeds);
+    return null;
   }
 
   /// Simple implementation of Http Client
   Dio get _api => Dio(config.clientOptions)
     ..options.headers[authHeader] = apiKey
-    ..options.headers[acceptHeader] = 'application/json'
-    ..interceptors.add(!kReleaseMode
-        ? PrettyDioLogger(
-            requestHeader: true,
-            requestBody: true,
-            responseBody: true,
-            responseHeader: false,
-            compact: false,
-          )
-        : null);
+    ..options.headers[acceptHeader] = 'application/json';
 
   /// Get a list of existing Features for the given environment and user
   ///
@@ -62,7 +54,7 @@ class BulletTrainClient {
     try {
       if (user == null) {
         if (!reload) {
-          return store.getAll();
+          return await store.getAll();
         }
 
         var params = <String, dynamic>{'page': '1'};
@@ -71,8 +63,7 @@ class BulletTrainClient {
         var returnList = <Flag>[];
         if (response.statusCode == 200) {
           var list = response.data
-              .map<Flag>(
-                  (dynamic e) => Flag.fromJson(e as Map<String, dynamic>))
+              .map<Flag>((dynamic e) => Flag.fromMap(e as Map<String, dynamic>))
               .toList();
           list.map(store.create);
           returnList = list;
@@ -82,15 +73,14 @@ class BulletTrainClient {
         return returnList;
       } else {
         if (!reload) {
-          return store.getAll();
+          return await store.getAll();
         }
         var response = await _api
             .get<List<dynamic>>('${config.flagsURI}${'/${user.identifier}'}');
         var returnList = <Flag>[];
         if (response.statusCode == 200) {
           var list = response.data
-              .map<Flag>(
-                  (dynamic e) => Flag.fromJson(e as Map<String, dynamic>))
+              .map<Flag>((dynamic e) => Flag.fromMap(e as Map<String, dynamic>))
               .toList();
           list.map(store.create);
           returnList = list;
@@ -154,7 +144,8 @@ class BulletTrainClient {
   Future<Trait> getTrait(FeatureUser user, String key) async {
     try {
       var result = await _getUserTraits(user);
-      return result.firstWhere((element) => element.key == key);
+      return result.firstWhere((element) => element.key == key,
+          orElse: () => null);
     } on DioError catch (_) {
       throw BulletTrainException(BulletTrainExceptionType.connectionSettings);
     } on FormatException catch (_) {
@@ -189,8 +180,7 @@ class BulletTrainClient {
           queryParameters: params);
 
       if (response.statusCode == 200) {
-        var data =
-            FlagAndTraits.fromJson(response.data as Map<String, dynamic>);
+        var data = FlagAndTraits.fromMap(response.data as Map<String, dynamic>);
         return data.traits ?? [];
       }
       return [];
@@ -214,7 +204,7 @@ class BulletTrainClient {
       var trait = toUpdate.copyWith(identity: user);
       var response =
           await _api.post<dynamic>(config.traitsURI, data: trait.toJson());
-      return Trait.fromJson(response.data as Map<String, dynamic>);
+      return Trait.fromMap(response.data as Map<String, dynamic>);
     } on DioError catch (_) {
       throw BulletTrainException(BulletTrainExceptionType.connectionSettings);
     } on FormatException catch (_) {
@@ -222,5 +212,10 @@ class BulletTrainClient {
     } on Exception catch (_) {
       throw BulletTrainException(BulletTrainExceptionType.genericError);
     }
+  }
+
+  Future<void> clearStore() async {
+    await store.clear();
+    return null;
   }
 }

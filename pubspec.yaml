@@ -1,7 +1,8 @@
 name: bullet_train
 description: >-
-  Flutter Clinet SDK for http://bullet-train.io, Bullet Train is 100% Open Source. Host yourself or let us take care of the hosting.
-version: 0.0.3+1
+  Flutter Client SDK for http://bullet-train.io, Bullet Train is 100% Open
+  Source. Host yourself or let us take care of the hosting.
+version: 0.0.4+1
 homepage: https://github.com/printeastwoodcz/bullet_train_flutter
 repository: https://github.com/printeastwoodcz/bullet_train_flutter
 issue_tracker: https://github.com/printeastwoodcz/bullet_train_flutter/issues
@@ -14,16 +15,10 @@ dependencies:
   flutter:
     sdk: flutter
   dio: ^3.0.10
-  pretty_dio_logger: ^1.1.1
-  json_annotation: ^3.0.1
-  freezed_annotation: ^0.11.0+1
   sembast: ^2.4.7+6
+  collection: ^1.14.13
   
 dev_dependencies:
   flutter_test:
    sdk: flutter
-  
   pedantic: ^1.9.0
-  build_runner: ^1.10.1
-  json_serializable: ^3.4.1
-  freezed: ^0.11.6

@@ -1,9 +1,8 @@
-import 'dart:convert';
-
 import 'package:bullet_train/src/model/flag.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
   test('flag test', () {
     var testValue = '''{
       "id": 2,
@@ -22,8 +21,8 @@ void main() {
       "identity": null
     }
     ''';
-    var data = jsonDecode(testValue.toString()) as Map<String, dynamic>;
-    var flag = Flag.fromJson(data);
+
+    var flag = Flag.fromJson(testValue);
     expect(flag.stateValue, isNotNull);
     expect(flag.enabled, true);
     expect(flag.feature, isNotNull);

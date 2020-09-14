@@ -12,15 +12,15 @@ dependencies:
   get_it: ^4.0.4
   flutter_bloc: ^6.0.5
   hexcolor: ^1.0.4
-  json_annotation: ^3.0.1
-  freezed_annotation: ^0.11.0+1
+  path_provider: ^1.6.7
+  path: ^1.7.0
+  google_fonts: ^1.1.0
+  
   bullet_train:
     path: ../
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  build_runner: ^1.10.1
-  freezed: ^0.11.6
 flutter:
   uses-material-design: true

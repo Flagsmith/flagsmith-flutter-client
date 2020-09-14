@@ -1,22 +1,96 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
+import 'dart:convert';
 
 import 'flag_type.dart';
+import 'flag_type_x.dart';
 
-part 'feature.freezed.dart';
-part 'feature.g.dart';
+class Feature {
+  final int id;
+  final String name;
+  final DateTime createdDate;
+  final FlagType type;
+  String description;
+  Feature(
+    this.id,
+    this.name,
+    this.createdDate,
+    this.type,
+    this.description,
+  );
+  Feature.named({
+    this.id,
+    this.name,
+    this.createdDate,
+    this.type,
+    this.description,
+  });
 
-/// Representation of the feature model of the feature Flag.
-///
-@freezed
-abstract class Feature with _$Feature {
-  @JsonSerializable(explicitToJson: true)
-  const factory Feature(
-      {@required int id,
-      @required String name,
-      @required @JsonKey(name: 'created_date') DateTime createDate,
-      @required FlagType type,
-      @Default('') String description}) = _Feature;
+  Feature copyWith({
+    int id,
+    String name,
+    DateTime createdDate,
+    FlagType type,
+    String description,
+  }) {
+    return Feature(
+      id ?? this.id,
+      name ?? this.name,
+      createdDate ?? this.createdDate,
+      type ?? this.type,
+      description ?? this.description,
+    );
+  }
 
-  factory Feature.fromJson(Map<String, dynamic> json) =>
-      _$FeatureFromJson(json);
+  Map<String, dynamic> toMap() {
+    return <String, dynamic>{
+      'id': id,
+      'name': name,
+      'created_date': createdDate?.toIso8601String(),
+      'type': type?.toMap(),
+      'description': description,
+    };
+  }
+
+  factory Feature.fromMap(Map<String, dynamic> map) {
+    if (map == null) {
+      return null;
+    }
+
+    return Feature(
+      map['id'] as int,
+      map['name'] as String,
+      map['created_date'] != null
+          ? DateTime.parse(map['created_date'] as String)
+          : null,
+      FlagTypeX.fromMap(map['type'] as String),
+      map['description'] as String,
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory Feature.fromJson(String source) =>
+      Feature.fromMap(json.decode(source) as Map<String, dynamic>);
+
+  @override
+  String toString() {
+    return 'Feature(id: $id, name: $name, type: $type, description: $description)';
+  }
+
+  @override
+  bool operator ==(Object o) {
+    if (identical(this, o)) {
+      return true;
+    }
+
+    return o is Feature &&
+        o.id == id &&
+        o.name == name &&
+        o.type == type &&
+        o.description == description;
+  }
+
+  @override
+  int get hashCode {
+    return id.hashCode ^ name.hashCode ^ type.hashCode ^ description.hashCode;
+  }
 }
