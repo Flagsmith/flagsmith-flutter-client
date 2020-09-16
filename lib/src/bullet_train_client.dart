@@ -33,9 +33,9 @@ class BulletTrainClient {
   }
   Future<void> initStore({List<Flag> seeds, bool clear = false}) async {
     await store.init();
-    // if (clear) {
-    //   await store.clear();
-    // }
+    if (clear) {
+      await store.clear();
+    }
     await store.seed(seeds);
     return null;
   }

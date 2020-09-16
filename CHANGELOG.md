@@ -1,3 +1,6 @@
+## [0.0.4+3] - 09/15/2020
+* added missing initial value field in Feature
+
 ## [0.0.4+2] - 09/12/2020
 * dependency package
 

@@ -3,16 +3,19 @@ import 'dart:convert';
 import 'flag_type.dart';
 import 'flag_type_x.dart';
 
+/// Standard bullet train feature
 class Feature {
   final int id;
   final String name;
   final DateTime createdDate;
+  final String initialValue;
   final FlagType type;
   String description;
   Feature(
     this.id,
     this.name,
     this.createdDate,
+    this.initialValue,
     this.type,
     this.description,
   );
@@ -20,6 +23,7 @@ class Feature {
     this.id,
     this.name,
     this.createdDate,
+    this.initialValue,
     this.type,
     this.description,
   });
@@ -28,6 +32,7 @@ class Feature {
     int id,
     String name,
     DateTime createdDate,
+    String initialValue,
     FlagType type,
     String description,
   }) {
@@ -35,6 +40,7 @@ class Feature {
       id ?? this.id,
       name ?? this.name,
       createdDate ?? this.createdDate,
+      initialValue ?? this.initialValue,
       type ?? this.type,
       description ?? this.description,
     );
@@ -45,6 +51,7 @@ class Feature {
       'id': id,
       'name': name,
       'created_date': createdDate?.toIso8601String(),
+      'initial_value': initialValue,
       'type': type?.toMap(),
       'description': description,
     };
@@ -61,6 +68,7 @@ class Feature {
       map['created_date'] != null
           ? DateTime.parse(map['created_date'] as String)
           : null,
+      map['initial_value']?.toString(),
       FlagTypeX.fromMap(map['type'] as String),
       map['description'] as String,
     );
@@ -73,7 +81,7 @@ class Feature {
 
   @override
   String toString() {
-    return 'Feature(id: $id, name: $name, type: $type, description: $description)';
+    return 'Feature(id: $id, name: $name, type: $type, initialValue: $initialValue, description: $description)';
   }
 
   @override

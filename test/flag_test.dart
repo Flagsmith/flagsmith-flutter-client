@@ -15,7 +15,7 @@ void main() {
         "type": "CONFIG",
         "project": 2
       },
-      "feature_state_value": "10",
+      "feature_state_value": 10,
       "enabled": true,
       "environment": 2,
       "identity": null
