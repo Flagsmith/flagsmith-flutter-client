@@ -12,8 +12,8 @@ class BulletTrainConfig {
   final int receiveTimeout;
   final int sendTimeout;
 
-  final String storePath;
   final StoreType storeType;
+  final String password;
 
   /// Bullet train config initialization
   /// change only if you have self-hosted bullet train
@@ -37,7 +37,7 @@ class BulletTrainConfig {
       this.receiveTimeout = 5000,
       this.sendTimeout = 5000,
       this.storeType = StoreType.inMemory,
-      this.storePath = ''});
+      this.password = 'bullet_trains_sdk_secure'});
 
   /// Client options from config
   BaseOptions get clientOptions => BaseOptions(

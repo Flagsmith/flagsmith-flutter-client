@@ -1,3 +1,4 @@
+import 'store/storage_provider.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
@@ -5,9 +6,8 @@ import 'package:flutter/widgets.dart';
 import '../bullet_train.dart';
 import 'bullet_train_config.dart';
 import 'model/index.dart';
-import 'store/crud_store.dart';
-import 'store/in_memory_store.dart';
-import 'store/persistant_store.dart';
+import 'store/storage/in_memory_store.dart';
+import 'store/storage/persistant_store.dart';
 
 /// Bullet train client initialization
 ///
@@ -19,34 +19,27 @@ class BulletTrainClient {
 
   final String apiKey;
   final BulletTrainConfig config;
-  CrudStore store = InMemoryStore();
+  StorageProvider storage;
 
   BulletTrainClient(
       {this.config = const BulletTrainConfig(),
       @required this.apiKey,
       List<Flag> seeds})
-      : assert(apiKey != null, 'Missing Bullet-train.io apiKey')
-  // ,assert(config.storeType == StoreType.sembast && config.storePath != '',
-  //     'Store type sembast require [storePath]')
-  {
+      : assert(apiKey != null, 'Missing Bullet-train.io apiKey') {
+    switch (config.storeType) {
+      case StoreType.persistant:
+        storage = StorageProvider(PersistantStore(), password: config.password);
+        break;
+      default:
+        storage = StorageProvider(InMemoryStore(), password: config.password);
+    }
     initStore(seeds: seeds);
   }
   Future<void> initStore({List<Flag> seeds, bool clear = false}) async {
-    switch (config.storeType) {
-      case StoreType.sembast:
-        store = PersistantStore(databasePath: config.storePath);
-        break;
-      case StoreType.prefs:
-        store = await SharedPrefsStore.getInstance();
-        break;
-      default:
-        store = InMemoryStore();
-    }
-    await store.init();
     if (clear) {
-      await store.clear();
+      await storage.clear();
     }
-    await store.seed(seeds);
+    await storage.seed(seeds);
     return null;
   }
 
@@ -64,7 +57,7 @@ class BulletTrainClient {
     try {
       if (user == null) {
         if (!reload) {
-          return await store.getAll();
+          return await storage.getAll();
         }
 
         var params = <String, dynamic>{'page': '1'};
@@ -75,15 +68,17 @@ class BulletTrainClient {
           var list = response.data
               .map<Flag>((dynamic e) => Flag.fromMap(e as Map<String, dynamic>))
               .toList();
-          list.map(store.create);
+
+          await storage.saveAll(list);
+
           returnList = list;
         } else {
-          returnList = await store.getAll();
+          returnList = await storage.getAll();
         }
         return returnList;
       } else {
         if (!reload) {
-          return await store.getAll();
+          return await storage.getAll();
         }
         var response = await _api
             .get<List<dynamic>>('${config.flagsURI}${'/${user.identifier}'}');
@@ -92,10 +87,10 @@ class BulletTrainClient {
           var list = response.data
               .map<Flag>((dynamic e) => Flag.fromMap(e as Map<String, dynamic>))
               .toList();
-          list.map(store.create);
+          await storage.saveAll(list);
           returnList = list;
         } else {
-          returnList = await store.getAll();
+          returnList = await storage.getAll();
         }
         return returnList;
       }
@@ -224,8 +219,5 @@ class BulletTrainClient {
     }
   }
 
-  Future<void> clearStore() async {
-    await store.clear();
-    return null;
-  }
+  Future<bool> clearStore() async => storage.clear();
 }

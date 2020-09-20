@@ -18,8 +18,8 @@ dependencies:
   sembast: ^2.4.7+6
   collection: ^1.14.12
   shared_preferences: ^0.5.10
-  crypto: ^2.1.5
-
+  encrypt: ^4.0.3
+  crypto: '>=2.0.6'
 dev_dependencies:
   flutter_test:
     sdk: flutter

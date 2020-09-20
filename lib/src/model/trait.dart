@@ -1,7 +1,10 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
+
 import 'feature_user.dart';
 
+@immutable
 class Trait {
   final int id;
   final FeatureUser identity;

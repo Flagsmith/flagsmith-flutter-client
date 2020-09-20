@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'package:collection/collection.dart';
+import 'package:flutter/material.dart';
 import 'index.dart';
 
+@immutable
 class FlagAndTraits {
-  List<Flag> flags;
-  List<Trait> traits;
+  final List<Flag> flags;
+  final List<Trait> traits;
   FlagAndTraits({
     this.flags,
     this.traits,

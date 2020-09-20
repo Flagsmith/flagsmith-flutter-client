@@ -4,30 +4,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:path/path.dart';
 
 final GetIt getIt = GetIt.instance;
 
 /// Prepare DI for [BulletTrainSampleApp]
-Future<void> setup() async {
-  final appDir = await getApplicationDocumentsDirectory();
-  await appDir.create(recursive: true);
-  final databasePath = join(appDir.path, 'bullt_train.db');
-
-  getIt.registerSingleton<BulletTrainClient>(BulletTrainClient(
-      apiKey: 'EBnVjhp7xvkT5oTLq4q7Ny',
-      config: BulletTrainConfig(
-          storeType: StoreType.sembast, storePath: databasePath)));
-
-  getIt.registerFactory(() => FlagBloc(bt: getIt<BulletTrainClient>()));
-  return null;
-}
 
 void setupPrefs() {
   getIt.registerSingleton<BulletTrainClient>(BulletTrainClient(
       apiKey: 'EBnVjhp7xvkT5oTLq4q7Ny',
-      config: BulletTrainConfig(storeType: StoreType.prefs)));
+      config: BulletTrainConfig(storeType: StoreType.persistant)));
 
   getIt.registerFactory(() => FlagBloc(bt: getIt<BulletTrainClient>()));
   return null;
@@ -35,7 +20,6 @@ void setupPrefs() {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // await setup();
   setupPrefs();
   runApp(BulletTrainSampleApp());
 }
@@ -176,6 +160,7 @@ enum FlagEvent {
 }
 
 /// Simple [FlagState] for [FlagBloc]
+@immutable
 class FlagState {
   // Loading state of bloc
   final LoadingState loading;

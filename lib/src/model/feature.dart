@@ -1,16 +1,19 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
+
 import 'flag_type.dart';
 import 'flag_type_x.dart';
 
 /// Standard bullet train feature
+@immutable
 class Feature {
   final int id;
   final String name;
   final DateTime createdDate;
   final String initialValue;
   final FlagType type;
-  String description;
+  final String description;
   Feature(
     this.id,
     this.name,

@@ -8,10 +8,24 @@ import 'shared.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-
-  var bulletTrain = BulletTrainClient(apiKey: apiKey, seeds: seeds);
+  BulletTrainClient bulletTrain;
+  setUpAll(() {
+    bulletTrain = BulletTrainClient(
+        apiKey: apiKey,
+        seeds: seeds,
+        config: BulletTrainConfig(storeType: StoreType.inMemory));
+  });
 
   group('[Bullet Train: InMemory storage]', () {
+    test('When init remove all items and Save seeds', () async {
+      await bulletTrain.clearStore();
+      var result = await bulletTrain.getFeatureFlags(reload: false);
+      expect(result, isEmpty);
+
+      await bulletTrain.initStore(seeds: seeds, clear: true);
+      var result2 = await bulletTrain.getFeatureFlags(reload: false);
+      expect(result2, isNotEmpty);
+    });
     test('When has seeded Features then success', () async {
       var result = await bulletTrain.getFeatureFlags(reload: false);
       expect(result, isNotNull);

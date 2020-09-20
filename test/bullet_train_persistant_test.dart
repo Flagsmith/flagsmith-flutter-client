@@ -1,31 +1,31 @@
 import 'package:bullet_train/bullet_train.dart';
 import 'package:bullet_train/src/bullet_train_client.dart';
 import 'package:bullet_train/src/model/feature_user.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'shared.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  const channel = MethodChannel('plugins.flutter.io/path_provider');
-  channel.setMockMethodCallHandler((MethodCall methodCall) async {
-    return '.';
+  SharedPreferences.setMockInitialValues(<String, String>{});
+  BulletTrainClient bulletTrain;
+  setUpAll(() {
+    bulletTrain = BulletTrainClient(
+        apiKey: apiKey,
+        seeds: seeds,
+        config: BulletTrainConfig(storeType: StoreType.persistant));
   });
-
-  var bulletTrain = BulletTrainClient(
-      apiKey: apiKey,
-      seeds: seeds,
-      config: BulletTrainConfig(
-        storeType: StoreType.sembast,
-        storePath: 'bullt_train.db',
-      ));
 
   group('[Bullet Train: Persistent storage]', () {
     test('When init remove all items and Save seeds', () async {
-      await bulletTrain.initStore(seeds: seeds, clear: true);
+      await bulletTrain.clearStore();
       var result = await bulletTrain.getFeatureFlags(reload: false);
-      expect(result, isNotNull);
+      expect(result, isEmpty);
+
+      await bulletTrain.initStore(seeds: seeds, clear: true);
+      var result2 = await bulletTrain.getFeatureFlags(reload: false);
+      expect(result2, isNotEmpty);
     });
     test('When has seeded Features then success', () async {
       var result = await bulletTrain.getFeatureFlags(reload: false);

@@ -1,8 +1,11 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
+
 /// Personalized user
+@immutable
 class FeatureUser {
-  String identifier;
+  final String identifier;
   FeatureUser({
     this.identifier,
   });
