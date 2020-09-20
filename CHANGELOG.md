@@ -1,3 +1,5 @@
+## [0.0.4+3] - 09/15/2020
+* added missing initial value field in Feature
 ## [0.1.0] - 09/20/2020
 * adding new type of persistant storage
 * changing config attributes for storage

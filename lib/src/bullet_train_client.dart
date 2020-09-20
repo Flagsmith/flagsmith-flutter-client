@@ -43,9 +43,9 @@ class BulletTrainClient {
         store = InMemoryStore();
     }
     await store.init();
-    // if (clear) {
-    //   await store.clear();
-    // }
+    if (clear) {
+      await store.clear();
+    }
     await store.seed(seeds);
     return null;
   }
