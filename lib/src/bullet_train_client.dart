@@ -25,13 +25,23 @@ class BulletTrainClient {
       {this.config = const BulletTrainConfig(),
       @required this.apiKey,
       List<Flag> seeds})
-      : assert(apiKey != null, 'Missing Bullet-train.io apiKey') {
-    if (config.usePersistantStorage) {
-      store = PersistantStore(databasePath: config.persistantDatabasePath);
-    }
+      : assert(apiKey != null, 'Missing Bullet-train.io apiKey')
+  // ,assert(config.storeType == StoreType.sembast && config.storePath != '',
+  //     'Store type sembast require [storePath]')
+  {
     initStore(seeds: seeds);
   }
   Future<void> initStore({List<Flag> seeds, bool clear = false}) async {
+    switch (config.storeType) {
+      case StoreType.sembast:
+        store = PersistantStore(databasePath: config.storePath);
+        break;
+      case StoreType.prefs:
+        store = await SharedPrefsStore.getInstance();
+        break;
+      default:
+        store = InMemoryStore();
+    }
     await store.init();
     // if (clear) {
     //   await store.clear();

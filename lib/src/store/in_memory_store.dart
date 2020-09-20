@@ -78,8 +78,10 @@ class InMemoryStore<T extends Flag> implements CrudStore<T> {
 
   @override
   Future<void> seed(List<T> items) async {
-    for (var item in items) {
-      await create(item);
+    if (items != null) {
+      for (var item in items) {
+        await create(item);
+      }
     }
     return null;
   }

@@ -18,7 +18,16 @@ Future<void> setup() async {
   getIt.registerSingleton<BulletTrainClient>(BulletTrainClient(
       apiKey: 'EBnVjhp7xvkT5oTLq4q7Ny',
       config: BulletTrainConfig(
-          usePersistantStorage: true, persistantDatabasePath: databasePath)));
+          storeType: StoreType.sembast, storePath: databasePath)));
+
+  getIt.registerFactory(() => FlagBloc(bt: getIt<BulletTrainClient>()));
+  return null;
+}
+
+void setupPrefs() {
+  getIt.registerSingleton<BulletTrainClient>(BulletTrainClient(
+      apiKey: 'EBnVjhp7xvkT5oTLq4q7Ny',
+      config: BulletTrainConfig(storeType: StoreType.prefs)));
 
   getIt.registerFactory(() => FlagBloc(bt: getIt<BulletTrainClient>()));
   return null;
@@ -26,7 +35,8 @@ Future<void> setup() async {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await setup();
+  // await setup();
+  setupPrefs();
   runApp(BulletTrainSampleApp());
 }
 

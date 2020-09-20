@@ -55,7 +55,7 @@ class Flag {
     return Flag(
       map['id'] as int,
       Feature.fromMap(map['feature'] as Map<String, dynamic>),
-      map['feature_state_value'] as String,
+      (map['feature_state_value']).toString(),
       map['enabled'] as bool,
     );
   }

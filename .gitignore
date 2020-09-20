@@ -30,6 +30,7 @@
 .pub-cache/
 .pub/
 build/
+test/.test_coverage.dart
 
 
 # Android related

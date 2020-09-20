@@ -1,3 +1,7 @@
+## [0.1.0] - 09/20/2020
+* adding new type of persistant storage
+* changing config attributes for storage
+
 ## [0.0.4+2] - 09/12/2020
 * dependency package
 

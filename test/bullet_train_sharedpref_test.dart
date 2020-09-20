@@ -4,23 +4,26 @@ import 'package:bullet_train/src/model/feature_user.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'shared.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  const channel = MethodChannel('plugins.flutter.io/path_provider');
-  channel.setMockMethodCallHandler((MethodCall methodCall) async {
-    return '.';
-  });
-
+  SharedPreferences.setMockInitialValues(<String, String>{});
   var bulletTrain = BulletTrainClient(
       apiKey: apiKey,
       seeds: seeds,
       config: BulletTrainConfig(
-        storeType: StoreType.sembast,
-        storePath: 'bullt_train.db',
+        storeType: StoreType.prefs,
       ));
-
+  setUp(() {
+    bulletTrain = BulletTrainClient(
+        apiKey: apiKey,
+        seeds: seeds,
+        config: BulletTrainConfig(
+          storeType: StoreType.prefs,
+        ));
+  });
   group('[Bullet Train: Persistent storage]', () {
     test('When init remove all items and Save seeds', () async {
       await bulletTrain.initStore(seeds: seeds, clear: true);

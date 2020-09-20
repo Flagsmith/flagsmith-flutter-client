@@ -17,6 +17,6 @@ linter:
     prefer_relative_imports: true
     prefer_single_quotes: true
     prefer_void_to_null: true
-    avoid_equals_and_hash_code_on_mutable_classes: false
+    avoid_equals_and_hash_code_on_mutable_classes: true
     avoid_relative_lib_imports: true
     prefer_bool_in_asserts: true
