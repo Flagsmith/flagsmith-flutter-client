@@ -52,7 +52,7 @@ class PersistantStore extends CrudStore with ExtendCrudStore {
   Future<List<String>> getAll() async {
     await init();
     var items = <String>[];
-    var keys = await _prefs.getKeys();
+    var keys = _prefs.getKeys();
     for (var key in keys) {
       var item = await read(key);
       items.add(item);
