@@ -1,3 +1,5 @@
+## [0.1.1] - 09/21/2020
+* minor fixes
 ## [0.1.0] - 09/21/2020
 * securing sotrages
 * change persistant storage

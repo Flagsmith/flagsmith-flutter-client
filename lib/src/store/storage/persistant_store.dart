@@ -34,7 +34,7 @@ class PersistantStore extends CrudStore with ExtendCrudStore {
   Future<String> read(String key) async {
     await init();
     if (await containsKey(key)) {
-      return await _prefs.getString(key);
+      return _prefs.getString(key);
     }
     return null;
   }

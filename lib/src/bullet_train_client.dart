@@ -220,6 +220,4 @@ class BulletTrainClient {
   }
 
   Future<bool> clearStore() async => storage.clear();
-
-  Stream<Flag> listen(String key) {}
 }
