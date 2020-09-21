@@ -19,7 +19,7 @@ dependencies:
   collection: ^1.14.12
   shared_preferences: ^0.5.10
   encrypt: ^4.0.3
-  crypto: '>=2.0.6'
+  crypto: ^2.0.6
   rxdart: ^0.24.1
 dev_dependencies:
   flutter_test:
