@@ -1,8 +1,11 @@
+## [0.1.0] - 09/21/2020
+* securing sotrages
+* change persistant storage
+* changing config attributes for storage
+* minor fixes
+
 ## [0.0.4+3] - 09/15/2020
 * added missing initial value field in Feature
-## [0.1.0] - 09/20/2020
-* adding new type of persistant storage
-* changing config attributes for storage
 
 ## [0.0.4+2] - 09/12/2020
 * dependency package

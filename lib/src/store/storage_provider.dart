@@ -1,8 +1,8 @@
-import 'package:flutter/foundation.dart';
+import 'dart:async';
 import '../../bullet_train.dart';
 import 'tools/security.dart';
 
-class StorageProvider extends CrudStore with SecureStore {
+class StorageProvider with SecureStore {
   StorageSecurity _storageSecurity;
   final ExtendCrudStore _store;
   StorageProvider(this._store, {String password}) {
@@ -14,7 +14,6 @@ class StorageProvider extends CrudStore with SecureStore {
   Future<String> getSecuredValue(String key) async {
     var item = await _store.read(key);
     var decrypted = _storageSecurity.decrypt(item);
-    debugPrint('_getString: $key : stored: $item  decrypted: [$decrypted]');
     return decrypted;
   }
 
@@ -22,28 +21,31 @@ class StorageProvider extends CrudStore with SecureStore {
   Future<bool> setSecuredValue(String key, String value,
       {bool update = false}) async {
     var encrypted = _storageSecurity.encrypt(value);
-    debugPrint(
-        ' ${update ? '_updateString' : '_setString'}: $key : store: $value encrypted: [$encrypted]');
     if (update) {
       return await _store.update(key, encrypted);
     }
     return await _store.create(key, encrypted);
   }
 
-  @override
-  Future<bool> create(String key, String item) => setSecuredValue(key, item);
+  Future<bool> create(String key, Flag item) async {
+    var result = setSecuredValue(key, item.toJson());
+    return result;
+  }
 
-  @override
   Future<bool> delete(String key) => _store.delete(key);
 
-  @override
-  Future<String> read(String key) => getSecuredValue(key);
+  Future<Flag> read(String key) async {
+    var decrypted = await getSecuredValue(key);
+    return Flag.fromJson(decrypted);
+  }
 
-  @override
-  Future<bool> update(String key, String item) =>
-      setSecuredValue(key, item, update: true);
+  Future<bool> update(String key, Flag item) =>
+      setSecuredValue(key, item.toJson(), update: true);
 
-  Future<bool> clear() => _store.clear();
+  Future<bool> clear() async {
+    await _store.clear();
+    return true;
+  }
 
   Future<List<Flag>> getAll() async {
     var list = await _store.getAll();
@@ -55,7 +57,7 @@ class StorageProvider extends CrudStore with SecureStore {
 
   Future<bool> saveAll(List<Flag> items) async {
     for (var item in items) {
-      await create(item.key, item.toJson());
+      await create(item.key, item);
     }
     return true;
   }
