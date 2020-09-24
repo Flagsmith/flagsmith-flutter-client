@@ -74,7 +74,7 @@ class BulletTrainClient {
       {FeatureUser user, bool reload = true}) async {
     if (!reload) {
       var result = await storage.getAll();
-      result.sort((a, b) => a.feature.name.compareTo(b.feature.name));
+      result?.sort((a, b) => a.feature.name.compareTo(b.feature.name));
       return result;
     }
     return user == null ? await _getFlags() : await _getUserFlags(user);
@@ -156,8 +156,7 @@ class BulletTrainClient {
       if (keys == null) {
         return result;
       }
-      var filtered =
-          result.where((element) => keys.contains(element.key)).toList();
+
       return result.where((element) => keys.contains(element.key)).toList();
     } on DioError catch (e) {
       log('getTraits dioError: ${e?.error}');

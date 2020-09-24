@@ -1,11 +1,12 @@
 import 'dart:async';
+import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../../bullet_train.dart';
 import 'tools/security.dart';
 
 class StorageProvider with SecureStore {
-  final Map<String, BehaviorSubject<Flag>> _streams = {};
+  Map<String, BehaviorSubject<Flag>> _streams = {};
   StorageSecurity _storageSecurity;
   final ExtendCrudStore _store;
 
@@ -40,6 +41,7 @@ class StorageProvider with SecureStore {
 
   Future<bool> delete(String key) {
     _destroySubject(key);
+    _streams?.remove(key);
     return _store.delete(key);
   }
 
@@ -112,15 +114,19 @@ class StorageProvider with SecureStore {
   }
 
   void _destroySubject(String featureName) {
-    _streams[featureName]?.close();
-    _streams[featureName] = null;
-    _streams.remove(featureName);
+    try {
+      _streams[featureName]?.close();
+      _streams[featureName] = null;
+    } catch (e) {
+      debugPrint(e.toString());
+    }
   }
 
   void _clearSubjects() {
-    _streams.forEach((key, value) {
-      _destroySubject(key);
-    });
+    for (var item in _streams.entries) {
+      _destroySubject(item.key);
+    }
+    _streams = {};
   }
 
   Future<bool> togggleFeature(String featureName) async {

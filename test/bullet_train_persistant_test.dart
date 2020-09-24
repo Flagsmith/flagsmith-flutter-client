@@ -14,8 +14,7 @@ void main() {
     bulletTrain = BulletTrainClient(
         apiKey: apiKey,
         seeds: seeds,
-        config:
-            BulletTrainConfig(storeType: StoreType.persistant, isDebug: false));
+        config: BulletTrainConfig(storeType: StoreType.persistant));
   });
 
   group('[Bullet Train: Persistent storage]', () {
