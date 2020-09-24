@@ -1,12 +1,14 @@
 import 'dart:convert';
-import 'package:collection/collection.dart';
-import 'package:flutter/material.dart';
+import 'package:equatable/equatable.dart';
 import 'index.dart';
 
-@immutable
-class FlagAndTraits {
+class FlagAndTraits extends Equatable {
   final List<Flag> flags;
   final List<Trait> traits;
+  @override
+  List<Object> get props => [flags, traits];
+  @override
+  bool get stringify => true;
   FlagAndTraits({
     this.flags,
     this.traits,
@@ -48,23 +50,4 @@ class FlagAndTraits {
 
   factory FlagAndTraits.fromJson(String source) =>
       FlagAndTraits.fromMap(json.decode(source) as Map<String, dynamic>);
-
-  @override
-  String toString() => 'FlagAndTraits(flags: $flags, traits: $traits)';
-
-  @override
-  bool operator ==(Object o) {
-    if (identical(this, o)) {
-      return true;
-    }
-
-    final listEquals = const DeepCollectionEquality().equals;
-
-    return o is FlagAndTraits &&
-        listEquals(o.flags, flags) &&
-        listEquals(o.traits, traits);
-  }
-
-  @override
-  int get hashCode => flags.hashCode ^ traits.hashCode;
 }

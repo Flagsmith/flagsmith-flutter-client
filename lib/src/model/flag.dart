@@ -1,16 +1,18 @@
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
-
+import 'package:equatable/equatable.dart';
+import '../extensions/string_x.dart';
 import 'feature.dart';
 
-@immutable
-class Flag {
+class Flag extends Equatable {
   final int id;
   final Feature feature;
   final String stateValue;
   final bool enabled;
-
+  @override
+  List<Object> get props => [id, feature, stateValue, enabled];
+  @override
+  bool get stringify => true;
   Flag(
     this.id,
     this.feature,
@@ -55,7 +57,7 @@ class Flag {
     return Flag(
       map['id'] as int,
       Feature.fromMap(map['feature'] as Map<String, dynamic>),
-      map['feature_state_value']?.toString(),
+      map['feature_state_value']?.toString()?.normalize(),
       map['enabled'] as bool,
     );
   }
@@ -65,31 +67,5 @@ class Flag {
   factory Flag.fromJson(String source) =>
       Flag.fromMap(json.decode(source) as Map<String, dynamic>);
 
-  @override
-  String toString() {
-    return 'Flag(id: $id, feature: $feature, stateValue: $stateValue, enabled: $enabled)';
-  }
-
-  @override
-  bool operator ==(Object o) {
-    if (identical(this, o)) {
-      return true;
-    }
-
-    return o is Flag &&
-        o.id == id &&
-        o.feature == feature &&
-        o.stateValue == stateValue &&
-        o.enabled == enabled;
-  }
-
-  @override
-  int get hashCode {
-    return id.hashCode ^
-        feature.hashCode ^
-        stateValue.hashCode ^
-        enabled.hashCode;
-  }
-
-  String get key => id.toString();
+  String get key => feature.name ?? id.toString();
 }

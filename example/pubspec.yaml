@@ -11,9 +11,10 @@ dependencies:
     sdk: flutter
   get_it: ^4.0.4
   flutter_bloc: ^6.0.5
+  rxdart: '>=0.23.1 <0.24.2'
   hexcolor: ^1.0.4
   google_fonts: ^1.1.0
-  
+  equatable: ^1.2.5
   bullet_train:
     path: ../
 

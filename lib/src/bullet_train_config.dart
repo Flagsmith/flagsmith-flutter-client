@@ -15,6 +15,8 @@ class BulletTrainConfig {
   final StoreType storeType;
   final String password;
 
+  final bool isDebug;
+
   /// Bullet train config initialization
   /// change only if you have self-hosted bullet train
   /// [baseURI], [flagsURI], [identitiesURI], [traitsURI]
@@ -27,6 +29,8 @@ class BulletTrainConfig {
   /// default type of storage used by [BulletTrainClient] is [StoreType.inMemory].
   /// you can choose on of [StoreType.inMemory], [StoreType.prefs] and [StoreType.sembast].
   /// for [StoreType.sembast] must by defined [storePath] where should be db file stored.
+  ///
+  /// if you want to see logs change [isDebug] to *true*
 
   const BulletTrainConfig(
       {this.baseURI = 'https://api.bullet-train.io/api/v1/',
@@ -37,7 +41,8 @@ class BulletTrainConfig {
       this.receiveTimeout = 5000,
       this.sendTimeout = 5000,
       this.storeType = StoreType.inMemory,
-      this.password = 'bullet_trains_sdk_secure'});
+      this.password = 'bullet_trains_sdk_secure',
+      this.isDebug = false});
 
   /// Client options from config
   BaseOptions get clientOptions => BaseOptions(

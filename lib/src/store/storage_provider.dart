@@ -1,13 +1,18 @@
 import 'dart:async';
+import 'package:rxdart/rxdart.dart';
+
 import '../../bullet_train.dart';
 import 'tools/security.dart';
 
 class StorageProvider with SecureStore {
+  final Map<String, BehaviorSubject<Flag>> _streams = {};
   StorageSecurity _storageSecurity;
   final ExtendCrudStore _store;
+
   StorageProvider(this._store, {String password}) {
     _storageSecurity = StorageSecurity(password);
     _store.init();
+    _initSubjects();
   }
 
   @override
@@ -28,21 +33,29 @@ class StorageProvider with SecureStore {
   }
 
   Future<bool> create(String key, Flag item) async {
-    var result = setSecuredValue(key, item.toJson());
-    return result;
+    var response = await setSecuredValue(key, item.toJson());
+    _createSubject(await read(key));
+    return response;
   }
 
-  Future<bool> delete(String key) => _store.delete(key);
+  Future<bool> delete(String key) {
+    _destroySubject(key);
+    return _store.delete(key);
+  }
 
   Future<Flag> read(String key) async {
     var decrypted = await getSecuredValue(key);
     return Flag.fromJson(decrypted);
   }
 
-  Future<bool> update(String key, Flag item) =>
-      setSecuredValue(key, item.toJson(), update: true);
+  Future<bool> update(String key, Flag item) async {
+    var result = await setSecuredValue(key, item.toJson(), update: true);
+    _updateSubject(await read(key));
+    return result;
+  }
 
   Future<bool> clear() async {
+    _clearSubjects();
     await _store.clear();
     return true;
   }
@@ -66,6 +79,55 @@ class StorageProvider with SecureStore {
     var list = items
         ?.map((e) => MapEntry(e.key, _storageSecurity.encrypt(e.toJson())))
         ?.toList();
-    return await _store.seed(list);
+    var result = await _store.seed(list);
+    if (result && items != null) {
+      for (var item in items) {
+        _createSubject(item);
+      }
+    }
+    return result;
+  }
+
+  Stream<Flag> stream(String featureName) => _streams[featureName]?.stream;
+
+  BehaviorSubject<Flag> subject(String featureName) => _streams[featureName];
+
+  Future<void> _initSubjects() async {
+    var result = await getAll();
+    for (var flag in result) {
+      _createSubject(flag);
+    }
+  }
+
+  void _createSubject(Flag item) {
+    if (_streams[item.key] == null) {
+      _streams[item.key] = BehaviorSubject<Flag>.seeded(item);
+      log('_createSubject ${item.key} -> ${_streams[item.key]?.value}');
+    }
+  }
+
+  void _updateSubject(Flag item) {
+    _streams[item.key]?.add(item);
+    log('_updateSubject ${item.key} -> ${_streams[item.key]?.value?.enabled} f: ${item.enabled}');
+  }
+
+  void _destroySubject(String featureName) {
+    _streams[featureName]?.close();
+    _streams[featureName] = null;
+    _streams.remove(featureName);
+  }
+
+  void _clearSubjects() {
+    _streams.forEach((key, value) {
+      _destroySubject(key);
+    });
+  }
+
+  Future<bool> togggleFeature(String featureName) async {
+    var value = await read(featureName);
+    var current = value.enabled;
+    var updated = value.copyWith(enabled: !current);
+
+    return await update(featureName, updated);
   }
 }

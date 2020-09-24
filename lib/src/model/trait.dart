@@ -1,15 +1,18 @@
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
-
+import 'package:equatable/equatable.dart';
+import '../extensions/string_x.dart';
 import 'feature_user.dart';
 
-@immutable
-class Trait {
+class Trait extends Equatable {
   final int id;
   final FeatureUser identity;
   final String key;
   final String value;
+  @override
+  List<Object> get props => [id, identity, key, value];
+  @override
+  bool get stringify => true;
   Trait({
     this.id,
     this.identity,
@@ -50,8 +53,8 @@ class Trait {
       identity: map['identity'] != null
           ? FeatureUser.fromMap(map['identity'] as Map<String, dynamic>)
           : null,
-      key: map['trait_key'] as String,
-      value: map['trait_value'] as String,
+      key: (map['trait_key'] as String)?.normalize(),
+      value: (map['trait_value'] as String)?.normalize(),
     );
   }
 
@@ -59,23 +62,4 @@ class Trait {
 
   factory Trait.fromJson(String source) =>
       Trait.fromMap(json.decode(source) as Map<String, dynamic>);
-
-  @override
-  String toString() =>
-      'Trait(id: $id, identity: $identity, key: $key, value: $value)';
-
-  @override
-  bool operator ==(Object o) {
-    if (identical(this, o)) {
-      return true;
-    }
-
-    return o is Trait &&
-        o.identity == identity &&
-        o.key == key &&
-        o.value == value;
-  }
-
-  @override
-  int get hashCode => identity.hashCode ^ key.hashCode ^ value.hashCode;
 }

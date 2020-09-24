@@ -1,19 +1,24 @@
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
+import 'package:equatable/equatable.dart';
 
 import 'flag_type.dart';
-import 'flag_type_x.dart';
+import '../extensions/flag_type_x.dart';
+import '../extensions/string_x.dart';
 
 /// Standard bullet train feature
-@immutable
-class Feature {
+class Feature extends Equatable {
   final int id;
   final String name;
   final DateTime createdDate;
   final String initialValue;
   final FlagType type;
   final String description;
+  @override
+  List<Object> get props =>
+      [id, name, createdDate, initialValue, type, description];
+  @override
+  bool get stringify => true;
   Feature(
     this.id,
     this.name,
@@ -52,7 +57,7 @@ class Feature {
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'id': id,
-      'name': name,
+      'name': name?.normalize(),
       'created_date': createdDate?.toIso8601String(),
       'initial_value': initialValue,
       'type': type?.toMap(),
@@ -67,7 +72,7 @@ class Feature {
 
     return Feature(
       map['id'] as int,
-      map['name'] as String,
+      (map['name'] as String)?.normalize(),
       map['created_date'] != null
           ? DateTime.parse(map['created_date'] as String)
           : null,
@@ -81,27 +86,4 @@ class Feature {
 
   factory Feature.fromJson(String source) =>
       Feature.fromMap(json.decode(source) as Map<String, dynamic>);
-
-  @override
-  String toString() {
-    return 'Feature(id: $id, name: $name, type: $type, initialValue: $initialValue, description: $description)';
-  }
-
-  @override
-  bool operator ==(Object o) {
-    if (identical(this, o)) {
-      return true;
-    }
-
-    return o is Feature &&
-        o.id == id &&
-        o.name == name &&
-        o.type == type &&
-        o.description == description;
-  }
-
-  @override
-  int get hashCode {
-    return id.hashCode ^ name.hashCode ^ type.hashCode ^ description.hashCode;
-  }
 }

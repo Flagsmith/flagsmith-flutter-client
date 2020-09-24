@@ -1,3 +1,9 @@
+## [0.1.1] - 09/24/2020
+* adding support for streams from storage
+* breaking change in storing values
+* implementing equatable
+* config: new isDebug attr for toggle loging to console
+
 ## [0.1.0+2] - 09/22/2020
 * rxdart range
 ## [0.1.0+1] - 09/21/2020

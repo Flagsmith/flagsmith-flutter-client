@@ -1,4 +1,9 @@
+import 'dart:async';
+import 'dart:io';
+import 'dart:math';
 import 'package:bullet_train/bullet_train.dart';
+import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
@@ -6,13 +11,15 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
 
 final GetIt getIt = GetIt.instance;
+const String testFeature = 'show_title_logo';
 
 /// Prepare DI for [BulletTrainSampleApp]
 
 void setupPrefs() {
   getIt.registerSingleton<BulletTrainClient>(BulletTrainClient(
       apiKey: 'EBnVjhp7xvkT5oTLq4q7Ny',
-      config: BulletTrainConfig(storeType: StoreType.persistant)));
+      config:
+          BulletTrainConfig(storeType: StoreType.persistant, isDebug: true)));
 
   getIt.registerFactory(() => FlagBloc(bt: getIt<BulletTrainClient>()));
   return null;
@@ -40,8 +47,9 @@ class BulletTrainSampleApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: BlocProvider(
-        create: (context) =>
-            getIt<FlagBloc>()..add(FlagEvent.personalize)..add(FlagEvent.fetch),
+        create: (context) => getIt<FlagBloc>()
+          ..add(FlagEvent.personalize)
+          ..add(FlagEvent.initial),
         child: BulletTrainSampleScreen(title: 'Bullet Train Example'),
       ),
     );
@@ -60,7 +68,7 @@ class BulletTrainSampleScreen extends StatelessWidget {
         builder: (context, state) {
           return Scaffold(
             appBar: AppBar(
-              title: state.isEnabled('show_title_logo')
+              title: state.isEnabled(testFeature)
                   ? Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -74,44 +82,65 @@ class BulletTrainSampleScreen extends StatelessWidget {
                         SizedBox(
                           width: 8,
                         ),
-                        Text(title)
+                        Text(title + '/${state.isEnabled(testFeature)}'),
                       ],
                     )
-                  : Text(title),
-              centerTitle: true,
+                  : Text(title + '/${state.isEnabled(testFeature)}'),
+              centerTitle: Platform.isIOS,
             ),
-            body: state.loading == LoadingState.isLoading
-                ? Center(child: CircularProgressIndicator())
-                : RefreshIndicator(
-                    onRefresh: () async {
-                      context.bloc<FlagBloc>().add(FlagEvent.fetch);
-                      return null;
-                    },
-                    child: ListView.separated(
-                      padding: const EdgeInsets.all(8.0),
-                      separatorBuilder: (context, index) => Divider(
-                        height: 1,
-                        indent: 16,
-                      ),
-                      itemCount: state.flags.length,
-                      itemBuilder: (context, index) {
-                        var item = state.flags[index];
-                        return SwitchListTile(
-                            title: Text(item.feature.description),
-                            subtitle: Text('name: ${item.feature.name}'),
-                            value: item.enabled,
-                            onChanged: (bool value) {});
+            body: SafeArea(
+              child: state.loading == LoadingState.isLoading
+                  ? Center(child: CircularProgressIndicator())
+                  : RefreshIndicator(
+                      onRefresh: () async {
+                        context.bloc<FlagBloc>().add(FlagEvent.fetch);
+                        return null;
                       },
+                      child: ListView.separated(
+                        padding: const EdgeInsets.all(8.0),
+                        separatorBuilder: (context, index) => Divider(
+                          height: 1,
+                          indent: 16,
+                        ),
+                        itemCount: state.flags.length,
+                        itemBuilder: (context, index) {
+                          var item = state.flags[index];
+                          return SwitchListTile.adaptive(
+                              title: Text(item.feature.description ??
+                                  item.feature.name ??
+                                  'no description'),
+                              subtitle: item.feature.description != null
+                                  ? Text(
+                                      'feature: ${item.feature.name}\ntype: ${describeEnum(item.feature.type)}')
+                                  : Text(
+                                      'type: ${describeEnum(item.feature.type)}'),
+                              value: item.enabled,
+                              onChanged: (bool value) {});
+                        },
+                      ),
                     ),
-                  ),
-            floatingActionButton: FloatingActionButton.extended(
-              onPressed: () => context.bloc<FlagBloc>().add(FlagEvent.fetch),
-              tooltip: 'Fetch',
-              icon: Icon(Icons.add),
-              label: Text('Fetch'),
             ),
 
-            // This trailing comma makes auto-formatting nicer for build methods.
+            floatingActionButton: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                FloatingActionButton(
+                  mini: true,
+                  onPressed: () =>
+                      context.bloc<FlagBloc>().add(FlagEvent.toggle),
+                  child: Icon(Icons.account_circle),
+                ),
+                FloatingActionButton.extended(
+                  onPressed: () =>
+                      context.bloc<FlagBloc>().add(FlagEvent.fetch),
+                  tooltip: 'Fetch',
+                  icon: Icon(Icons.add),
+                  label: Text('Fetch'),
+                ),
+              ],
+            ), // This trailing comma makes auto-formatting nicer for build methods.
           );
         });
   }
@@ -153,58 +182,55 @@ enum FlagEvent {
   /// Notifies bloc to fetch flags from API
   initial,
 
+  /// set stream listeners after fetch data
+  register,
+
   /// Notifies bloc to fetch flags from API
   fetch,
   // Notifies bloc to update user traits
-  personalize
+  personalize,
+
+  // reload from storage
+  reload,
+  // toggle feature
+  toggle
 }
 
 /// Simple [FlagState] for [FlagBloc]
-@immutable
-class FlagState {
+class FlagState extends Equatable {
   // Loading state of bloc
   final LoadingState loading;
   // Loaded flag list
   final List<Flag> flags;
-  FlagState({@required this.loading, this.flags}) : assert(loading != null);
+
+  @override
+  List<Object> get props => [loading, flags];
+
+  const FlagState({@required this.loading, this.flags})
+      : assert(loading != null);
 
   FlagState copyWith({LoadingState loading, List<Flag> flags}) {
     return FlagState(
         loading: loading ?? this.loading, flags: flags ?? this.flags);
   }
 
-  @override
-  String toString() => 'FlagState(loading: $loading, flags: $flags)';
-
-  @override
-  bool operator ==(Object o) {
-    if (identical(this, o)) {
-      return true;
-    }
-
-    return o is FlagState && o.loading == loading;
-  }
-
-  @override
-  int get hashCode => loading.hashCode;
-
   /// Initial state
   factory FlagState.initial() =>
       FlagState(loading: LoadingState.isInitial, flags: []);
 
   bool isEnabled(String flag) =>
-      flags
-          .firstWhere(
-            (element) => element.feature.name == flag,
-            orElse: () => null,
-          )
-          ?.enabled ??
-      false;
+      flags.firstWhere(
+        (element) => element.feature.name == flag && element.enabled == true,
+        orElse: () => null,
+      ) !=
+      null;
 }
 
 /// A simple [Bloc] which manages an `FlagState` as its state.
 class FlagBloc extends Bloc<FlagEvent, FlagState> {
   final BulletTrainClient bt;
+
+  StreamSubscription<Flag> _behaviorSubject;
   FlagBloc({@required this.bt})
       : assert(bt != null),
         super(FlagState.initial());
@@ -214,11 +240,19 @@ class FlagBloc extends Bloc<FlagEvent, FlagState> {
     switch (event) {
       case FlagEvent.initial:
         yield state.copyWith(loading: LoadingState.isInitial);
+        add(FlagEvent.register);
         add(FlagEvent.fetch);
+
         break;
       case FlagEvent.fetch:
         yield state.copyWith(loading: LoadingState.isLoading);
         var result = await bt.getFeatureFlags();
+        yield state.copyWith(loading: LoadingState.isComplete, flags: result);
+        add(FlagEvent.register);
+        break;
+      case FlagEvent.reload:
+        yield state.copyWith(loading: LoadingState.isLoading);
+        var result = await bt.getFeatureFlags(reload: false);
         yield state.copyWith(loading: LoadingState.isComplete, flags: result);
         break;
       case FlagEvent.personalize:
@@ -226,8 +260,26 @@ class FlagBloc extends Bloc<FlagEvent, FlagState> {
         await bt.updateTrait(FeatureUser(identifier: 'testUser'),
             Trait(key: 'age', value: '21'));
         break;
+      case FlagEvent.register:
+        _behaviorSubject ??= bt.stream(testFeature)?.listen((event) {
+          log('LISTEN: ${event.feature.name} => ${event.enabled}');
+          add(FlagEvent.reload);
+        });
+        break;
+      case FlagEvent.toggle:
+        await bt.testToggle(testFeature);
+        break;
       default:
         addError(Exception('unsupported event'));
     }
+  }
+
+  Future<bool> isEnabled(String featureName, {FeatureUser user}) =>
+      bt.hasFeatureFlag(featureName, user: user);
+
+  @override
+  Future<void> close() {
+    _behaviorSubject?.cancel();
+    return super.close();
   }
 }

@@ -1,14 +1,18 @@
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
+import 'package:equatable/equatable.dart';
 
 /// Personalized user
-@immutable
-class FeatureUser {
+class FeatureUser extends Equatable {
   final String identifier;
-  FeatureUser({
+  const FeatureUser({
     this.identifier,
   });
+  @override
+  List<Object> get props => [identifier];
+
+  @override
+  bool get stringify => true;
 
   /// copy [FeatureUser] to new instance
   FeatureUser copyWith({
@@ -42,19 +46,4 @@ class FeatureUser {
 
   factory FeatureUser.fromJson(String source) =>
       FeatureUser.fromMap(json.decode(source) as Map<String, dynamic>);
-
-  @override
-  String toString() => 'FeatureUser(identifier: $identifier)';
-
-  @override
-  bool operator ==(Object o) {
-    if (identical(this, o)) {
-      return true;
-    }
-
-    return o is FeatureUser && o.identifier == identifier;
-  }
-
-  @override
-  int get hashCode => identifier.hashCode;
 }
