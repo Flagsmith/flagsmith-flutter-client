@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:dio/adapter.dart';
 import 'package:rxdart/subjects.dart';
 
 import 'store/storage_provider.dart';
@@ -58,10 +59,18 @@ class BulletTrainClient {
           'BulletTrainFlutterSDK(${Platform.operatingSystem}/${Platform.version})'
       ..options.headers[authHeader] = apiKey
       ..options.headers[acceptHeader] = 'application/json';
+
     if (config.isDebug) {
       dio.interceptors.add(config.isDebug
           ? LogInterceptor(requestHeader: false, responseBody: true)
           : null);
+    }
+    if (config.isSelfSigned) {
+      (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
+          (client) {
+        client.badCertificateCallback = (cert, host, port) => true;
+        return client;
+      };
     }
     return dio;
   }
