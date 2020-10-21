@@ -63,12 +63,14 @@ class PersistantStore extends CrudStore with ExtendCrudStore {
   @override
   Future<bool> seed(List<MapEntry<String, String>> items) async {
     await init();
-    if (items != null && items?.isNotEmpty == true) {
+    var saved = await getAll();
+    if (saved.isEmpty && items != null && items?.isNotEmpty == true) {
       for (var item in items) {
         await create(item.key, item.value);
       }
+      return true;
     }
-    return true;
+    return false;
   }
 
   @override
