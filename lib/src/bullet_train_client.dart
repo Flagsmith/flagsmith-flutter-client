@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:dio/adapter.dart';
 import 'package:rxdart/subjects.dart';
 
 import 'store/storage_provider.dart';
@@ -58,10 +59,18 @@ class BulletTrainClient {
           'BulletTrainFlutterSDK(${Platform.operatingSystem}/${Platform.version})'
       ..options.headers[authHeader] = apiKey
       ..options.headers[acceptHeader] = 'application/json';
+
     if (config.isDebug) {
       dio.interceptors.add(config.isDebug
           ? LogInterceptor(requestHeader: false, responseBody: true)
           : null);
+    }
+    if (config.isSelfSigned) {
+      (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
+          (client) {
+        client.badCertificateCallback = (cert, host, port) => true;
+        return client;
+      };
     }
     return dio;
   }
@@ -74,7 +83,7 @@ class BulletTrainClient {
       {FeatureUser user, bool reload = true}) async {
     if (!reload) {
       var result = await storage.getAll();
-      result.sort((a, b) => a.feature.name.compareTo(b.feature.name));
+      result?.sort((a, b) => a.feature.name.compareTo(b.feature.name));
       return result;
     }
     return user == null ? await _getFlags() : await _getUserFlags(user);
@@ -156,8 +165,7 @@ class BulletTrainClient {
       if (keys == null) {
         return result;
       }
-      var filtered =
-          result.where((element) => keys.contains(element.key)).toList();
+
       return result.where((element) => keys.contains(element.key)).toList();
     } on DioError catch (e) {
       log('getTraits dioError: ${e?.error}');

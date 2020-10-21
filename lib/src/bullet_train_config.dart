@@ -16,6 +16,7 @@ class BulletTrainConfig {
   final String password;
 
   final bool isDebug;
+  final bool isSelfSigned;
 
   /// Bullet train config initialization
   /// change only if you have self-hosted bullet train
@@ -31,6 +32,7 @@ class BulletTrainConfig {
   /// for [StoreType.sembast] must by defined [storePath] where should be db file stored.
   ///
   /// if you want to see logs change [isDebug] to *true*
+  /// for self hosted server without valid cert set [isSelfSigned] to *true*
 
   const BulletTrainConfig(
       {this.baseURI = 'https://api.bullet-train.io/api/v1/',
@@ -42,7 +44,8 @@ class BulletTrainConfig {
       this.sendTimeout = 5000,
       this.storeType = StoreType.inMemory,
       this.password = 'bullet_trains_sdk_secure',
-      this.isDebug = false});
+      this.isDebug = false,
+      this.isSelfSigned = false});
 
   /// Client options from config
   BaseOptions get clientOptions => BaseOptions(

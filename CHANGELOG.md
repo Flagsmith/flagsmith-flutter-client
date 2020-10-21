@@ -1,3 +1,5 @@
+## [0.1.2] - 010/04/2020
+* adding new attr to config isSelfSigned for overriding self signed cert issues
 ## [0.1.1] - 09/24/2020
 * adding support for streams from storage
 * breaking change in storing values
