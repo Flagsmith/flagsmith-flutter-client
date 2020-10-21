@@ -1,5 +1,3 @@
-import 'package:flutter/foundation.dart';
-
 import '../../bullet_train.dart';
 
 extension FlagTypeX on FlagType {
