@@ -157,8 +157,9 @@ class CardTileWidget extends StatelessWidget {
         super(key: key);
   @override
   Widget build(BuildContext context) {
-    var color =
-        item.feature.name == 'color' ? Hexcolor(item.stateValue) : Colors.black;
+    var color = item.feature.name == 'color'
+        ? HexColor(item.stateValue ?? '')
+        : Colors.black;
     return Card(
       elevation: 1,
       child: Column(

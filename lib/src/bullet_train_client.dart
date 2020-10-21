@@ -44,12 +44,11 @@ class BulletTrainClient {
     }
     initStore(seeds: seeds);
   }
-  Future<void> initStore({List<Flag> seeds, bool clear = false}) async {
+  Future<bool> initStore({List<Flag> seeds, bool clear = false}) async {
     if (clear) {
       await storage.clear();
     }
-    await storage.seed(seeds);
-    return null;
+    return await storage.seed(seeds);
   }
 
   /// Simple implementation of Http Client

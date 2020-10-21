@@ -30,6 +30,7 @@
 .pub-cache/
 .pub/
 build/
+coverage/
 test/.test_coverage.dart
 
 

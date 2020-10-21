@@ -18,6 +18,26 @@ void main() {
   });
 
   group('[Bullet Train: Persistent storage]', () {
+    test('When test multiple init with seed', () async {
+      var result = await bulletTrain.initStore(seeds: seeds, clear: true);
+      expect(result, true);
+
+      var resultFF = await bulletTrain.getFeatureFlags(reload: false);
+      expect(resultFF, isNotNull);
+      expect(resultFF, isNotEmpty);
+      expect(resultFF.length, seeds.length);
+
+      var result2 = await bulletTrain.initStore(seeds: seeds);
+      expect(result2, false);
+
+      var resultFF2 = await bulletTrain.getFeatureFlags(reload: false);
+      expect(resultFF2, isNotNull);
+      expect(resultFF2, isNotEmpty);
+      expect(resultFF2.length, seeds.length);
+      expect(resultFF2, isNotNull);
+      expect(resultFF2, isNotEmpty);
+      expect(resultFF2.length, seeds.length);
+    });
     test('When init remove all items and Save seeds', () async {
       await bulletTrain.clearStore();
       var result = await bulletTrain.getFeatureFlags(reload: false);
