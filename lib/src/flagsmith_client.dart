@@ -1,40 +1,39 @@
 import 'dart:io';
+import 'package:meta/meta.dart';
 import 'package:dio/adapter.dart';
 import 'package:rxdart/subjects.dart';
 
 import 'store/storage_provider.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
 
-import '../bullet_train.dart';
-import 'bullet_train_config.dart';
+import '../flagsmith.dart';
+import 'flagsmith_config.dart';
 import 'model/index.dart';
 import 'store/storage/in_memory_store.dart';
 import 'store/storage/persistant_store.dart';
 
-/// Bullet train client initialization
+/// Flagsmith client initialization
 ///
 /// [config] configuration for http client and endpoints
 /// [apiKey] api key for your enviornment
-/// [seeds] default values before update from bullet train env.
+/// [seeds] default values before update from Flagsmith env.
 ///
 
-class BulletTrainClient {
+class FlagsmithClient {
   static final String authHeader = 'X-Environment-Key';
   static final String acceptHeader = 'Accept';
   static final String userAgentHeader = 'User-Agent';
 
   final String apiKey;
-  final BulletTrainConfig config;
+  final FlagsmithConfig config;
   StorageProvider storage;
 
-  BulletTrainClient(
-      {this.config = const BulletTrainConfig(),
+  FlagsmithClient(
+      {this.config = const FlagsmithConfig(),
       @required this.apiKey,
       List<Flag> seeds})
-      : assert(apiKey != null, 'Missing Bullet-train.io apiKey') {
-    bulletTrainDebug = config.isDebug;
+      : assert(apiKey != null, 'Missing flagsmith.com apiKey') {
+    flagsmithDebug = config.isDebug;
     switch (config.storeType) {
       case StoreType.persistant:
         storage = StorageProvider(PersistantStore(), password: config.password);
@@ -102,7 +101,7 @@ class BulletTrainClient {
           orElse: () => null);
       return feature != null;
     } on Exception catch (_) {
-      throw BulletTrainException(BulletTrainExceptionType.genericError);
+      throw FlagsmithException(FlagsmithExceptionType.genericError);
     }
   }
 
@@ -115,7 +114,7 @@ class BulletTrainClient {
           orElse: () => null);
       return feature?.enabled;
     } on Exception catch (_) {
-      throw BulletTrainException(BulletTrainExceptionType.genericError);
+      throw FlagsmithException(FlagsmithExceptionType.genericError);
     }
   }
 
@@ -132,11 +131,11 @@ class BulletTrainClient {
       return feature?.stateValue;
     } on DioError catch (e) {
       log('getFeatureFlagValue dioError: ${e.toString()}');
-      throw BulletTrainException(BulletTrainExceptionType.connectionSettings);
+      throw FlagsmithException(FlagsmithExceptionType.connectionSettings);
     } on FormatException catch (_) {
-      throw BulletTrainException(BulletTrainExceptionType.wrongFlagFormat);
+      throw FlagsmithException(FlagsmithExceptionType.wrongFlagFormat);
     } on Exception catch (_) {
-      throw BulletTrainException(BulletTrainExceptionType.genericError);
+      throw FlagsmithException(FlagsmithExceptionType.genericError);
     }
   }
 
@@ -149,11 +148,11 @@ class BulletTrainClient {
     } on DioError catch (e) {
       log('getTrait dioError: ${e?.error}');
 
-      throw BulletTrainException(BulletTrainExceptionType.connectionSettings);
+      throw FlagsmithException(FlagsmithExceptionType.connectionSettings);
     } on FormatException catch (_) {
-      throw BulletTrainException(BulletTrainExceptionType.wrongFlagFormat);
+      throw FlagsmithException(FlagsmithExceptionType.wrongFlagFormat);
     } on Exception catch (_) {
-      throw BulletTrainException(BulletTrainExceptionType.genericError);
+      throw FlagsmithException(FlagsmithExceptionType.genericError);
     }
   }
 
@@ -168,11 +167,11 @@ class BulletTrainClient {
       return result.where((element) => keys.contains(element.key)).toList();
     } on DioError catch (e) {
       log('getTraits dioError: ${e?.error}');
-      throw BulletTrainException(BulletTrainExceptionType.connectionSettings);
+      throw FlagsmithException(FlagsmithExceptionType.connectionSettings);
     } on FormatException catch (_) {
-      throw BulletTrainException(BulletTrainExceptionType.wrongFlagFormat);
+      throw FlagsmithException(FlagsmithExceptionType.wrongFlagFormat);
     } on Exception catch (_) {
-      throw BulletTrainException(BulletTrainExceptionType.genericError);
+      throw FlagsmithException(FlagsmithExceptionType.genericError);
     }
   }
 
@@ -190,11 +189,11 @@ class BulletTrainClient {
       return [];
     } on DioError catch (e) {
       log('_getFlags dioError: ${e?.error}');
-      throw BulletTrainException(BulletTrainExceptionType.connectionSettings);
+      throw FlagsmithException(FlagsmithExceptionType.connectionSettings);
     } on FormatException catch (_) {
-      throw BulletTrainException(BulletTrainExceptionType.wrongFlagFormat);
+      throw FlagsmithException(FlagsmithExceptionType.wrongFlagFormat);
     } on Exception catch (_) {
-      throw BulletTrainException(BulletTrainExceptionType.genericError);
+      throw FlagsmithException(FlagsmithExceptionType.genericError);
     }
   }
 
@@ -216,11 +215,11 @@ class BulletTrainClient {
       return [];
     } on DioError catch (e) {
       log('getUserTraits dioError: ${e?.error}');
-      throw BulletTrainException(BulletTrainExceptionType.connectionSettings);
+      throw FlagsmithException(FlagsmithExceptionType.connectionSettings);
     } on FormatException catch (_) {
-      throw BulletTrainException(BulletTrainExceptionType.wrongFlagFormat);
+      throw FlagsmithException(FlagsmithExceptionType.wrongFlagFormat);
     } on Exception catch (_) {
-      throw BulletTrainException(BulletTrainExceptionType.genericError);
+      throw FlagsmithException(FlagsmithExceptionType.genericError);
     }
   }
 
@@ -239,11 +238,11 @@ class BulletTrainClient {
     } on DioError catch (e) {
       log('getUserTraits dioError: ${e?.error}');
 
-      throw BulletTrainException(BulletTrainExceptionType.connectionSettings);
+      throw FlagsmithException(FlagsmithExceptionType.connectionSettings);
     } on FormatException catch (_) {
-      throw BulletTrainException(BulletTrainExceptionType.wrongFlagFormat);
+      throw FlagsmithException(FlagsmithExceptionType.wrongFlagFormat);
     } on Exception catch (_) {
-      throw BulletTrainException(BulletTrainExceptionType.genericError);
+      throw FlagsmithException(FlagsmithExceptionType.genericError);
     }
   }
 
@@ -261,11 +260,11 @@ class BulletTrainClient {
       return Trait.fromMap(response.data as Map<String, dynamic>);
     } on DioError catch (e) {
       log('_postUserTraits dioError: ${e?.error}');
-      throw BulletTrainException(BulletTrainExceptionType.connectionSettings);
+      throw FlagsmithException(FlagsmithExceptionType.connectionSettings);
     } on FormatException catch (_) {
-      throw BulletTrainException(BulletTrainExceptionType.wrongFlagFormat);
+      throw FlagsmithException(FlagsmithExceptionType.wrongFlagFormat);
     } on Exception catch (_) {
-      throw BulletTrainException(BulletTrainExceptionType.genericError);
+      throw FlagsmithException(FlagsmithExceptionType.genericError);
     }
   }
 

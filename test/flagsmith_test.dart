@@ -1,6 +1,6 @@
-import 'package:bullet_train/bullet_train.dart';
-import 'package:bullet_train/src/bullet_train_client.dart';
-import 'package:bullet_train/src/model/feature_user.dart';
+import 'package:flagsmith/flagsmith.dart';
+import 'package:flagsmith/src/flagsmith_client.dart';
+import 'package:flagsmith/src/model/feature_user.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -8,15 +8,15 @@ import 'shared.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  BulletTrainClient bulletTrain;
+  FlagsmithClient bulletTrain;
   setUpAll(() {
-    bulletTrain = BulletTrainClient(
+    bulletTrain = FlagsmithClient(
         apiKey: apiKey,
         seeds: seeds,
-        config: BulletTrainConfig(storeType: StoreType.inMemory));
+        config: FlagsmithConfig(storeType: StoreType.inMemory));
   });
 
-  group('[Bullet Train: InMemory storage]', () {
+  group('[Flagsmith: InMemory storage]', () {
     test('When init remove all items and Save seeds', () async {
       await bulletTrain.clearStore();
       var result = await bulletTrain.getFeatureFlags(reload: false);

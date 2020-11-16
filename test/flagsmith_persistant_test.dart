@@ -1,23 +1,25 @@
-import 'package:bullet_train/bullet_train.dart';
-import 'package:bullet_train/src/bullet_train_client.dart';
-import 'package:bullet_train/src/model/feature_user.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'package:flagsmith/flagsmith.dart';
+import 'package:flagsmith/src/flagsmith_client.dart';
+import 'package:flagsmith/src/model/feature_user.dart';
+
 import 'shared.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   SharedPreferences.setMockInitialValues(<String, String>{});
-  BulletTrainClient bulletTrain;
+  FlagsmithClient bulletTrain;
   setUpAll(() {
-    bulletTrain = BulletTrainClient(
+    bulletTrain = FlagsmithClient(
         apiKey: apiKey,
         seeds: seeds,
-        config: BulletTrainConfig(storeType: StoreType.persistant));
+        config: FlagsmithConfig(storeType: StoreType.persistant));
   });
 
-  group('[Bullet Train: Persistent storage]', () {
+  group('[Flagsmith: Persistent storage]', () {
     test('When test multiple init with seed', () async {
       var result = await bulletTrain.initStore(seeds: seeds, clear: true);
       expect(result, true);

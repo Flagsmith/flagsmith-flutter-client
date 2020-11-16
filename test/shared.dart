@@ -1,4 +1,4 @@
-import 'package:bullet_train/bullet_train.dart';
+import 'package:flagsmith/flagsmith.dart';
 
 final apiKey = '74acvNqePTwZZdUtESiV7f';
 final seeds = [

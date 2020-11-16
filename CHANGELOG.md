@@ -1,3 +1,5 @@
+## [0.1.4] - 10/26/2020
+* replace imports for using models in integration tests
 ## [0.1.3] - 10/21/2020
 * fixing seed function
 * extending default values for timeouts

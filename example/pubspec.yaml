@@ -15,7 +15,7 @@ dependencies:
   hexcolor: ^1.0.6
   google_fonts: ^1.1.0
   equatable: ^1.2.5
-  bullet_train:
+  flagsmith:
     path: ../
 
 dev_dependencies:

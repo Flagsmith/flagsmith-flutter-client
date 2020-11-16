@@ -1,8 +1,7 @@
 import 'dart:async';
-import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 
-import '../../bullet_train.dart';
+import '../../flagsmith.dart';
 import 'tools/security.dart';
 
 class StorageProvider with SecureStore {
@@ -118,7 +117,7 @@ class StorageProvider with SecureStore {
       _streams[featureName]?.close();
       _streams[featureName] = null;
     } catch (e) {
-      debugPrint(e.toString());
+      log(e.toString());
     }
   }
 

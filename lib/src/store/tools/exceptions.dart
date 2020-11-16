@@ -7,7 +7,7 @@
 /// [wrongFlagFormat] - flag/feature json format error
 /// [genericError] - unknown error
 
-enum BulletTrainExceptionType {
+enum FlagsmithExceptionType {
   // store could't save item
   notSaved,
   // store could't found item
@@ -22,7 +22,7 @@ enum BulletTrainExceptionType {
   genericError
 }
 
-class BulletTrainException implements Exception {
-  BulletTrainExceptionType type;
-  BulletTrainException(this.type);
+class FlagsmithException implements Exception {
+  FlagsmithExceptionType type;
+  FlagsmithException(this.type);
 }

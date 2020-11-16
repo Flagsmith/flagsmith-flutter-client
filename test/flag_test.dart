@@ -1,4 +1,4 @@
-import 'package:bullet_train/src/model/flag.dart';
+import 'package:flagsmith/src/model/flag.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -10,12 +10,12 @@ void main() {
         "id": 2,
         "name": "font_size",
         "created_date": "2018-06-04T12:51:18.646762Z",
-        "initial_value": "10",
+        "initial_value": 10,
         "description": "test description",
         "type": "CONFIG",
         "project": 2
       },
-      "feature_state_value": 10,
+      "feature_state_value": "10.1.0",
       "enabled": true,
       "environment": 2,
       "identity": null

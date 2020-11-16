@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:math';
-import 'package:bullet_train/bullet_train.dart';
+import 'package:flagsmith/flagsmith.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -13,54 +13,53 @@ import 'package:hexcolor/hexcolor.dart';
 final GetIt getIt = GetIt.instance;
 const String testFeature = 'show_title_logo';
 
-/// Prepare DI for [BulletTrainSampleApp]
+/// Prepare DI for [FlagsmithSampleApp]
 
 void setupPrefs() {
-  getIt.registerSingleton<BulletTrainClient>(BulletTrainClient(
+  getIt.registerSingleton<FlagsmithClient>(FlagsmithClient(
       apiKey: 'EBnVjhp7xvkT5oTLq4q7Ny',
-      config:
-          BulletTrainConfig(storeType: StoreType.persistant, isDebug: true)));
+      config: FlagsmithConfig(storeType: StoreType.persistant, isDebug: true)));
 
-  getIt.registerFactory(() => FlagBloc(bt: getIt<BulletTrainClient>()));
+  getIt.registerFactory(() => FlagBloc(fs: getIt<FlagsmithClient>()));
   return null;
 }
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   setupPrefs();
-  runApp(BulletTrainSampleApp());
+  runApp(FlagsmithSampleApp());
 }
 
-/// Simple [BulletTrainSampleApp]
-class BulletTrainSampleApp extends StatelessWidget {
+/// Simple [FlagsmithSampleApp]
+class FlagsmithSampleApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Bullet Train Example',
+      title: 'Flagsmith Example',
       theme: ThemeData(
         textTheme: GoogleFonts.varelaRoundTextTheme(
           Theme.of(context).textTheme,
         ),
-        primaryColor: Color.fromARGB(255, 35, 61, 83),
-        accentColor: Color(0xff1c9997),
+        primaryColor: Colors.deepPurple,
+        accentColor: Colors.deepPurpleAccent,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: BlocProvider(
         create: (context) => getIt<FlagBloc>()
           ..add(FlagEvent.personalize)
           ..add(FlagEvent.initial),
-        child: BulletTrainSampleScreen(title: 'Bullet Train Example'),
+        child: FlagsmithSampleScreen(title: 'Flagsmith Example'),
       ),
     );
   }
 }
 
 /// Sample screen
-class BulletTrainSampleScreen extends StatelessWidget {
+class FlagsmithSampleScreen extends StatelessWidget {
   // Screen title
   final String title;
-  BulletTrainSampleScreen({Key key, this.title}) : super(key: key);
+  FlagsmithSampleScreen({Key key, this.title}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<FlagBloc, FlagState>(
@@ -74,7 +73,7 @@ class BulletTrainSampleScreen extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Image.network(
-                          'https://docs.bullet-train.io/images/logo.png',
+                          'https://www.flagsmith.com/static/images/nav-logo.svg',
                           width: 32,
                           height: 32,
                           fit: BoxFit.contain,
@@ -229,11 +228,11 @@ class FlagState extends Equatable {
 
 /// A simple [Bloc] which manages an `FlagState` as its state.
 class FlagBloc extends Bloc<FlagEvent, FlagState> {
-  final BulletTrainClient bt;
+  final FlagsmithClient fs;
 
   StreamSubscription<Flag> _behaviorSubject;
-  FlagBloc({@required this.bt})
-      : assert(bt != null),
+  FlagBloc({@required this.fs})
+      : assert(fs != null),
         super(FlagState.initial());
 
   @override
@@ -247,28 +246,28 @@ class FlagBloc extends Bloc<FlagEvent, FlagState> {
         break;
       case FlagEvent.fetch:
         yield state.copyWith(loading: LoadingState.isLoading);
-        var result = await bt.getFeatureFlags();
+        var result = await fs.getFeatureFlags();
         yield state.copyWith(loading: LoadingState.isComplete, flags: result);
         add(FlagEvent.register);
         break;
       case FlagEvent.reload:
         yield state.copyWith(loading: LoadingState.isLoading);
-        var result = await bt.getFeatureFlags(reload: false);
+        var result = await fs.getFeatureFlags(reload: false);
         yield state.copyWith(loading: LoadingState.isComplete, flags: result);
         break;
       case FlagEvent.personalize:
         yield state.copyWith(loading: LoadingState.isLoading);
-        await bt.updateTrait(FeatureUser(identifier: 'testUser'),
+        await fs.updateTrait(FeatureUser(identifier: 'testUser'),
             Trait(key: 'age', value: '21'));
         break;
       case FlagEvent.register:
-        _behaviorSubject ??= bt.stream(testFeature)?.listen((event) {
+        _behaviorSubject ??= fs.stream(testFeature)?.listen((event) {
           log('LISTEN: ${event.feature.name} => ${event.enabled}');
           add(FlagEvent.reload);
         });
         break;
       case FlagEvent.toggle:
-        await bt.testToggle(testFeature);
+        await fs.testToggle(testFeature);
         break;
       default:
         addError(Exception('unsupported event'));
@@ -276,7 +275,7 @@ class FlagBloc extends Bloc<FlagEvent, FlagState> {
   }
 
   Future<bool> isEnabled(String featureName, {FeatureUser user}) =>
-      bt.hasFeatureFlag(featureName, user: user);
+      fs.hasFeatureFlag(featureName, user: user);
 
   @override
   Future<void> close() {

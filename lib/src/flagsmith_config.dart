@@ -1,8 +1,8 @@
-import '../bullet_train.dart';
+import '../flagsmith.dart';
 import 'package:dio/dio.dart';
 
 /// Default definition of connection to API
-class BulletTrainConfig {
+class FlagsmithConfig {
   final String baseURI;
   final String flagsURI;
   final String identitiesURI;
@@ -18,8 +18,8 @@ class BulletTrainConfig {
   final bool isDebug;
   final bool isSelfSigned;
 
-  /// Bullet train config initialization
-  /// change only if you have self-hosted bullet train
+  /// Flagsmith config initialization
+  /// change only if you have self-hosted Flagsmith
   /// [baseURI], [flagsURI], [identitiesURI], [traitsURI]
   ///
   /// Connection settings timeouts in milliseconds
@@ -27,14 +27,14 @@ class BulletTrainConfig {
   ///
   /// Storage
   ///
-  /// default type of storage used by [BulletTrainClient] is [StoreType.inMemory].
+  /// default type of storage used by [FlagsmithClient] is [StoreType.inMemory].
   /// you can choose on of [StoreType.inMemory], [StoreType.prefs] and [StoreType.sembast].
   /// for [StoreType.sembast] must by defined [storePath] where should be db file stored.
   ///
   /// if you want to see logs change [isDebug] to *true*
   /// for self hosted server without valid cert set [isSelfSigned] to *true*
 
-  const BulletTrainConfig(
+  const FlagsmithConfig(
       {this.baseURI = 'https://api.bullet-train.io/api/v1/',
       this.flagsURI = 'flags/',
       this.identitiesURI = 'identities/',

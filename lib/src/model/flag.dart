@@ -68,4 +68,8 @@ class Flag extends Equatable {
       Flag.fromMap(json.decode(source) as Map<String, dynamic>);
 
   String get key => feature.name ?? id.toString();
+  @override
+  String toString() {
+    return 'F(${feature?.name}:$enabled)';
+  }
 }

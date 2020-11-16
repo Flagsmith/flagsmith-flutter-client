@@ -38,7 +38,7 @@ class InMemoryStore extends CrudStore with ExtendCrudStore {
       _items.remove(key);
       return true;
     }
-    throw BulletTrainException(BulletTrainExceptionType.notDeleted);
+    throw FlagsmithException(FlagsmithExceptionType.notDeleted);
   }
 
   /// read saved by [id]
@@ -48,7 +48,7 @@ class InMemoryStore extends CrudStore with ExtendCrudStore {
     if (_items.containsKey(key)) {
       return Future<String>.value(_items[key]);
     }
-    throw BulletTrainException(BulletTrainExceptionType.notFound);
+    throw FlagsmithException(FlagsmithExceptionType.notFound);
   }
 
   /// update or create [item]
@@ -58,7 +58,7 @@ class InMemoryStore extends CrudStore with ExtendCrudStore {
       _items[key] = item;
       return true;
     }
-    throw BulletTrainException(BulletTrainExceptionType.notSaved);
+    throw FlagsmithException(FlagsmithExceptionType.notSaved);
   }
 
   /// regturns all saved flags [List<Flag>]
