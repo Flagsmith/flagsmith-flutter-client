@@ -35,7 +35,7 @@ class FlagsmithConfig {
   /// for self hosted server without valid cert set [isSelfSigned] to *true*
 
   const FlagsmithConfig(
-      {this.baseURI = 'https://api.bullet-train.io/api/v1/',
+      {this.baseURI = 'https://api.flagsmith.com/api/v1/',
       this.flagsURI = 'flags/',
       this.identitiesURI = 'identities/',
       this.traitsURI = 'traits/',

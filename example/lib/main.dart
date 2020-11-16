@@ -9,6 +9,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 final GetIt getIt = GetIt.instance;
 const String testFeature = 'show_title_logo';
@@ -30,6 +31,12 @@ void main() async {
   runApp(FlagsmithSampleApp());
 }
 
+ThemeData theme = ThemeData(
+  brightness: Brightness.light,
+  primarySwatch: Colors.deepPurple,
+  accentColor: Colors.deepPurpleAccent,
+);
+
 /// Simple [FlagsmithSampleApp]
 class FlagsmithSampleApp extends StatelessWidget {
   // This widget is the root of your application.
@@ -37,13 +44,10 @@ class FlagsmithSampleApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flagsmith Example',
-      theme: ThemeData(
+      theme: theme.copyWith(
         textTheme: GoogleFonts.varelaRoundTextTheme(
           Theme.of(context).textTheme,
         ),
-        primaryColor: Colors.deepPurple,
-        accentColor: Colors.deepPurpleAccent,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: BlocProvider(
         create: (context) => getIt<FlagBloc>()
@@ -67,25 +71,45 @@ class FlagsmithSampleScreen extends StatelessWidget {
         builder: (context, state) {
           return Scaffold(
             appBar: AppBar(
+              elevation: 0,
               title: state.isEnabled(testFeature)
                   ? Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Image.network(
+                        SvgPicture.network(
                           'https://www.flagsmith.com/static/images/nav-logo.svg',
-                          width: 32,
                           height: 32,
                           fit: BoxFit.contain,
                         ),
                         SizedBox(
                           width: 8,
                         ),
-                        Text(title + '/${state.isEnabled(testFeature)}'),
+                        Text(
+                          title + '/${state.isEnabled(testFeature)}',
+                          style: Theme.of(context)
+                              .textTheme
+                              .caption
+                              .copyWith(color: Theme.of(context).primaryColor),
+                        ),
                       ],
                     )
-                  : Text(title + '/${state.isEnabled(testFeature)}'),
+                  : Text(
+                      title + '/${state.isEnabled(testFeature)}',
+                      style: Theme.of(context)
+                          .textTheme
+                          .headline5
+                          .copyWith(color: Theme.of(context).primaryColor),
+                    ),
               centerTitle: Platform.isIOS,
+              flexibleSpace: Container(
+                decoration: BoxDecoration(
+                    color: Theme.of(context).scaffoldBackgroundColor,
+                    border: Border(
+                      bottom: BorderSide(
+                          color: Theme.of(context).dividerColor, width: 1),
+                    )),
+              ),
             ),
             body: SafeArea(
               child: state.loading == LoadingState.isLoading

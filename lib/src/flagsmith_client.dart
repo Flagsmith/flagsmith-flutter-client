@@ -54,7 +54,7 @@ class FlagsmithClient {
   Dio _api() {
     var dio = Dio(config.clientOptions)
       ..options.headers[userAgentHeader] =
-          'BulletTrainFlutterSDK(${Platform.operatingSystem}/${Platform.version})'
+          'FlagsmithFlutterSDK(${Platform.operatingSystem}/${Platform.version})'
       ..options.headers[authHeader] = apiKey
       ..options.headers[acceptHeader] = 'application/json';
 
