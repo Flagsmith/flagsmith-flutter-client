@@ -126,8 +126,7 @@ class BulletTrainClient {
     try {
       var features = await getFeatureFlags(user: user, reload: false);
       var feature = features.firstWhere(
-          (element) =>
-              element.feature.name == featureId && element.enabled == true,
+          (element) => element.feature.name == featureId,
           orElse: () => null);
       return feature?.stateValue;
     } on DioError catch (e) {
