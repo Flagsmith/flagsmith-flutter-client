@@ -81,7 +81,9 @@ class FlagsmithClient {
       {FeatureUser user, bool reload = true}) async {
     if (!reload) {
       var result = await storage.getAll();
-      result?.sort((a, b) => a.feature.name.compareTo(b.feature.name));
+      if (result != null && result.isNotEmpty) {
+        result?.sort((a, b) => a.feature.name.compareTo(b.feature.name));
+      }
       return result;
     }
     return user == null ? await _getFlags() : await _getUserFlags(user);
@@ -207,7 +209,9 @@ class FlagsmithClient {
 
       if (response.statusCode == 200) {
         var data = FlagAndTraits.fromMap(response.data)?.flags ?? [];
-        data.sort((a, b) => a.feature.name.compareTo(b.feature.name));
+        if (data.isNotEmpty) {
+          data.sort((a, b) => a.feature.name.compareTo(b.feature.name));
+        }
         await storage.saveAll(data);
 
         return data;

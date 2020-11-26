@@ -43,7 +43,7 @@ class FlagsmithConfig {
       this.receiveTimeout = 20000,
       this.sendTimeout = 20000,
       this.storeType = StoreType.inMemory,
-      this.password = 'bullet_trains_sdk_secure',
+      this.password = 'flagsmith_sdk_secure',
       this.isDebug = false,
       this.isSelfSigned = false});
 
