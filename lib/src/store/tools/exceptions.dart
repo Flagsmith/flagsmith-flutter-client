@@ -6,8 +6,9 @@
 /// [connectionSettings] - internet connection issues
 /// [wrongFlagFormat] - flag/feature json format error
 /// [genericError] - unknown error
+/// [cachesDisabled] - enable cache in FlagsmithConfig
 
-enum BulletTrainExceptionType {
+enum FlagsmithExceptionType {
   // store could't save item
   notSaved,
   // store could't found item
@@ -19,10 +20,12 @@ enum BulletTrainExceptionType {
   // flag/feature json format error
   wrongFlagFormat,
   // unknown error
-  genericError
+  genericError,
+  // trying to use query on caches without caches
+  cachesDisabled
 }
 
-class BulletTrainException implements Exception {
-  BulletTrainExceptionType type;
-  BulletTrainException(this.type);
+class FlagsmithException implements Exception {
+  FlagsmithExceptionType type;
+  FlagsmithException(this.type);
 }

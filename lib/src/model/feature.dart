@@ -6,7 +6,7 @@ import 'flag_type.dart';
 import '../extensions/flag_type_x.dart';
 import '../extensions/string_x.dart';
 
-/// Standard bullet train feature
+/// Standard Flagsmith feature
 class Feature extends Equatable {
   final int id;
   final String name;

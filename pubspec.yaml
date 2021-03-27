@@ -1,11 +1,11 @@
-name: bullet_train
+name: flagsmith
 description: >-
-  Flutter Client SDK for http://bullet-train.io, Bullet Train is 100% Open
+  Flutter Client SDK for https://www.flagsmith.com/, Flagsmith is 100% Open
   Source. Host yourself or let us take care of the hosting.
-version: 0.1.5
-homepage: https://github.com/printeastwoodcz/bullet_train_flutter
-repository: https://github.com/printeastwoodcz/bullet_train_flutter
-issue_tracker: https://github.com/printeastwoodcz/bullet_train_flutter/issues
+version: 1.0.0+beta1
+homepage: https://github.com/printeastwoodcz/flagsmith_flutter
+repository: https://github.com/printeastwoodcz/flagsmith_flutter
+issue_tracker: https://github.com/printeastwoodcz/flagsmith_flutter/issues
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
@@ -14,18 +14,17 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  dio: ^3.0.10
-  sembast: ^2.4.7+6
   collection: ^1.14.12
-  shared_preferences: ">=0.5.8 <0.5.13"
-  encrypt: ^4.0.3
   crypto: ^2.0.6
-  rxdart: ">=0.23.1 <0.24.2"
+  dio: ^3.0.10
+  encrypt: ^4.0.3
   equatable: ">=1.2.3 <1.2.6"
+  rxdart: ">=0.23.1 <0.24.2"
+  shared_preferences: ">=0.5.8 <2.0.0"
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  test:
   pedantic: ^1.9.0
+  test: null
   test_coverage: ^0.4.2

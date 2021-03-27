@@ -1,4 +1,4 @@
-import '../../bullet_train.dart';
+import '../../flagsmith.dart';
 
 extension FlagTypeX on FlagType {
   static FlagType byName(String name) {

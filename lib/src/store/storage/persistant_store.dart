@@ -1,4 +1,4 @@
-import '../../../bullet_train.dart';
+import '../../../flagsmith.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PersistantStore extends CrudStore with ExtendCrudStore {
@@ -79,6 +79,6 @@ class PersistantStore extends CrudStore with ExtendCrudStore {
     if (await containsKey(key)) {
       return await _prefs.setString(key, item);
     }
-    throw BulletTrainException(BulletTrainExceptionType.notSaved);
+    throw FlagsmithException(FlagsmithExceptionType.notSaved);
   }
 }

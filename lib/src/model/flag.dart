@@ -1,8 +1,10 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:equatable/equatable.dart';
 import '../extensions/string_x.dart';
 import 'feature.dart';
+import 'flag_type.dart';
 
 class Flag extends Equatable {
   final int id;
@@ -68,4 +70,25 @@ class Flag extends Equatable {
       Flag.fromMap(json.decode(source) as Map<String, dynamic>);
 
   String get key => feature.name ?? id.toString();
+  @override
+  String toString() {
+    return 'F(${feature?.name}:$enabled)';
+  }
+
+  static int _generateNum(int min, int max) =>
+      min + Random().nextInt(max - min);
+  static Flag seed(String featureName, {bool enabled = true, String value}) {
+    var id = _generateNum(1, 100);
+
+    return Flag.named(
+        id: id,
+        stateValue: value,
+        feature: Feature.named(
+            id: id,
+            name: featureName,
+            createdDate:
+                DateTime.now().add(Duration(days: _generateNum(0, 10))),
+            type: value != null ? FlagType.config : FlagType.flag),
+        enabled: enabled);
+  }
 }
