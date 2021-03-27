@@ -22,13 +22,18 @@ void main() {
 
   group('[Flagsmith: Persistent storage]', () {
     test('When test multiple init with seed', () async {
+      fs = await FlagsmithClient.init(
+        apiKey: apiKey,
+        seeds: seeds,
+        config: FlagsmithConfig(storeType: StoreType.persistant),
+      );
+      var result = await fs.initStore(seeds: seeds, clear: true);
+      expect(result, true);
+
       var resultFF = await fs.getFeatureFlags(reload: false);
       expect(resultFF, isNotNull);
       expect(resultFF, isNotEmpty);
       expect(resultFF.length, seeds.length);
-
-      var result2 = await fs.initStore(seeds: seeds);
-      expect(result2, false);
 
       var resultFF2 = await fs.getFeatureFlags(reload: false);
       expect(resultFF2, isNotNull);

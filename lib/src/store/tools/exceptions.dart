@@ -6,6 +6,7 @@
 /// [connectionSettings] - internet connection issues
 /// [wrongFlagFormat] - flag/feature json format error
 /// [genericError] - unknown error
+/// [cachesDisabled] - enable cache in FlagsmithConfig
 
 enum FlagsmithExceptionType {
   // store could't save item

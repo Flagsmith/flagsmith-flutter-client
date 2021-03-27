@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:meta/meta.dart';
 import 'package:dio/adapter.dart';
+import 'package:flutter/foundation.dart';
 import 'package:rxdart/subjects.dart';
 
 import 'store/storage_provider.dart';

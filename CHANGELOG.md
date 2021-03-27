@@ -1,4 +1,4 @@
-## [1.0.0.beta1] - 03/27/2021
+## [1.0.0+beta1] - 03/27/2021
 * rebranding to ***Flagsmith***
 
 * ***Client***
