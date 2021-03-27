@@ -19,7 +19,9 @@ enum FlagsmithExceptionType {
   // flag/feature json format error
   wrongFlagFormat,
   // unknown error
-  genericError
+  genericError,
+  // trying to use query on caches without caches
+  cachesDisabled
 }
 
 class FlagsmithException implements Exception {

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:meta/meta.dart';
 import 'package:dio/adapter.dart';
@@ -28,10 +29,16 @@ class FlagsmithClient {
   final FlagsmithConfig config;
   StorageProvider storage;
 
+  final Set<Flag> _flags = {};
+
+  final StreamController<FlagsmithLoading> _loading =
+      StreamController.broadcast();
+
   FlagsmithClient(
       {this.config = const FlagsmithConfig(),
       @required this.apiKey,
-      List<Flag> seeds})
+      List<Flag> seeds,
+      bool update = false})
       : assert(apiKey != null, 'Missing flagsmith.com apiKey') {
     flagsmithDebug = config.isDebug;
     switch (config.storeType) {
@@ -41,13 +48,53 @@ class FlagsmithClient {
       default:
         storage = StorageProvider(InMemoryStore(), password: config.password);
     }
-    initStore(seeds: seeds);
+    initStore(seeds: seeds).then((value) async {
+      if (update) {
+        await getFeatureFlags(reload: true);
+      }
+    });
   }
-  Future<bool> initStore({List<Flag> seeds, bool clear = false}) async {
+
+  /// Async initialization
+  ///
+  /// Returns [FlagsmithClient] after seeds are ready
+  static Future<FlagsmithClient> init(
+      {FlagsmithConfig config = const FlagsmithConfig(),
+      @required String apiKey,
+      List<Flag> seeds,
+      bool update = false}) async {
+    assert(apiKey != null, 'Missing flagsmith.com apiKey');
+    final client = FlagsmithClient(
+      config: config,
+      apiKey: apiKey,
+      seeds: <Flag>[],
+    );
+    flagsmithDebug = config.isDebug;
+    switch (config.storeType) {
+      case StoreType.persistant:
+        client.storage =
+            StorageProvider(PersistantStore(), password: config.password);
+        break;
+      default:
+        client.storage =
+            StorageProvider(InMemoryStore(), password: config.password);
+    }
+    await client.initStore(seeds: seeds);
+
+    if (update) {
+      await client.getFeatureFlags(reload: true);
+    }
+    return client;
+  }
+
+  Future<bool> initStore(
+      {List<Flag> seeds = const <Flag>[], bool clear = false}) async {
     if (clear) {
       await storage.clear();
     }
-    return await storage.seed(seeds);
+    await storage.seed(items: seeds);
+    _updateCaches(list: seeds);
+    return true;
   }
 
   /// Simple implementation of Http Client
@@ -81,12 +128,17 @@ class FlagsmithClient {
       {FeatureUser user, bool reload = true}) async {
     if (!reload) {
       var result = await storage.getAll();
+
       if (result != null && result.isNotEmpty) {
         result?.sort((a, b) => a.feature.name.compareTo(b.feature.name));
       }
+      _updateCaches(list: result);
       return result;
     }
-    return user == null ? await _getFlags() : await _getUserFlags(user);
+    _loading.add(FlagsmithLoading.loading);
+    final list = user == null ? await _getFlags() : await _getUserFlags(user);
+    _loading.add(FlagsmithLoading.loaded);
+    return list;
   }
 
   /// Check if Feature flag exist and is enabled
@@ -102,11 +154,42 @@ class FlagsmithClient {
               element.feature.name == featureName && element.enabled == true,
           orElse: () => null);
       return feature != null;
-    } on Exception catch (_) {
+    } on Exception catch (e) {
+      log('Exception: hasFeatureFlag $e');
       throw FlagsmithException(FlagsmithExceptionType.genericError);
     }
   }
 
+  /// Check if Feature flag exist and is enabled
+  ///
+  /// [featureName] an identifier for the feature
+  /// [user] an identifier for the user
+  /// Returns true if feature flag exist and enabled, false otherwise
+  ///
+  /// Returns only if [caches] are enabled in config exception otherwise
+  ///
+  bool hasCachedFeatureFlag(String featureName, {FeatureUser user}) {
+    if (!config.caches) {
+      log('Exception: caches not enabled');
+      throw FlagsmithException(FlagsmithExceptionType.cachesDisabled);
+    }
+    try {
+      var feature = _flags.firstWhere(
+          (element) =>
+              element.feature.name == featureName && element.enabled == true,
+          orElse: () => null);
+      return feature != null;
+    } on Exception catch (e) {
+      log('Exception: hasFeatureFlag $e');
+      throw FlagsmithException(FlagsmithExceptionType.genericError);
+    }
+  }
+
+  /// Check if Feature flag exist and is enabled
+  ///
+  /// [featureName] an identifier for the feature
+  /// [user] an identifier for the user
+  /// Returns true if feature flag exist and enabled, null otherwise
   Future<bool> isFeatureFlagEnabled(String featureName,
       {FeatureUser user}) async {
     try {
@@ -115,7 +198,8 @@ class FlagsmithClient {
           (element) => element.feature.name == featureName,
           orElse: () => null);
       return feature?.enabled;
-    } on Exception catch (_) {
+    } on Exception catch (e) {
+      log('Exception: isFeatureFlagEnabled $e');
       throw FlagsmithException(FlagsmithExceptionType.genericError);
     }
   }
@@ -134,9 +218,11 @@ class FlagsmithClient {
     } on DioError catch (e) {
       log('getFeatureFlagValue dioError: ${e.toString()}');
       throw FlagsmithException(FlagsmithExceptionType.connectionSettings);
-    } on FormatException catch (_) {
+    } on FormatException catch (e) {
+      log('Exception: getFeatureFlagValue $e');
       throw FlagsmithException(FlagsmithExceptionType.wrongFlagFormat);
-    } on Exception catch (_) {
+    } on Exception catch (e) {
+      log('Exception: getFeatureFlagValue $e');
       throw FlagsmithException(FlagsmithExceptionType.genericError);
     }
   }
@@ -151,9 +237,11 @@ class FlagsmithClient {
       log('getTrait dioError: ${e?.error}');
 
       throw FlagsmithException(FlagsmithExceptionType.connectionSettings);
-    } on FormatException catch (_) {
+    } on FormatException catch (e) {
+      log('Exception: getTrait $e');
       throw FlagsmithException(FlagsmithExceptionType.wrongFlagFormat);
-    } on Exception catch (_) {
+    } on Exception catch (e) {
+      log('Exception: getTrait $e');
       throw FlagsmithException(FlagsmithExceptionType.genericError);
     }
   }
@@ -170,9 +258,11 @@ class FlagsmithClient {
     } on DioError catch (e) {
       log('getTraits dioError: ${e?.error}');
       throw FlagsmithException(FlagsmithExceptionType.connectionSettings);
-    } on FormatException catch (_) {
+    } on FormatException catch (e) {
+      log('Exception: getTraits $e');
       throw FlagsmithException(FlagsmithExceptionType.wrongFlagFormat);
-    } on Exception catch (_) {
+    } on Exception catch (e) {
+      log('Exception: getTraits $e');
       throw FlagsmithException(FlagsmithExceptionType.genericError);
     }
   }
@@ -186,15 +276,21 @@ class FlagsmithClient {
             .toList();
         await storage.saveAll(list);
         list.sort((a, b) => a.feature.name.compareTo(b.feature.name));
+        _flags
+          ..clear()
+          ..addAll((list).toSet());
         return list;
       }
+      _flags.clear();
       return [];
     } on DioError catch (e) {
       log('_getFlags dioError: ${e?.error}');
       throw FlagsmithException(FlagsmithExceptionType.connectionSettings);
-    } on FormatException catch (_) {
+    } on FormatException catch (e) {
+      log('Exception: _getFlags $e');
       throw FlagsmithException(FlagsmithExceptionType.wrongFlagFormat);
-    } on Exception catch (_) {
+    } on Exception catch (e) {
+      log('Exception: _getFlags $e');
       throw FlagsmithException(FlagsmithExceptionType.genericError);
     }
   }
@@ -213,16 +309,20 @@ class FlagsmithClient {
           data.sort((a, b) => a.feature.name.compareTo(b.feature.name));
         }
         await storage.saveAll(data);
-
+        _flags
+          ..clear()
+          ..addAll((data ?? []).toSet());
         return data;
       }
       return [];
     } on DioError catch (e) {
       log('getUserTraits dioError: ${e?.error}');
       throw FlagsmithException(FlagsmithExceptionType.connectionSettings);
-    } on FormatException catch (_) {
+    } on FormatException catch (e) {
+      log('Exception: _getUserFlags $e');
       throw FlagsmithException(FlagsmithExceptionType.wrongFlagFormat);
-    } on Exception catch (_) {
+    } on Exception catch (e) {
+      log('Exception: _getUserFlags $e');
       throw FlagsmithException(FlagsmithExceptionType.genericError);
     }
   }
@@ -243,9 +343,11 @@ class FlagsmithClient {
       log('getUserTraits dioError: ${e?.error}');
 
       throw FlagsmithException(FlagsmithExceptionType.connectionSettings);
-    } on FormatException catch (_) {
+    } on FormatException catch (e) {
+      log('Exception: getUserTraits $e');
       throw FlagsmithException(FlagsmithExceptionType.wrongFlagFormat);
-    } on Exception catch (_) {
+    } on Exception catch (e) {
+      log('Exception: getUserTraits $e');
       throw FlagsmithException(FlagsmithExceptionType.genericError);
     }
   }
@@ -265,10 +367,23 @@ class FlagsmithClient {
     } on DioError catch (e) {
       log('_postUserTraits dioError: ${e?.error}');
       throw FlagsmithException(FlagsmithExceptionType.connectionSettings);
-    } on FormatException catch (_) {
+    } on FormatException catch (e) {
+      log('Exception: _postUserTraits $e');
       throw FlagsmithException(FlagsmithExceptionType.wrongFlagFormat);
-    } on Exception catch (_) {
+    } on Exception catch (e) {
+      log('Exception: _postUserTraits $e');
       throw FlagsmithException(FlagsmithExceptionType.genericError);
+    }
+  }
+
+  /// Internal updadte caches from list of featurs
+  void _updateCaches({List<Flag> list = const <Flag>[], bool clear = false}) {
+    if (config.caches) {
+      if (clear) {
+        _flags.clear();
+      } else {
+        _flags.addAll(list.toSet());
+      }
     }
   }
 
@@ -280,6 +395,13 @@ class FlagsmithClient {
 
   /// basic stream
   BehaviorSubject<Flag> subject(String key) => storage.subject(key);
+
+  // Loading from API
+  Stream<FlagsmithLoading> get loading => _loading.stream;
+
+  void close() {
+    _loading?.close();
+  }
 
   /// test toggle feature
   ///

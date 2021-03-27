@@ -2,7 +2,7 @@ name: flagsmith
 description: >-
   Flutter Client SDK for https://www.flagsmith.com/, Flagsmith is 100% Open
   Source. Host yourself or let us take care of the hosting.
-version: 0.1.4
+version: 1.0.0+beta1
 homepage: https://github.com/printeastwoodcz/flagsmith_flutter
 repository: https://github.com/printeastwoodcz/flagsmith_flutter
 issue_tracker: https://github.com/printeastwoodcz/flagsmith_flutter/issues
@@ -19,9 +19,7 @@ dependencies:
   dio: ^3.0.10
   encrypt: ^4.0.3
   equatable: ">=1.2.3 <1.2.6"
-  package_info: ^0.4.3+2
   rxdart: ">=0.23.1 <0.24.2"
-  sembast: ^2.4.7+6
   shared_preferences: ">=0.5.8 <2.0.0"
 
 dev_dependencies:

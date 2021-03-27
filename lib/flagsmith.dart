@@ -14,6 +14,6 @@ export 'src/store/index.dart';
 bool flagsmithDebug = false;
 void log(String message) {
   if (flagsmithDebug) {
-    print(message);
+    print('Flagsmith: $message');
   }
 }

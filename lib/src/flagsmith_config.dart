@@ -16,6 +16,7 @@ class FlagsmithConfig {
   final String password;
 
   final bool isDebug;
+  final bool caches;
   final bool isSelfSigned;
 
   /// Flagsmith config initialization
@@ -28,11 +29,12 @@ class FlagsmithConfig {
   /// Storage
   ///
   /// default type of storage used by [FlagsmithClient] is [StoreType.inMemory].
-  /// you can choose on of [StoreType.inMemory], [StoreType.prefs] and [StoreType.sembast].
-  /// for [StoreType.sembast] must by defined [storePath] where should be db file stored.
+  /// you can choose on of [StoreType.inMemory], [StoreType.persistant].
   ///
   /// if you want to see logs change [isDebug] to *true*
   /// for self hosted server without valid cert set [isSelfSigned] to *true*
+  ///
+  /// if you want to use caches [caches] to *true*
 
   const FlagsmithConfig(
       {this.baseURI = 'https://api.flagsmith.com/api/v1/',
@@ -45,6 +47,7 @@ class FlagsmithConfig {
       this.storeType = StoreType.inMemory,
       this.password = 'flagsmith_sdk_secure',
       this.isDebug = false,
+      this.caches = false,
       this.isSelfSigned = false});
 
   /// Client options from config

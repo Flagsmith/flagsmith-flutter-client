@@ -9,11 +9,14 @@ import 'shared.dart';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   FlagsmithClient fs;
-  setUpAll(() {
-    fs = FlagsmithClient(
+  setUpAll(() async {
+    fs = await FlagsmithClient.init(
         apiKey: apiKey,
         seeds: seeds,
         config: FlagsmithConfig(storeType: StoreType.inMemory));
+    fs.loading.listen((event) {
+      log('loading: $event');
+    });
   });
 
   group('[Flagsmith: InMemory storage]', () {

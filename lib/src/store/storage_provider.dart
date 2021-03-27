@@ -76,7 +76,7 @@ class StorageProvider with SecureStore {
     return true;
   }
 
-  Future<bool> seed(List<Flag> items) async {
+  Future<bool> seed({List<Flag> items}) async {
     var list = items
         ?.map((e) => MapEntry(e.key, _storageSecurity.encrypt(e.toJson())))
         ?.toList();

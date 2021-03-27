@@ -13,8 +13,8 @@ void main() {
 
   SharedPreferences.setMockInitialValues(<String, String>{});
   FlagsmithClient fs;
-  setUpAll(() {
-    fs = FlagsmithClient(
+  setUpAll(() async {
+    fs = await FlagsmithClient.init(
         apiKey: apiKey,
         seeds: seeds,
         config: FlagsmithConfig(storeType: StoreType.persistant));
@@ -22,9 +22,6 @@ void main() {
 
   group('[Flagsmith: Persistent storage]', () {
     test('When test multiple init with seed', () async {
-      var result = await fs.initStore(seeds: seeds, clear: true);
-      expect(result, true);
-
       var resultFF = await fs.getFeatureFlags(reload: false);
       expect(resultFF, isNotNull);
       expect(resultFF, isNotEmpty);
