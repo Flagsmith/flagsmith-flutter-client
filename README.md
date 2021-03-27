@@ -22,7 +22,7 @@ dependencies:
 By default, the client uses the default configuration. You can override this configuration as follows:
 
 ```dart
-var flagsmithClient = FlagsmithClient(
+final flagsmithClient = FlagsmithClient(
       config: FlagsmithConfig(
           baseURI: 'http://yoururl.com/'
       ), apiKey: 'YOUR_ENV_API_KEY');
@@ -31,11 +31,7 @@ var flagsmithClient = FlagsmithClient(
 Override the default configuration with your own:
 
 ```dart
-final appDir = await getApplicationDocumentsDirectory();
-await appDir.create(recursive: true);
-final databasePath = join(appDir.path, 'flagsmith.db');
-
-var flagsmithClient = FlagsmithClient(
+final flagsmithClient = FlagsmithClient(
       config: FlagsmithConfig(
           baseURI: 'http://yoururl.com/',
           connectTimeout: 200,
@@ -55,14 +51,27 @@ Sign Up and create an account at [https://flagsmith.com/](https://flagsmith.com/
 In your application, initialise the BulletTrain client with your API key:
 
 ```dart
-var flagsmithClient = FlagsmithClient(apiKey: 'YOUR_ENV_API_KEY' config: config, seeds: <Flag>[Flag.seed('feature', enabled: true),])
+final flagsmithClient = FlagsmithClient(
+        apiKey: 'YOUR_ENV_API_KEY' 
+        config: config, 
+        seeds: <Flag>[
+            Flag.seed('feature', enabled: true),
+        ],
+    );
 await flagsmithClient.getFeatureFlags(reload: true) // fetch updates from api
 ```
 
 if you prefer async initialization then you should use
 
 ```dart
-var flagsmithClient = await FlagsmithClient.init(apiKey: 'YOUR_ENV_API_KEY' config: config, seeds: <Flag>[Flag.seed('feature', enabled: true),], update: false)
+final flagsmithClient = await FlagsmithClient.init(
+        apiKey: 'YOUR_ENV_API_KEY',
+        config: config, 
+        seeds: <Flag>[
+            Flag.seed('feature', enabled: true),
+        ], 
+        update: false,
+    );
 await flagsmithClient.getFeatureFlags(reload: true) // fetch updates from api
 ```
 
@@ -81,7 +90,7 @@ if (featureEnabled) {
 To get the configuration value for a feature flag:
 
 ```dart
-var myRemoteConfig = await flagsmithClient.getFeatureFlagValue("my_test_feature");
+final myRemoteConfig = await flagsmithClient.getFeatureFlagValue("my_test_feature");
 if (myRemoteConfig != null) {
     // run the code to use remote config value
 } else {
@@ -96,15 +105,15 @@ You can use caches instead of async/await
 
 ```dart
 final config = FlagsmithConfig(
-          baseURI: 'http://yoururl.com/',
-          connectTimeout: 200,
-          receiveTimeout: 500,
-          sendTimeout: 500,
-          storeType = StoreType.inMemory,
-          caches: true, // mandatory if you want to use caches
-      );
+    baseURI: 'http://yoururl.com/',
+    connectTimeout: 200,
+    receiveTimeout: 500,
+    sendTimeout: 500,
+    storeType = StoreType.inMemory,
+    caches: true, // mandatory if you want to use caches
+);
 
-var flagsmithClient = await FlagsmithClient.init(
+final flagsmithClient = await FlagsmithClient.init(
         apiKey: 'YOUR_ENV_API_KEY', 
         config: config, 
         seeds: <Flag>[
@@ -124,7 +133,7 @@ Identifying users allows you to target specific users from the [Flagsmith dashbo
 To check if a feature exists for a given user Identity:
 
 ```dart
-var user = FeatureUser(identifier: 'flagsmith_sample_user');
+final user = FeatureUser(identifier: 'flagsmith_sample_user');
 bool featureEnabled = await flagsmithClient.hasFeatureFlag('my_test_feature', user: user);
 if (featureEnabled) {
     // run the code to execute enabled feature for given user
@@ -136,7 +145,7 @@ if (featureEnabled) {
 To get the configuration value for a feature flag for given a user Identity:
 
 ```dart
-var myRemoteConfig = await flagsmithClient.getFeatureFlagValue('my_test_feature', user: user);
+final myRemoteConfig = await flagsmithClient.getFeatureFlagValue('my_test_feature', user: user);
 if (myRemoteConfig != null) {
     // run the code to use remote config value
 } else {
@@ -147,7 +156,7 @@ if (myRemoteConfig != null) {
 To get the user traits for given user Identity:
 
 ```dart
-var userTraits = await flagsmithClient.getTraits(user)
+final userTraits = await flagsmithClient.getTraits(user)
 if (userTraits != null && userTraits) {
     // run the code to use user traits
 } else {
@@ -158,7 +167,7 @@ if (userTraits != null && userTraits) {
 To get user trait for given user Identity and specific Trait key:
 
 ```dart
-var userTrait = await flagsmithClient.getTrait(user, 'cookies_key');
+final userTrait = await flagsmithClient.getTrait(user, 'cookies_key');
 if (userTrait != null) {
     // run the code to use user trait
 } else {
@@ -169,7 +178,7 @@ if (userTrait != null) {
 Or get user traits for given user Identity and specific Trait keys:
 
 ```dart
- var userTraits = await flagsmithClient.getTraits(user, keys: ['cookies_key', 'other_trait']);
+final userTraits = await flagsmithClient.getTraits(user, keys: ['cookies_key', 'other_trait']);
 if (userTraits != null) {
     // run the code to use user traits
 } else {
@@ -180,7 +189,7 @@ if (userTraits != null) {
 To update a user trait for given user Identity:
 
 ```dart
- var userTrait = await flagsmithClient.getTrait(user, 'cookies_key');
+final userTrait = await flagsmithClient.getTrait(user, 'cookies_key');
 if (userTrait != null) {
     // update value for user trait
     var updatedTrait = userTrait.copyWith(value: 'new value');
