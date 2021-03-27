@@ -1,13 +1,15 @@
 ## [1.0.0+beta1] - 03/27/2021
+*Bullet train client* is **Flagsmith**
 * rebranding to ***Flagsmith***
+* `isDebug` logs exceptions to console with prefix *Flagsmith:*.
 
-* ***Client***
+**Client**
 * adding `client.loading` stream [loading] [loaded] for detection api request state
 * adding `FlagsmithClient({ bool update = false})` for update from api directly after init
 * adding async init `FlagsmithClient.init({FlagsmithConfig config = const FlagsmithConfig(),@required String apiKey,List<Flag> seeds,bool update = false})`
 * adding `Flag.seed(String featureName, {bool enabled, String value})`
 
-* ***Config***
+**Config**
 * adding `caches` with default value `false`
 * adding caches to client and new `bool hasCachedFeatureFlag(String featureName, {FeatureUser user})`
 ## [0.1.5] - 11/26/2020

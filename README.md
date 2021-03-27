@@ -17,6 +17,35 @@ dependencies:
 
 ## Usage
 
+## Override default configuration
+
+By default, the client uses the default configuration. You can override this configuration as follows:
+
+```dart
+var flagsmithClient = FlagsmithClient(
+      config: FlagsmithConfig(
+          baseURI: 'http://yoururl.com/'
+      ), apiKey: 'YOUR_ENV_API_KEY');
+```
+
+Override the default configuration with your own:
+
+```dart
+final appDir = await getApplicationDocumentsDirectory();
+await appDir.create(recursive: true);
+final databasePath = join(appDir.path, 'flagsmith.db');
+
+var flagsmithClient = FlagsmithClient(
+      config: FlagsmithConfig(
+          baseURI: 'http://yoururl.com/',
+          connectTimeout: 200,
+          receiveTimeout: 500,
+          sendTimeout: 500,
+          storeType = StoreType.inMemory,
+          caches: true,
+      ), apiKey: 'YOUR_ENV_API_KEY');
+```
+
 ### Retrieving feature flags for your project
 
 **For full documentation visit [https://docs.flagsmith.com/](https://docs.flagsmith.com/)**
@@ -26,8 +55,17 @@ Sign Up and create an account at [https://flagsmith.com/](https://flagsmith.com/
 In your application, initialise the BulletTrain client with your API key:
 
 ```dart
-var flagsmithClient = FlagsmithClient(apiKey: 'YOUR_ENV_API_KEY')
+var flagsmithClient = FlagsmithClient(apiKey: 'YOUR_ENV_API_KEY' config: config, seeds: <Flag>[Flag.seed('feature', enabled: true),])
+await flagsmithClient.getFeatureFlags(reload: true) // fetch updates from api
 ```
+
+if you prefer async initialization then you should use
+
+```dart
+var flagsmithClient = await FlagsmithClient.init(apiKey: 'YOUR_ENV_API_KEY' config: config, seeds: <Flag>[Flag.seed('feature', enabled: true),], update: false)
+await flagsmithClient.getFeatureFlags(reload: true) // fetch updates from api
+```
+
 
 To check if a feature flag exists and is enabled:
 
@@ -50,6 +88,34 @@ if (myRemoteConfig != null) {
     // run the code without remote config
 }
 ```
+
+#### Cached flags
+
+You can use caches instead of async/await 
+
+
+```dart
+final config = FlagsmithConfig(
+          baseURI: 'http://yoururl.com/',
+          connectTimeout: 200,
+          receiveTimeout: 500,
+          sendTimeout: 500,
+          storeType = StoreType.inMemory,
+          caches: true, // mandatory if you want to use caches
+      );
+
+var flagsmithClient = await FlagsmithClient.init(
+        apiKey: 'YOUR_ENV_API_KEY', 
+        config: config, 
+        seeds: <Flag>[
+            Flag.seed('feature', enabled: true),
+        ], 
+    );
+
+await flagsmithClient.getFeatureFlags(reload: true); // fetch updates from api
+bool isFeatureEnabled = flagsmithClient.hasCachedFeatureFlag('feature');
+```
+
 
 ### Identifying users
 
@@ -122,35 +188,6 @@ if (userTrait != null) {
 } else {
     // run the code without user trait
 }
-```
-
-## Override default configuration
-
-By default, the client uses the default configuration. You can override this configuration as follows:
-
-```dart
-var flagsmithClient = FlagsmithClient(
-      config: FlagsmithConfig(
-          baseURI: 'http://yoururl.com/'
-      ), apiKey: 'YOUR_ENV_API_KEY');
-```
-
-Override the default configuration with your own:
-
-```dart
-final appDir = await getApplicationDocumentsDirectory();
-await appDir.create(recursive: true);
-final databasePath = join(appDir.path, 'flagsmith.db');
-
-var flagsmithClient = FlagsmithClient(
-      config: FlagsmithConfig(
-          baseURI: 'http://yoururl.com/',
-          connectTimeout: 200,
-          receiveTimeout: 500,
-          sendTimeout: 500,
-          usePersitantStorage: true,
-          persistantDatabasePath: databasePath,
-      ), apiKey: 'YOUR_ENV_API_KEY');
 ```
 
 ## Getting Help
