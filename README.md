@@ -17,31 +17,6 @@ dependencies:
 
 ## Usage
 
-## Override default configuration
-
-By default, the client uses the default configuration. You can override this configuration as follows:
-
-```dart
-final flagsmithClient = FlagsmithClient(
-      config: FlagsmithConfig(
-          baseURI: 'http://yoururl.com/'
-      ), apiKey: 'YOUR_ENV_API_KEY');
-```
-
-Override the default configuration with your own:
-
-```dart
-final flagsmithClient = FlagsmithClient(
-      config: FlagsmithConfig(
-          baseURI: 'http://yoururl.com/',
-          connectTimeout: 200,
-          receiveTimeout: 500,
-          sendTimeout: 500,
-          storeType = StoreType.inMemory,
-          caches: true,
-      ), apiKey: 'YOUR_ENV_API_KEY');
-```
-
 ### Retrieving feature flags for your project
 
 **For full documentation visit [https://docs.flagsmith.com/](https://docs.flagsmith.com/)**
@@ -98,7 +73,7 @@ if (myRemoteConfig != null) {
 }
 ```
 
-#### Cached flags
+## Cached flags
 
 You can use caches instead of async/await 
 
@@ -198,7 +173,30 @@ if (userTrait != null) {
     // run the code without user trait
 }
 ```
+## Override default configuration
 
+By default, the client uses the default configuration. You can override this configuration as follows:
+
+```dart
+final flagsmithClient = FlagsmithClient(
+      config: FlagsmithConfig(
+          baseURI: 'http://yoururl.com/'
+      ), apiKey: 'YOUR_ENV_API_KEY');
+```
+
+Override the default configuration with your own:
+
+```dart
+final flagsmithClient = FlagsmithClient(
+      config: FlagsmithConfig(
+          baseURI: 'http://yoururl.com/',
+          connectTimeout: 200,
+          receiveTimeout: 500,
+          sendTimeout: 500,
+          storeType = StoreType.inMemory,
+          caches: true,
+      ), apiKey: 'YOUR_ENV_API_KEY');
+```
 ## Getting Help
 
 If you encounter a bug or feature request we would like to hear about it. Before you submit an issue please search existing issues in order to prevent duplicates.
