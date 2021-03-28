@@ -1,3 +1,5 @@
+## [1.0.0-prev.0+beta1] - 03/27/2021
+* init version of nullsafety version
 ## [1.0.0+beta1] - 03/27/2021
 *Bullet train client* is **Flagsmith**
 * rebranding to ***Flagsmith***
