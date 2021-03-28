@@ -8,14 +8,14 @@ import '../extensions/string_x.dart';
 
 /// Standard Flagsmith feature
 class Feature extends Equatable {
-  final int id;
-  final String name;
-  final DateTime createdDate;
-  final String initialValue;
-  final FlagType type;
-  final String description;
+  final int? id;
+  final String? name;
+  final DateTime? createdDate;
+  final String? initialValue;
+  final FlagType? type;
+  final String? description;
   @override
-  List<Object> get props =>
+  List<Object?> get props =>
       [id, name, createdDate, initialValue, type, description];
   @override
   bool get stringify => true;
@@ -37,12 +37,12 @@ class Feature extends Equatable {
   });
 
   Feature copyWith({
-    int id,
-    String name,
-    DateTime createdDate,
-    String initialValue,
-    FlagType type,
-    String description,
+    int? id,
+    String? name,
+    DateTime? createdDate,
+    String? initialValue,
+    FlagType? type,
+    String? description,
   }) {
     return Feature(
       id ?? this.id,
@@ -66,19 +66,15 @@ class Feature extends Equatable {
   }
 
   factory Feature.fromMap(Map<String, dynamic> map) {
-    if (map == null) {
-      return null;
-    }
-
     return Feature(
-      map['id'] as int,
-      (map['name'] as String)?.normalize(),
+      map['id'] as int?,
+      (map['name'] as String?)?.normalize(),
       map['created_date'] != null
           ? DateTime.parse(map['created_date'] as String)
           : null,
       map['initial_value']?.toString(),
-      FlagTypeX.fromMap(map['type'] as String),
-      map['description'] as String,
+      FlagTypeX.fromMap(map['type'] as String?),
+      map['description'] as String?,
     );
   }
 

@@ -1,3 +1,3 @@
 extension StringX on String {
-  String normalize() => toLowerCase()?.trim()?.replaceAll(' ', '_');
+  String? normalize() => toLowerCase().trim().replaceAll(' ', '_');
 }

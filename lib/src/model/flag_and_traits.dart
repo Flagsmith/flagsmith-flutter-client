@@ -3,10 +3,10 @@ import 'package:equatable/equatable.dart';
 import 'index.dart';
 
 class FlagAndTraits extends Equatable {
-  final List<Flag> flags;
-  final List<Trait> traits;
+  final List<Flag>? flags;
+  final List<Trait>? traits;
   @override
-  List<Object> get props => [flags, traits];
+  List<Object?> get props => [flags, traits];
   @override
   bool get stringify => true;
   FlagAndTraits({
@@ -15,8 +15,8 @@ class FlagAndTraits extends Equatable {
   });
 
   FlagAndTraits copyWith({
-    List<Flag> flags,
-    List<Trait> traits,
+    List<Flag>? flags,
+    List<Trait>? traits,
   }) {
     return FlagAndTraits(
       flags: flags ?? this.flags,
@@ -26,16 +26,12 @@ class FlagAndTraits extends Equatable {
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
-      'flags': flags?.map((x) => x?.toMap())?.toList(),
-      'traits': traits?.map((x) => x?.toMap())?.toList(),
+      'flags': flags?.map((x) => x.toMap()).toList(),
+      'traits': traits?.map((x) => x.toMap()).toList(),
     };
   }
 
   factory FlagAndTraits.fromMap(Map<String, dynamic> map) {
-    if (map == null) {
-      return null;
-    }
-
     return FlagAndTraits(
       flags: List<Flag>.from(map['flags']
               ?.map((dynamic x) => Flag.fromMap(x as Map<String, dynamic>))

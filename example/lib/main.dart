@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:math';
+import 'package:collection/collection.dart' show IterableExtension;
 import 'package:flagsmith/flagsmith.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
@@ -63,7 +63,7 @@ class FlagsmithSampleApp extends StatelessWidget {
 class FlagsmithSampleScreen extends StatelessWidget {
   // Screen title
   final String title;
-  FlagsmithSampleScreen({Key key, this.title}) : super(key: key);
+  FlagsmithSampleScreen({Key? key, this.title = ''}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<FlagBloc, FlagState>(
@@ -90,7 +90,7 @@ class FlagsmithSampleScreen extends StatelessWidget {
                           style: Theme.of(context)
                               .textTheme
                               .caption
-                              .copyWith(color: Theme.of(context).primaryColor),
+                              ?.copyWith(color: Theme.of(context).primaryColor),
                         ),
                       ],
                     )
@@ -99,7 +99,7 @@ class FlagsmithSampleScreen extends StatelessWidget {
                       style: Theme.of(context)
                           .textTheme
                           .headline5
-                          .copyWith(color: Theme.of(context).primaryColor),
+                          ?.copyWith(color: Theme.of(context).primaryColor),
                     ),
               centerTitle: Platform.isIOS,
               flexibleSpace: Container(
@@ -116,7 +116,7 @@ class FlagsmithSampleScreen extends StatelessWidget {
                   ? Center(child: CircularProgressIndicator())
                   : RefreshIndicator(
                       onRefresh: () async {
-                        context.bloc<FlagBloc>().add(FlagEvent.fetch);
+                        context.read<FlagBloc>().add(FlagEvent.fetch);
                         return null;
                       },
                       child: ListView.separated(
@@ -129,15 +129,15 @@ class FlagsmithSampleScreen extends StatelessWidget {
                         itemBuilder: (context, index) {
                           var item = state.flags[index];
                           return SwitchListTile.adaptive(
-                              title: Text(item.feature.description ??
-                                  item.feature.name ??
+                              title: Text(item.feature?.description ??
+                                  item.feature?.name ??
                                   'no description'),
-                              subtitle: item.feature.description != null
+                              subtitle: item.feature?.description != null
                                   ? Text(
-                                      'feature: ${item.feature.name}\ntype: ${describeEnum(item.feature.type)}')
+                                      'feature: ${item.feature?.name}\ntype: ${item.feature != null ? describeEnum(item.feature!.type!) : ''}')
                                   : Text(
-                                      'type: ${describeEnum(item.feature.type)}'),
-                              value: item.enabled,
+                                      'type: ${item.feature != null ? describeEnum(item.feature!.type!) : ''}'),
+                              value: item.enabled ?? false,
                               onChanged: (bool value) {});
                         },
                       ),
@@ -152,12 +152,12 @@ class FlagsmithSampleScreen extends StatelessWidget {
                 FloatingActionButton(
                   mini: true,
                   onPressed: () =>
-                      context.bloc<FlagBloc>().add(FlagEvent.toggle),
+                      context.read<FlagBloc>().add(FlagEvent.toggle),
                   child: Icon(Icons.account_circle),
                 ),
                 FloatingActionButton.extended(
                   onPressed: () =>
-                      context.bloc<FlagBloc>().add(FlagEvent.fetch),
+                      context.read<FlagBloc>().add(FlagEvent.fetch),
                   tooltip: 'Fetch',
                   icon: Icon(Icons.add),
                   label: Text('Fetch'),
@@ -175,12 +175,10 @@ extension BuildContextX on BuildContext {
 
 class CardTileWidget extends StatelessWidget {
   final Flag item;
-  const CardTileWidget({Key key, @required this.item})
-      : assert(item != null, 'missing data'),
-        super(key: key);
+  const CardTileWidget({Key? key, required this.item}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    var color = item.feature.name == 'color'
+    var color = item.feature?.name == 'color'
         ? HexColor(item.stateValue ?? '')
         : Colors.black;
     return Card(
@@ -189,8 +187,8 @@ class CardTileWidget extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            item.feature?.name,
-            style: context.textTheme.headline5.copyWith(color: color),
+            item.feature?.name ?? '',
+            style: context.textTheme.headline5?.copyWith(color: color),
           )
         ],
       ),
@@ -230,10 +228,9 @@ class FlagState extends Equatable {
   @override
   List<Object> get props => [loading, flags];
 
-  const FlagState({@required this.loading, this.flags})
-      : assert(loading != null);
+  const FlagState({required this.loading, this.flags = const <Flag>[]});
 
-  FlagState copyWith({LoadingState loading, List<Flag> flags}) {
+  FlagState copyWith({LoadingState? loading, List<Flag>? flags}) {
     return FlagState(
         loading: loading ?? this.loading, flags: flags ?? this.flags);
   }
@@ -242,22 +239,18 @@ class FlagState extends Equatable {
   factory FlagState.initial() =>
       FlagState(loading: LoadingState.isInitial, flags: []);
 
-  bool isEnabled(String flag) =>
-      flags.firstWhere(
-        (element) => element.feature.name == flag && element.enabled == true,
-        orElse: () => null,
-      ) !=
-      null;
+  bool isEnabled(String flag) {
+    final found = flags.firstWhereOrNull(
+        (element) => element.feature?.name == flag && element.enabled == true);
+    return found?.enabled ?? false;
+  }
 }
 
 /// A simple [Bloc] which manages an `FlagState` as its state.
 class FlagBloc extends Bloc<FlagEvent, FlagState> {
   final FlagsmithClient fs;
-
-  StreamSubscription<Flag> _behaviorSubject;
-  FlagBloc({@required this.fs})
-      : assert(fs != null),
-        super(FlagState.initial());
+  Stream<Flag>? _streamSubscription;
+  FlagBloc({required this.fs}) : super(FlagState.initial());
 
   @override
   Stream<FlagState> mapEventToState(FlagEvent event) async* {
@@ -285,10 +278,12 @@ class FlagBloc extends Bloc<FlagEvent, FlagState> {
             Trait(key: 'age', value: '21'));
         break;
       case FlagEvent.register:
-        _behaviorSubject ??= fs.stream(testFeature)?.listen((event) {
-          log('LISTEN: ${event.feature.name} => ${event.enabled}');
+        _streamSubscription ??= fs.stream(testFeature);
+        _streamSubscription?.listen((event) {
+          log('LISTEN: ${event.feature?.name} => ${event.enabled}');
           add(FlagEvent.reload);
         });
+
         break;
       case FlagEvent.toggle:
         await fs.testToggle(testFeature);
@@ -298,12 +293,12 @@ class FlagBloc extends Bloc<FlagEvent, FlagState> {
     }
   }
 
-  Future<bool> isEnabled(String featureName, {FeatureUser user}) =>
+  Future<bool> isEnabled(String featureName, {FeatureUser? user}) =>
       fs.hasFeatureFlag(featureName, user: user);
 
   @override
   Future<void> close() {
-    _behaviorSubject?.cancel();
+    // _behaviorSubject.cancel();
     return super.close();
   }
 }

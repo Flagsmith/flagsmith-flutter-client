@@ -4,19 +4,19 @@ import 'package:equatable/equatable.dart';
 
 /// Personalized user
 class FeatureUser extends Equatable {
-  final String identifier;
+  final String? identifier;
   const FeatureUser({
     this.identifier,
   });
   @override
-  List<Object> get props => [identifier];
+  List<Object?> get props => [identifier];
 
   @override
   bool get stringify => true;
 
   /// copy [FeatureUser] to new instance
   FeatureUser copyWith({
-    String identifier,
+    String? identifier,
   }) {
     return FeatureUser(
       identifier: identifier ?? this.identifier,
@@ -32,12 +32,8 @@ class FeatureUser extends Equatable {
 
   /// create [FeatureUser] from map
   factory FeatureUser.fromMap(Map<String, dynamic> map) {
-    if (map == null) {
-      return null;
-    }
-
     return FeatureUser(
-      identifier: map['identifier'] as String,
+      identifier: map['identifier'] as String?,
     );
   }
 

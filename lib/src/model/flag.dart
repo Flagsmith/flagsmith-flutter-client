@@ -7,12 +7,12 @@ import 'feature.dart';
 import 'flag_type.dart';
 
 class Flag extends Equatable {
-  final int id;
-  final Feature feature;
-  final String stateValue;
-  final bool enabled;
+  final int? id;
+  final Feature? feature;
+  final String? stateValue;
+  final bool? enabled;
   @override
-  List<Object> get props => [id, feature, stateValue, enabled];
+  List<Object?> get props => [id, feature, stateValue, enabled];
   @override
   bool get stringify => true;
   Flag(
@@ -29,10 +29,10 @@ class Flag extends Equatable {
   });
 
   Flag copyWith({
-    int id,
-    Feature feature,
-    String stateValue,
-    bool enabled,
+    int? id,
+    Feature? feature,
+    String? stateValue,
+    bool? enabled,
   }) {
     return Flag(
       id ?? this.id,
@@ -52,15 +52,11 @@ class Flag extends Equatable {
   }
 
   factory Flag.fromMap(Map<String, dynamic> map) {
-    if (map == null) {
-      return null;
-    }
-
     return Flag(
-      map['id'] as int,
+      map['id'] as int?,
       Feature.fromMap(map['feature'] as Map<String, dynamic>),
-      map['feature_state_value']?.toString()?.normalize(),
-      map['enabled'] as bool,
+      map['feature_state_value'].toString().normalize(),
+      map['enabled'] as bool?,
     );
   }
 
@@ -69,7 +65,7 @@ class Flag extends Equatable {
   factory Flag.fromJson(String source) =>
       Flag.fromMap(json.decode(source) as Map<String, dynamic>);
 
-  String get key => feature.name ?? id.toString();
+  String get key => feature!.name ?? id.toString();
   @override
   String toString() {
     return 'F(${feature?.name}:$enabled)';
@@ -77,7 +73,7 @@ class Flag extends Equatable {
 
   static int _generateNum(int min, int max) =>
       min + Random().nextInt(max - min);
-  static Flag seed(String featureName, {bool enabled = true, String value}) {
+  static Flag seed(String featureName, {bool enabled = true, String? value}) {
     var id = _generateNum(1, 100);
 
     return Flag.named(

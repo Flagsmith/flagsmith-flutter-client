@@ -27,9 +27,9 @@ void main() {
     expect(flag.stateValue, isNotNull);
     expect(flag.enabled, true);
     expect(flag.feature, isNotNull);
-    expect(flag.feature.name, isNotNull);
-    expect(flag.feature.type, isNotNull);
-    expect(flag.feature.description, isNotNull);
+    expect(flag.feature!.name, isNotNull);
+    expect(flag.feature!.type, isNotNull);
+    expect(flag.feature!.description, isNotNull);
   });
 
   test('flag seed - enabled', () {
@@ -37,26 +37,26 @@ void main() {
 
     expect(flagDefault.enabled, true);
     expect(flagDefault.feature, isNotNull);
-    expect(flagDefault.feature.type, FlagType.flag);
+    expect(flagDefault.feature!.type, FlagType.flag);
 
     var flag = Flag.seed('feature');
 
     expect(flag.enabled, true);
     expect(flag.feature, isNotNull);
-    expect(flag.feature.type, FlagType.flag);
+    expect(flag.feature!.type, FlagType.flag);
   });
   test('flag seed - disabled', () {
     var flag = Flag.seed('feature', enabled: false);
     expect(flag.enabled, false);
     expect(flag.feature, isNotNull);
-    expect(flag.feature.type, FlagType.flag);
+    expect(flag.feature!.type, FlagType.flag);
   });
 
   test('flag seed - cofig', () {
     var flag = Flag.seed('feature', enabled: false, value: '1.0.0');
     expect(flag.enabled, false);
     expect(flag.feature, isNotNull);
-    expect(flag.feature.type, FlagType.config);
+    expect(flag.feature!.type, FlagType.config);
     expect(flag.stateValue, isNotNull);
     expect(flag.stateValue, '1.0.0');
   });

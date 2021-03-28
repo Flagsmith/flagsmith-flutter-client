@@ -12,7 +12,7 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
   SharedPreferences.setMockInitialValues(<String, String>{});
-  FlagsmithClient fs;
+  late FlagsmithClient fs;
   setUpAll(() async {
     fs = await FlagsmithClient.init(
         apiKey: apiKey,
@@ -116,12 +116,13 @@ void main() {
       var user = FeatureUser(identifier: 'test_another_user');
       var result = await fs.getTrait(user, 'age');
       expect(result, isNotNull);
-      expect(result.value, isNotNull);
+      expect(result?.value, isNotNull);
 
-      var toUpdate = result.copyWith(value: '25');
-      var updateResult = await fs.updateTrait(user, toUpdate);
+      var toUpdate = result?.copyWith(value: '25');
+      expect(toUpdate, isNotNull);
+      var updateResult = await fs.updateTrait(user, toUpdate!);
       expect(updateResult, isNotNull);
-      expect(updateResult.value, '25');
+      expect(updateResult?.value, '25');
     });
   });
 }

@@ -1,12 +1,13 @@
 import '../../flagsmith.dart';
+import 'package:collection/collection.dart' show IterableExtension;
 
 extension FlagTypeX on FlagType {
-  static FlagType byName(String name) {
+  static FlagType? byName(String name) {
     return FlagType.values
-        .firstWhere((e) => e.name == name.toUpperCase(), orElse: () => null);
+        .firstWhereOrNull((e) => e.name == name.toUpperCase());
   }
 
-  static FlagType fromMap(String value) {
+  static FlagType? fromMap(String? value) {
     if (value == null) {
       return null;
     }

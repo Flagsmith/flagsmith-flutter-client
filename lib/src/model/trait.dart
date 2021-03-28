@@ -5,12 +5,12 @@ import '../extensions/string_x.dart';
 import 'feature_user.dart';
 
 class Trait extends Equatable {
-  final int id;
-  final FeatureUser identity;
-  final String key;
-  final String value;
+  final int? id;
+  final FeatureUser? identity;
+  final String? key;
+  final String? value;
   @override
-  List<Object> get props => [id, identity, key, value];
+  List<Object?> get props => [id, identity, key, value];
   @override
   bool get stringify => true;
   Trait({
@@ -21,10 +21,10 @@ class Trait extends Equatable {
   });
 
   Trait copyWith({
-    int id,
-    FeatureUser identity,
-    String key,
-    String value,
+    int? id,
+    FeatureUser? identity,
+    String? key,
+    String? value,
   }) {
     return Trait(
       id: id ?? this.id,
@@ -44,17 +44,13 @@ class Trait extends Equatable {
   }
 
   factory Trait.fromMap(Map<String, dynamic> map) {
-    if (map == null) {
-      return null;
-    }
-
     return Trait(
-      id: map['id'] as int,
+      id: map['id'] as int?,
       identity: map['identity'] != null
           ? FeatureUser.fromMap(map['identity'] as Map<String, dynamic>)
           : null,
-      key: (map['trait_key'] as String)?.normalize(),
-      value: (map['trait_value'] as String)?.normalize(),
+      key: (map['trait_key'] as String?)?.normalize(),
+      value: (map['trait_value'] as String?)?.normalize(),
     );
   }
 
