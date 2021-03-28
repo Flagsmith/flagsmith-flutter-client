@@ -1,4 +1,4 @@
-## [1.0.0+beta1] - 03/27/2021
+## [1.0.0-prev.0] - 03/27/2021
 *Bullet train client* is **Flagsmith**
 * rebranding to ***Flagsmith***
 * `isDebug` logs exceptions to console with prefix *Flagsmith:*.
