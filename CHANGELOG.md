@@ -1,4 +1,4 @@
-## [1.0.1-nullsafety.0] - 03/27/2021
+## [2.0.0-nullsafety.0] - 03/27/2021
 * init version of nullsafety version
 ## [1.0.1] - 03/27/2021
 * minor update
