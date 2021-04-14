@@ -4,7 +4,6 @@ import 'dart:math';
 import 'package:equatable/equatable.dart';
 import '../extensions/string_x.dart';
 import 'feature.dart';
-import 'flag_type.dart';
 
 class Flag extends Equatable {
   final int id;
@@ -87,8 +86,7 @@ class Flag extends Equatable {
             id: id,
             name: featureName,
             createdDate:
-                DateTime.now().add(Duration(days: _generateNum(0, 10))),
-            type: value != null ? FlagType.config : FlagType.flag),
+                DateTime.now().add(Duration(days: _generateNum(0, 10)))),
         enabled: enabled);
   }
 }

@@ -2,8 +2,6 @@ import 'dart:convert';
 
 import 'package:equatable/equatable.dart';
 
-import 'flag_type.dart';
-import '../extensions/flag_type_x.dart';
 import '../extensions/string_x.dart';
 
 /// Standard Flagsmith feature
@@ -12,11 +10,9 @@ class Feature extends Equatable {
   final String name;
   final DateTime createdDate;
   final String initialValue;
-  final FlagType type;
   final String description;
   @override
-  List<Object> get props =>
-      [id, name, createdDate, initialValue, type, description];
+  List<Object> get props => [id, name, createdDate, initialValue, description];
   @override
   bool get stringify => true;
   Feature(
@@ -24,7 +20,6 @@ class Feature extends Equatable {
     this.name,
     this.createdDate,
     this.initialValue,
-    this.type,
     this.description,
   );
   Feature.named({
@@ -32,7 +27,6 @@ class Feature extends Equatable {
     this.name,
     this.createdDate,
     this.initialValue,
-    this.type,
     this.description,
   });
 
@@ -41,7 +35,6 @@ class Feature extends Equatable {
     String name,
     DateTime createdDate,
     String initialValue,
-    FlagType type,
     String description,
   }) {
     return Feature(
@@ -49,7 +42,6 @@ class Feature extends Equatable {
       name ?? this.name,
       createdDate ?? this.createdDate,
       initialValue ?? this.initialValue,
-      type ?? this.type,
       description ?? this.description,
     );
   }
@@ -60,7 +52,6 @@ class Feature extends Equatable {
       'name': name?.normalize(),
       'created_date': createdDate?.toIso8601String(),
       'initial_value': initialValue,
-      'type': type?.toMap(),
       'description': description,
     };
   }
@@ -77,7 +68,6 @@ class Feature extends Equatable {
           ? DateTime.parse(map['created_date'] as String)
           : null,
       map['initial_value']?.toString(),
-      FlagTypeX.fromMap(map['type'] as String),
       map['description'] as String,
     );
   }
