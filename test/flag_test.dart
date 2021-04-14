@@ -13,7 +13,7 @@ void main() {
         "created_date": "2018-06-04T12:51:18.646762Z",
         "initial_value": 10,
         "description": "test description",
-        "type": "CONFIG",
+        "type": "STANDARD",
         "project": 2
       },
       "feature_state_value": "10.1.0",
