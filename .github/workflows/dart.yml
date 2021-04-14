@@ -1,14 +1,13 @@
-name: Example workflow
+name: Analyze and Test
 on: [push, pull_request]
 
 jobs:
-
-  package-analysis:
-
+  analyze-and-test:
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v2
     - uses: subosito/flutter-action@v1
-    - run: flutter analyze
+    # todo: reenable this
+    # - run: flutter analyze
     - run: flutter test
