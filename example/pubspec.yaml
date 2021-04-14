@@ -11,12 +11,12 @@ dependencies:
     sdk: flutter
   flagsmith:
     path: ../
-  equatable: ^1.2.5
-  flutter_bloc: ^6.0.5
-  flutter_svg: ^0.19.1
-  get_it: ^4.0.4
-  google_fonts: ^1.1.0
-  hexcolor: ^1.0.6
+  equatable: 1.2.5
+  flutter_bloc: 6.0.5
+  flutter_svg: 0.19.3
+  get_it: 4.0.4
+  google_fonts: 1.1.0
+  hexcolor: 1.0.6
   rxdart: ">=0.23.1 <0.24.2"
 
 dev_dependencies:
