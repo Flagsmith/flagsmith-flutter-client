@@ -1,3 +1,7 @@
+## [1.1.0] - 14/04/2021
+* remove reliance on `type` attribute of feature
+* minor fixes to example app
+
 ## [1.0.1] - 03/27/2021
 * minor update
 ## [1.0.0-prev.0] - 03/27/2021
