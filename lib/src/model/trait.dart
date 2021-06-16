@@ -6,25 +6,25 @@ import 'feature_user.dart';
 
 class Trait extends Equatable {
   final int id;
-  final FeatureUser identity;
-  final String key;
-  final String value;
+  final FeatureUser? identity;
+  final String? key;
+  final String? value;
   @override
   List<Object> get props => [id, identity, key, value];
   @override
   bool get stringify => true;
   Trait({
-    this.id,
-    this.identity,
-    this.key,
-    this.value,
+    required this.id,
+    required this.identity,
+    required this.key,
+    required this.value,
   });
 
   Trait copyWith({
-    int id,
-    FeatureUser identity,
-    String key,
-    String value,
+    int? id,
+    FeatureUser? identity,
+    String? key,
+    String? value,
   }) {
     return Trait(
       id: id ?? this.id,
@@ -44,10 +44,6 @@ class Trait extends Equatable {
   }
 
   factory Trait.fromMap(Map<String, dynamic> map) {
-    if (map == null) {
-      return null;
-    }
-
     return Trait(
       id: map['id'] as int,
       identity: map['identity'] != null

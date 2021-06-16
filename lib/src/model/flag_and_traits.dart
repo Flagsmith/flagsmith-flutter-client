@@ -10,13 +10,13 @@ class FlagAndTraits extends Equatable {
   @override
   bool get stringify => true;
   FlagAndTraits({
-    this.flags,
-    this.traits,
+    required this.flags,
+    required this.traits,
   });
 
   FlagAndTraits copyWith({
-    List<Flag> flags,
-    List<Trait> traits,
+    List<Flag>? flags,
+    List<Trait>? traits,
   }) {
     return FlagAndTraits(
       flags: flags ?? this.flags,

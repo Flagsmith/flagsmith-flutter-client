@@ -7,12 +7,12 @@ import '../extensions/string_x.dart';
 /// Standard Flagsmith feature
 class Feature extends Equatable {
   final int id;
-  final String name;
-  final DateTime createdDate;
-  final String initialValue;
+  final String? name;
+  final DateTime? createdDate;
+  final String? initialValue;
   final String description;
   @override
-  List<Object> get props => [id, name, createdDate, initialValue, description];
+  List<Object> get props => [id, name??'', createdDate??DateTime.fromMillisecondsSinceEpoch(0), initialValue??'', description];
   @override
   bool get stringify => true;
   Feature(
@@ -23,19 +23,19 @@ class Feature extends Equatable {
     this.description,
   );
   Feature.named({
-    this.id,
-    this.name,
-    this.createdDate,
-    this.initialValue,
-    this.description,
+    required this.id,
+    required this.name,
+    required this.createdDate,
+    required this.initialValue,
+    required this.description,
   });
 
   Feature copyWith({
-    int id,
-    String name,
-    DateTime createdDate,
-    String initialValue,
-    String description,
+    int? id,
+    String? name,
+    DateTime? createdDate,
+    String? initialValue,
+    String? description,
   }) {
     return Feature(
       id ?? this.id,
@@ -57,10 +57,6 @@ class Feature extends Equatable {
   }
 
   factory Feature.fromMap(Map<String, dynamic> map) {
-    if (map == null) {
-      return null;
-    }
-
     return Feature(
       map['id'] as int,
       (map['name'] as String)?.normalize(),
