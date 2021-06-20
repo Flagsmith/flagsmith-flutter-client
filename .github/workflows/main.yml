@@ -41,4 +41,4 @@ jobs:
           # Token to connect to GitHub. Use secrets.GITHUB_TOKEN
           githubToken: secrets.GITHUB_TOKEN
           # Path of the package relatively to the root of the repository
-          relativePath: # optional, default is 
+          # relativePath: # optional, default is 
