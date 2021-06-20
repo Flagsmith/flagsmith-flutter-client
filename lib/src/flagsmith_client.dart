@@ -28,18 +28,20 @@ class FlagsmithClient {
   final String apiKey;
   final FlagsmithConfig config;
   late StorageProvider storage;
-
+  late Dio _api;
+  
   final Set<Flag> _flags = {};
 
   final StreamController<FlagsmithLoading> _loading =
       StreamController.broadcast();
-
+  Dio get client => _api;
   FlagsmithClient(
       {this.config = const FlagsmithConfig(),
       required this.apiKey,
       List<Flag> seeds = const <Flag>[],
       bool update = false}) {
     flagsmithDebug = config.isDebug;
+    _api = _apiClient();
     switch (config.storeType) {
       case StoreType.persistant:
         storage = StorageProvider(PersistantStore(), password: config.password);
@@ -96,7 +98,7 @@ class FlagsmithClient {
   }
 
   /// Simple implementation of Http Client
-  Dio _api() {
+  Dio _apiClient() {
     var dio = Dio(config.clientOptions)
       ..options.headers[userAgentHeader] =
           'FlagsmithFlutterSDK(${Platform.operatingSystem}/${Platform.version})'
@@ -237,7 +239,7 @@ class FlagsmithClient {
 
   Future<List<Flag>> _getFlags() async {
     try {
-      var response = await _api().get<List<dynamic>>(config.flagsURI);
+      var response = await _api.get<List<dynamic>>(config.flagsURI);
       if (response.statusCode == 200) {
         var list = response.data!
             .map<Flag>((dynamic e) => Flag.fromMap(e as Map<String, dynamic>))
@@ -267,7 +269,7 @@ class FlagsmithClient {
   Future<List<Flag>> _getUserFlags(Identity user) async {
     try {
       var params = {'identifier': user.identifier};
-      var response = await _api().get<Map<String, dynamic>>(
+      var response = await _api.get<Map<String, dynamic>>(
           '${config.identitiesURI}',
           queryParameters: params);
 
@@ -328,7 +330,7 @@ class FlagsmithClient {
   Future<List<Trait>> _getUserTraits(Identity user) async {
     try {
       var params = {'identifier': user.identifier};
-      var response = await _api().get<Map<String, dynamic>>(
+      var response = await _api.get<Map<String, dynamic>>(
           '${config.identitiesURI}',
           queryParameters: params);
 
@@ -357,7 +359,7 @@ class FlagsmithClient {
       {required TraitWithIdentity value}) async {
     try {
       var response =
-          await _api().post<dynamic>(config.traitsURI, data: value.toMap());
+          await _api.post<dynamic>(config.traitsURI, data: value.toMap());
       if (response.data == null) {
         return null;
       }
@@ -382,7 +384,7 @@ class FlagsmithClient {
         return null;
       }
       final data = value.map((e) => e.toMap()).toList();
-      var response = await _api().put<dynamic>(
+      var response = await _api.put<dynamic>(
         '${config.traitsURI}bulk/',
         data: data,
       );

@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flagsmith/flagsmith.dart';
 import 'package:flagsmith/src/flagsmith_client.dart';
 import 'package:flagsmith/src/model/identity.dart';
@@ -31,6 +32,7 @@ void main() {
         storeType: StoreType.persistant,
       ),
     );
+    
     fsPersistant.loading.listen((event) {
       log('loading: $event');
     });
