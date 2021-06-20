@@ -15,6 +15,7 @@ class Feature extends Equatable {
   @override
   List<Object?> get props =>
       [id, name, createdDate, initialValue, defaultValue, description];
+
   @override
   bool get stringify => true;
   Feature(
@@ -46,9 +47,8 @@ class Feature extends Equatable {
       id ?? this.id,
       name ?? this.name,
       createdDate ?? this.createdDate,
-      
       initialValue ?? this.initialValue,
-       defaultValue ?? this.defaultValue,
+      defaultValue ?? this.defaultValue,
       description ?? this.description,
       
     );
@@ -59,6 +59,7 @@ class Feature extends Equatable {
       'id': id,
       'name': name.normalize(),
       'created_date': createdDate?.toIso8601String(),
+      'initial_value': initialValue,
       'description': description,
       'initial_value': initialValue,
       'default_value': defaultValue,
