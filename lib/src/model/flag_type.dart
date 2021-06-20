@@ -1,1 +1,0 @@
-enum FlagType { config, flag }

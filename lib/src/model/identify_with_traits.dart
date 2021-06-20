@@ -2,23 +2,23 @@ import 'dart:convert';
 import 'package:equatable/equatable.dart';
 import 'index.dart';
 
-class FlagAndTraits extends Equatable {
+class IdentifyWithTraits extends Equatable {
   final List<Flag>? flags;
   final List<Trait>? traits;
   @override
   List<Object?> get props => [flags, traits];
   @override
   bool get stringify => true;
-  FlagAndTraits({
-    this.flags,
-    this.traits,
+  IdentifyWithTraits({
+    this.flags = const <Flag>[],
+    this.traits = const <Trait>[],
   });
 
-  FlagAndTraits copyWith({
+  IdentifyWithTraits copyWith({
     List<Flag>? flags,
     List<Trait>? traits,
   }) {
-    return FlagAndTraits(
+    return IdentifyWithTraits(
       flags: flags ?? this.flags,
       traits: traits ?? this.traits,
     );
@@ -31,8 +31,8 @@ class FlagAndTraits extends Equatable {
     };
   }
 
-  factory FlagAndTraits.fromMap(Map<String, dynamic> map) {
-    return FlagAndTraits(
+  factory IdentifyWithTraits.fromMap(Map<String, dynamic> map) {
+    return IdentifyWithTraits(
       flags: List<Flag>.from(map['flags']
               ?.map((dynamic x) => Flag.fromMap(x as Map<String, dynamic>))
           as Iterable<dynamic>),
@@ -44,6 +44,6 @@ class FlagAndTraits extends Equatable {
 
   String toJson() => json.encode(toMap());
 
-  factory FlagAndTraits.fromJson(String source) =>
-      FlagAndTraits.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory IdentifyWithTraits.fromJson(String source) =>
+      IdentifyWithTraits.fromMap(json.decode(source) as Map<String, dynamic>);
 }

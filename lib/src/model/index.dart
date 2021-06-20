@@ -1,7 +1,6 @@
 export 'feature.dart';
-export 'feature_user.dart';
+export 'identity.dart';
 export 'flag.dart';
-export 'flag_and_traits.dart';
-export 'flag_type.dart';
+export 'identify_with_traits.dart';
 export 'trait.dart';
 export 'loading.dart';
