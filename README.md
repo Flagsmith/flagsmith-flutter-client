@@ -1,4 +1,4 @@
-<img width="100%" src="https://raw.githubusercontent.com/SolidStateGroup/bullet-train-frontend/master/hero.png"/>
+<img width="100%" src="https://github.com/Flagsmith/flagsmith/raw/main/static-files/hero.png"/>
 
 # Flagsmith SDK for Flutter
 
@@ -108,7 +108,7 @@ Identifying users allows you to target specific users from the [Flagsmith dashbo
 To check if a feature exists for a given user Identity:
 
 ```dart
-final user = FeatureUser(identifier: 'flagsmith_sample_user');
+final user = Identity(identifier: 'flagsmith_sample_user');
 bool featureEnabled = await flagsmithClient.hasFeatureFlag('my_test_feature', user: user);
 if (featureEnabled) {
     // run the code to execute enabled feature for given user

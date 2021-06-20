@@ -8,8 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hexcolor/hexcolor.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 final GetIt getIt = GetIt.instance;
 const String testFeature = 'show_title_logo';
@@ -18,7 +16,7 @@ const String testFeature = 'show_title_logo';
 
 void setupPrefs() {
   getIt.registerSingleton<FlagsmithClient>(FlagsmithClient(
-      apiKey: 'EBnVjhp7xvkT5oTLq4q7Ny',
+      apiKey: 'CoJErJUXmihfMDVwTzBff4',
       config: FlagsmithConfig(storeType: StoreType.persistant, isDebug: true)));
 
   getIt.registerFactory(() => FlagBloc(fs: getIt<FlagsmithClient>()));
@@ -31,10 +29,29 @@ void main() async {
   runApp(FlagsmithSampleApp());
 }
 
-ThemeData theme = ThemeData(
-  brightness: Brightness.light,
-  primarySwatch: Colors.deepPurple,
-  accentColor: Colors.deepPurpleAccent,
+ThemeData lightTheme = ThemeData.from(
+  colorScheme: ColorScheme.light(
+    primary: Colors.deepPurple,
+    primaryVariant: Colors.deepPurpleAccent,
+    secondary: Colors.deepPurpleAccent.shade400,
+    secondaryVariant: Colors.deepPurpleAccent.shade400,
+  ),
+  textTheme: GoogleFonts.varelaRoundTextTheme(
+    ThemeData.light().textTheme,
+  ),
+);
+ThemeData darkTheme = ThemeData.from(
+  colorScheme: ColorScheme.dark(
+    primary: Colors.deepPurple,
+    primaryVariant: Colors.deepPurpleAccent,
+    secondary: Colors.deepPurpleAccent.shade400,
+    secondaryVariant: Colors.deepPurpleAccent.shade400,
+    surface: Color(0xFF1a1c26),
+    background: Color(0xFF1a1c26),
+  ),
+  textTheme: GoogleFonts.varelaRoundTextTheme(
+    ThemeData.dark().textTheme,
+  ),
 );
 
 /// Simple [FlagsmithSampleApp]
@@ -44,11 +61,25 @@ class FlagsmithSampleApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flagsmith Example',
-      theme: theme.copyWith(
-        textTheme: GoogleFonts.varelaRoundTextTheme(
-          Theme.of(context).textTheme,
+      theme: lightTheme.copyWith(
+        appBarTheme: lightTheme.appBarTheme.copyWith(
+          textTheme: darkTheme.appBarTheme.textTheme?.apply(
+            bodyColor: Colors.red,
+            displayColor: Colors.redAccent,
+            fontFamily: GoogleFonts.poppins().fontFamily,
+          ),
         ),
       ),
+      darkTheme: darkTheme.copyWith(
+        appBarTheme: darkTheme.appBarTheme.copyWith(
+          textTheme: darkTheme.appBarTheme.textTheme?.apply(
+            bodyColor: Colors.red,
+            displayColor: Colors.redAccent,
+            fontFamily: GoogleFonts.poppins().fontFamily,
+          ),
+        ),
+      ),
+      themeMode: ThemeMode.system,
       home: BlocProvider(
         create: (context) => getIt<FlagBloc>()
           ..add(FlagEvent.personalize)
@@ -77,8 +108,8 @@ class FlagsmithSampleScreen extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        SvgPicture.network(
-                          'https://www.flagsmith.com/static/images/nav-logo.svg',
+                        Image.network(
+                          'https://github.com/Flagsmith/flagsmith/raw/main/static-files/hero.png',
                           height: 32,
                           fit: BoxFit.contain,
                         ),
@@ -89,8 +120,7 @@ class FlagsmithSampleScreen extends StatelessWidget {
                           title + '/${state.isEnabled(testFeature)}',
                           style: Theme.of(context)
                               .textTheme
-                              .caption
-                              ?.copyWith(color: Theme.of(context).primaryColor),
+                              .caption,
                         ),
                       ],
                     )
@@ -98,8 +128,7 @@ class FlagsmithSampleScreen extends StatelessWidget {
                       title + '/${state.isEnabled(testFeature)}',
                       style: Theme.of(context)
                           .textTheme
-                          .headline5
-                          ?.copyWith(color: Theme.of(context).primaryColor),
+                          .headline5,
                     ),
               centerTitle: Platform.isIOS,
               flexibleSpace: Container(
@@ -129,21 +158,26 @@ class FlagsmithSampleScreen extends StatelessWidget {
                         itemBuilder: (context, index) {
                           var item = state.flags[index];
                           return SwitchListTile.adaptive(
-                              title: Text(item.feature?.description ??
-                                  item.feature?.name ??
-                                  'no description'),
-                              subtitle: item.feature?.description != null
-                                  ? Text(
-                                      'feature: ${item.feature?.name}\ntype: ${item.feature != null ? describeEnum(item.feature!.type!) : ''}')
-                                  : Text(
-                                      'type: ${item.feature != null ? describeEnum(item.feature!.type!) : ''}'),
+                              title: Text(item.feature.description ??
+                                  item.feature.name),
+                              subtitle: Text(
+                                  'feature: ${item.feature.name} ${item.feature.initialValue != null ? '\nvalue: ${item.feature.initialValue}' : ''}'),
                               value: item.enabled ?? false,
                               onChanged: (bool value) {});
                         },
                       ),
                     ),
             ),
-
+            persistentFooterButtons: [
+              TextButton(onPressed: () {}, child: Text('none')),
+              TextButton(
+                  onPressed: () {
+                    // context.read<FlagBloc>().add(event)
+                  },
+                  child: Text('test_another_user')),
+              TextButton(
+                  onPressed: () {}, child: Text('invalid_users_another_user')),
+            ],
             floatingActionButton: Column(
               mainAxisAlignment: MainAxisAlignment.end,
               mainAxisSize: MainAxisSize.min,
@@ -178,17 +212,14 @@ class CardTileWidget extends StatelessWidget {
   const CardTileWidget({Key? key, required this.item}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    var color = item.feature?.name == 'color'
-        ? HexColor(item.stateValue ?? '')
-        : Colors.black;
+   
     return Card(
       elevation: 1,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            item.feature?.name ?? '',
-            style: context.textTheme.headline5?.copyWith(color: color),
+            item.feature.name, style: context.textTheme.headline5
           )
         ],
       ),
@@ -215,7 +246,8 @@ enum FlagEvent {
   // reload from storage
   reload,
   // toggle feature
-  toggle
+  toggle,
+  changeIdentity
 }
 
 /// Simple [FlagState] for [FlagBloc]
@@ -228,7 +260,7 @@ class FlagState extends Equatable {
   @override
   List<Object> get props => [loading, flags];
 
-  const FlagState({required this.loading, this.flags = const <Flag>[]});
+  FlagState({required this.loading, this.flags = const <Flag>[]});
 
   FlagState copyWith({LoadingState? loading, List<Flag>? flags}) {
     return FlagState(
@@ -241,7 +273,7 @@ class FlagState extends Equatable {
 
   bool isEnabled(String flag) {
     final found = flags.firstWhereOrNull(
-        (element) => element.feature?.name == flag && element.enabled == true);
+        (element) => element.feature.name == flag && element.enabled == true);
     return found?.enabled ?? false;
   }
 }
@@ -274,13 +306,17 @@ class FlagBloc extends Bloc<FlagEvent, FlagState> {
         break;
       case FlagEvent.personalize:
         yield state.copyWith(loading: LoadingState.isLoading);
-        await fs.updateTrait(FeatureUser(identifier: 'testUser'),
-            Trait(key: 'age', value: '21'));
+        await fs.createTrait(
+            value: TraitWithIdentity(
+          identity: Identity(identifier: 'testUser'),
+          traitKey: 'age',
+          traitValue: '21',
+        ));
         break;
       case FlagEvent.register:
         _streamSubscription ??= fs.stream(testFeature);
         _streamSubscription?.listen((event) {
-          log('LISTEN: ${event.feature?.name} => ${event.enabled}');
+          log('LISTEN: ${event.feature.name} => ${event.enabled}');
           add(FlagEvent.reload);
         });
 
@@ -288,12 +324,16 @@ class FlagBloc extends Bloc<FlagEvent, FlagState> {
       case FlagEvent.toggle:
         await fs.testToggle(testFeature);
         break;
+      case FlagEvent.changeIdentity:
+        yield state.copyWith(loading: LoadingState.isLoading);
+        
+        break;
       default:
         addError(Exception('unsupported event'));
     }
   }
 
-  Future<bool> isEnabled(String featureName, {FeatureUser? user}) =>
+  Future<bool> isEnabled(String featureName, {Identity? user}) =>
       fs.hasFeatureFlag(featureName, user: user);
 
   @override
