@@ -1,3 +1,5 @@
+## [2.0.0] - 06/20/2021
+* first official null-safety release of Flagsmith SDK for Flutter
 ## [2.0.0-nullsafety.1] - 06/17/2021
 * remove reliance on `type` attribute of feature
 * minor fixes to example app
