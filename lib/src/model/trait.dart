@@ -6,43 +6,43 @@ import 'identity.dart';
 
 class Trait extends Equatable {
   final int? id;
-  final String traitKey;
-  final String traitValue;
+  final String key;
+  final String value;
   @override
-  List<Object?> get props => [id, traitKey, traitValue];
+  List<Object?> get props => [id, key, value];
   @override
   bool get stringify => true;
   Trait({
     this.id,
-    required this.traitKey,
-    required this.traitValue,
+    required this.key,
+    required this.value,
   });
 
   Trait copyWith({
     int? id,
-    String? traitKey,
-    String? traitValue,
+    String? key,
+    String? value,
   }) {
     return Trait(
       id: id ?? this.id,
-      traitKey: traitKey ?? this.traitKey,
-      traitValue: traitValue ?? this.traitValue,
+      key: key ?? this.key,
+      value: value ?? this.value,
     );
   }
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'id': id,
-      'trait_key': traitKey,
-      'trait_value': traitValue,
+      'trait_key': key,
+      'trait_value': value,
     };
   }
 
   factory Trait.fromMap(Map<String, dynamic> map) {
     return Trait(
       id: map['id'] as int?,
-      traitKey: '${map['trait_key'] ?? ''}'.normalize(),
-      traitValue: '${map['trait_value'] ?? ''}'.normalize(),
+      key: '${map['trait_key'] ?? ''}'.normalize(),
+      value: '${map['trait_value'] ?? ''}'.normalize(),
     );
   }
 
@@ -75,42 +75,42 @@ class IdentityWithTraitsRequest extends Equatable {
 
 class TraitWithIdentity extends Equatable {
   final Identity identity;
-  final String traitKey, traitValue;
+  final String key, value;
   @override
-  List<Object?> get props => [identity, traitKey, traitValue];
+  List<Object?> get props => [identity, key, value];
   @override
   bool get stringify => true;
   TraitWithIdentity({
     required this.identity,
-    required this.traitKey,
-    required this.traitValue,
+    required this.key,
+    required this.value,
   });
 
   TraitWithIdentity copyWith({
     Identity? identity,
-    String? traitKey,
-    String? traitValue,
+    String? key,
+    String? value,
   }) {
     return TraitWithIdentity(
       identity: identity ?? this.identity,
-      traitKey: traitKey ?? this.traitKey,
-      traitValue: traitValue ?? this.traitValue,
+      key: key ?? this.key,
+      value: value ?? this.value,
     );
   }
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'identity': identity.toMap(),
-      'trait_key': traitKey,
-      'trait_value': traitValue,
+      'trait_key': key,
+      'trait_value': value,
     };
   }
 
   factory TraitWithIdentity.fromMap(Map<String, dynamic> map) {
     return TraitWithIdentity(
       identity: Identity.fromMap(map['identity'] as Map<String, dynamic>),
-      traitKey: '${map['trait_key'] ?? ''}'.normalize(),
-      traitValue: '${map['trait_value'] ?? ''}'.normalize(),
+      key: '${map['trait_key'] ?? ''}'.normalize(),
+      value: '${map['trait_value'] ?? ''}'.normalize(),
     );
   }
 

@@ -182,34 +182,34 @@ void main() {
       var user = Identity(identifier: 'test_another_user');
       var result = await fsPersistant.getTrait(user, 'age');
       expect(result, isNotNull);
-      expect(result?.traitValue, isNotNull);
+      expect(result?.value, isNotNull);
 
       var updateResult = await fs.createTrait(
             value: TraitWithIdentity(
         identity: user,
-        traitKey: 'age',
-        traitValue: '25',
+        key: 'age',
+        value: '25',
       ));
       expect(updateResult, isNotNull);
-      expect(updateResult?.traitValue, '25');
+      expect(updateResult?.value, '25');
     });
 
     test('When get User trait Update then bulk Updated', () async {
       var user = Identity(identifier: 'test_another_user');
       var result = await fsPersistant.getTrait(user, 'age');
       expect(result, isNotNull);
-      expect(result?.traitValue, isNotNull);
+      expect(result?.value, isNotNull);
 
       var updateResult = await fsPersistant.updateTraits(value: [
         TraitWithIdentity(
           identity: user,
-          traitKey: 'age',
-          traitValue: '21',
+          key: 'age',
+          value: '21',
         ),
         TraitWithIdentity(
           identity: user,
-          traitKey: 'age2',
-          traitValue: '21',
+          key: 'age2',
+          value: '21',
         )
       ]);
       expect(updateResult, isNotNull);

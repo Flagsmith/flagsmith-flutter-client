@@ -309,8 +309,8 @@ class FlagBloc extends Bloc<FlagEvent, FlagState> {
         await fs.createTrait(
             value: TraitWithIdentity(
           identity: Identity(identifier: 'testUser'),
-          traitKey: 'age',
-          traitValue: '21',
+          key: 'age',
+          value: '21',
         ));
         break;
       case FlagEvent.register:
