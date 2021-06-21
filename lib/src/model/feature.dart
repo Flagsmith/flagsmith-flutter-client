@@ -61,9 +61,7 @@ class Feature extends Equatable {
       'created_date': createdDate?.toIso8601String(),
       'initial_value': initialValue,
       'description': description,
-      'initial_value': initialValue,
       'default_value': defaultValue,
-      
     };
   }
 

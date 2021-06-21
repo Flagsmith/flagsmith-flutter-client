@@ -221,7 +221,7 @@ class FlagsmithClient {
   Future<Trait?> getTrait(Identity user, String key) async {
     try {
       var result = await _getUserTraits(user);
-      return result.firstWhereOrNull((element) => element.traitKey == key);
+      return result.firstWhereOrNull((element) => element.key == key);
     } on DioError catch (e) {
       log('getTrait dioError: ${e.error}');
 
@@ -275,7 +275,7 @@ class FlagsmithClient {
         if (response.data == null) {
           return [];
         }
-        var data = IdentifyWithTraits.fromMap(response.data!).flags ?? [];
+        var data = FlagsAndTraits.fromMap(response.data!).flags ?? [];
         if (data.isNotEmpty) {
           data.sort((a, b) => a.feature.name.compareTo(b.feature.name));
         }
@@ -310,7 +310,7 @@ class FlagsmithClient {
       }
 
       return result
-          .where((element) => keys.contains(element.traitKey))
+          .where((element) => keys.contains(element.key))
           .toList();
     } on DioError catch (e) {
       log('getTraits dioError: ${e.error}');
@@ -336,7 +336,7 @@ class FlagsmithClient {
         if (response.data == null) {
           return [];
         }
-        return IdentifyWithTraits.fromMap(response.data!).traits ?? [];
+        return FlagsAndTraits.fromMap(response.data!).traits ?? [];
       }
       return [];
     } on DioError catch (e) {
