@@ -1,5 +1,17 @@
-## [1.1.0] - 14/04/2021
+
+## [2.0.0] - 06/20/2021
+* first official null-safety release of Flagsmith SDK for Flutter
+* expores Dio client `FlagsmithClient.client`
+## [2.0.0-nullsafety.1] - 06/17/2021
 * remove reliance on `type` attribute of feature
+* minor fixes to example app
+* FeatureUser replaced by Identity model
+* new Trait function for create / bulk
+* fixing example app
+## [2.0.0-nullsafety.0] - 03/27/2021
+* init version of nullsafety version
+## [1.1.0] - 14/04/2021
+* remove reliance on type attribute of feature
 * minor fixes to example app
 
 ## [1.0.1] - 03/27/2021
@@ -32,14 +44,14 @@
 
 ## [0.1.2] - 010/04/2020
 
-- adding new attr to config isSelfSigned for overriding self signed cert issues
+- adding new attr to config `isSelfSigned` for overriding self-signed cert issues
 
 ## [0.1.1] - 09/24/2020
 
 - adding support for streams from storage
 - breaking change in storing values
 - implementing equatable
-- config: new isDebug attr for toggle loging to console
+- config: new isDebug attr for toggle logging to console
 
 ## [0.1.0+2] - 09/22/2020
 
@@ -51,8 +63,8 @@
 
 ## [0.1.0] - 09/21/2020
 
-- securing sotrages
-- change persistant storage
+- securing storages
+- change persistent storage
 - changing config attributes for storage
 - minor fixes
 
@@ -66,7 +78,7 @@
 
 ## [0.0.4+1] - 09/12/2020
 
-- path as parameter in Persistent storage
+- path as a parameter in Persistent storage
 
 ## [0.0.4+0] - 09/12/2020
 
@@ -83,7 +95,7 @@
 ## [0.0.3] - 09/11/2020
 
 - Reading from InMemoryStorage
-- Added persistante storage
+- Added persistent storage
 - Handling errors with custom Exception
 - fixing freezed issue
 
@@ -121,4 +133,4 @@
 
 ## [0.0.1] - 09/07/2020
 
-- TODO: Describe initial release.
+- TODO: Describe the initial release.

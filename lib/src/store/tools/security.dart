@@ -9,11 +9,11 @@ import '../../../flagsmith.dart';
 
 class StorageSecurity {
   final _random = Random.secure();
-  final String password;
-  Uint8List _encryptedPassword;
-  Encrypter _enc;
+  final String? password;
+  late Uint8List _encryptedPassword;
+  late Encrypter _enc;
   StorageSecurity(this.password) {
-    _encryptedPassword = _generateEncryptPassword(password);
+    _encryptedPassword = _generateEncryptPassword(password!);
     _enc = Encrypter(Salsa20(Key(_encryptedPassword)));
   }
   Uint8List _generateEncryptPassword(String password) {
@@ -35,7 +35,7 @@ class StorageSecurity {
     return '$ivEncoded$encoded';
   }
 
-  String decrypt(String value) {
+  String? decrypt(String value) {
     assert(value.length >= 12);
     final iv = base64.decode(value.substring(0, 12));
 
@@ -43,12 +43,12 @@ class StorageSecurity {
     value = value.substring(12);
 
     // Decode the input
-    return json.decode(_enc.decrypt64(value, iv: IV(iv))) as String;
+    return json.decode(_enc.decrypt64(value, iv: IV(iv))) as String?;
   }
 
   String setFlag(Flag item) => encrypt(item.toJson());
   Flag getFlag(String value) {
-    var decrypted = decrypt(value);
+    var decrypted = decrypt(value)!;
     return Flag.fromJson(decrypted);
   }
 }

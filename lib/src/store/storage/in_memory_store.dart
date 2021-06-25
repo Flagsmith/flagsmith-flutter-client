@@ -72,9 +72,9 @@ class InMemoryStore extends CrudStore with ExtendCrudStore {
   }
 
   @override
-  Future<bool> seed(List<MapEntry<String, String>> items) async {
+  Future<bool> seed(List<MapEntry<String, String>>? items) async {
     var saved = await getAll();
-    if (saved.isEmpty && items != null && items?.isNotEmpty == true) {
+    if (saved.isEmpty && items != null && items.isNotEmpty == true) {
       for (var item in items) {
         await create(item.key, item.value);
       }

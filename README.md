@@ -50,6 +50,25 @@ final flagsmithClient = await FlagsmithClient.init(
 await flagsmithClient.getFeatureFlags(reload: true) // fetch updates from api
 ```
 
+We are using [Dio](https://pub.dev/packages/dio) client for http request. 
+if you want to extend an instance of a client with your custom interceptors or adapters then you can use client like in code bellow.
+
+```dart
+final flagsmithClient = await FlagsmithClient.init(
+        apiKey: 'YOUR_ENV_API_KEY',
+        config: config, 
+        seeds: <Flag>[
+            Flag.seed('feature', enabled: true),
+        ], 
+        update: false,
+    );
+flagsmithClient.client.addAll([
+    YourInterceptor(),
+    YourSecondInterceptor(),
+]);
+```
+
+
 
 To check if a feature flag exists and is enabled:
 
@@ -108,7 +127,7 @@ Identifying users allows you to target specific users from the [Flagsmith dashbo
 To check if a feature exists for a given user Identity:
 
 ```dart
-final user = FeatureUser(identifier: 'flagsmith_sample_user');
+final user = Identity(identifier: 'flagsmith_sample_user');
 bool featureEnabled = await flagsmithClient.hasFeatureFlag('my_test_feature', user: user);
 if (featureEnabled) {
     // run the code to execute enabled feature for given user

@@ -5,19 +5,22 @@ import '../../flagsmith.dart';
 import 'tools/security.dart';
 
 class StorageProvider with SecureStore {
-  Map<String, BehaviorSubject<Flag>> _streams = {};
-  StorageSecurity _storageSecurity;
+  Map<String, BehaviorSubject<Flag>?> _streams = {};
+  late StorageSecurity _storageSecurity;
   final ExtendCrudStore _store;
 
-  StorageProvider(this._store, {String password}) {
+  StorageProvider(this._store, {String? password}) {
     _storageSecurity = StorageSecurity(password);
     _store.init();
     _initSubjects();
   }
 
   @override
-  Future<String> getSecuredValue(String key) async {
+  Future<String?> getSecuredValue(String key) async {
     var item = await _store.read(key);
+    if (item == null) {
+      return null;
+    }
     var decrypted = _storageSecurity.decrypt(item);
     return decrypted;
   }
@@ -40,12 +43,15 @@ class StorageProvider with SecureStore {
 
   Future<bool> delete(String key) {
     _destroySubject(key);
-    _streams?.remove(key);
+    _streams.remove(key);
     return _store.delete(key);
   }
 
-  Future<Flag> read(String key) async {
+  Future<Flag?> read(String key) async {
     var decrypted = await getSecuredValue(key);
+    if (decrypted == null) {
+      return null;
+    }
     return Flag.fromJson(decrypted);
   }
 
@@ -64,7 +70,7 @@ class StorageProvider with SecureStore {
   Future<List<Flag>> getAll() async {
     var list = await _store.getAll();
     return list.map((item) {
-      var decrypted = _storageSecurity.decrypt(item);
+      var decrypted = _storageSecurity.decrypt(item!)!;
       return Flag.fromJson(decrypted);
     }).toList();
   }
@@ -76,12 +82,12 @@ class StorageProvider with SecureStore {
     return true;
   }
 
-  Future<bool> seed({List<Flag> items}) async {
+  Future<bool> seed({required List<Flag> items}) async {
     var list = items
-        ?.map((e) => MapEntry(e.key, _storageSecurity.encrypt(e.toJson())))
-        ?.toList();
+        .map((e) => MapEntry(e.key, _storageSecurity.encrypt(e.toJson())))
+        .toList();
     var result = await _store.seed(list);
-    if (result && items != null) {
+    if (result) {
       for (var item in items) {
         _createSubject(item);
       }
@@ -89,9 +95,9 @@ class StorageProvider with SecureStore {
     return result;
   }
 
-  Stream<Flag> stream(String featureName) => _streams[featureName]?.stream;
+  Stream<Flag>? stream(String featureName) => _streams[featureName]?.stream;
 
-  BehaviorSubject<Flag> subject(String featureName) => _streams[featureName];
+  BehaviorSubject<Flag>? subject(String featureName) => _streams[featureName];
 
   Future<void> _initSubjects() async {
     var result = await getAll();
@@ -100,16 +106,22 @@ class StorageProvider with SecureStore {
     }
   }
 
-  void _createSubject(Flag item) {
+  void _createSubject(Flag? item) {
+    if (item == null) {
+      return;
+    }
     if (_streams[item.key] == null) {
       _streams[item.key] = BehaviorSubject<Flag>.seeded(item);
       log('_createSubject ${item.key} -> ${_streams[item.key]?.value}');
     }
   }
 
-  void _updateSubject(Flag item) {
+  void _updateSubject(Flag? item) {
+    if (item == null) {
+      return;
+    }
     _streams[item.key]?.add(item);
-    log('_updateSubject ${item.key} -> ${_streams[item.key]?.value?.enabled} f: ${item.enabled}');
+    log('_updateSubject ${item.key} -> ${_streams[item.key]?.value.enabled} f: ${item.enabled}');
   }
 
   void _destroySubject(String featureName) {
@@ -130,7 +142,10 @@ class StorageProvider with SecureStore {
 
   Future<bool> togggleFeature(String featureName) async {
     var value = await read(featureName);
-    var current = value.enabled;
+    if (value == null) {
+      return false;
+    }
+    var current = value.enabled!;
     var updated = value.copyWith(enabled: !current);
 
     return await update(featureName, updated);

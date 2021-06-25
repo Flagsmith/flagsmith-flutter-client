@@ -18,7 +18,7 @@ void main() {
       "feature_state_value": "10.1.0",
       "enabled": true,
       "environment": 2,
-      "identity": null
+      "identity": 1
     }
     ''';
 
@@ -46,7 +46,6 @@ void main() {
     expect(flag.enabled, false);
     expect(flag.feature, isNotNull);
   });
-
   test('flag seed - cofig', () {
     var flag = Flag.seed('feature', enabled: false, value: '1.0.0');
     expect(flag.enabled, false);

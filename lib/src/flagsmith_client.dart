@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:collection/collection.dart' show IterableExtension;
 import 'package:dio/adapter.dart';
-import 'package:flutter/foundation.dart';
 import 'package:rxdart/subjects.dart';
 
 import 'store/storage_provider.dart';
@@ -27,20 +27,21 @@ class FlagsmithClient {
 
   final String apiKey;
   final FlagsmithConfig config;
-  StorageProvider storage;
-
+  late StorageProvider storage;
+  late Dio _api;
+  
   final Set<Flag> _flags = {};
 
   final StreamController<FlagsmithLoading> _loading =
       StreamController.broadcast();
-
+  Dio get client => _api;
   FlagsmithClient(
       {this.config = const FlagsmithConfig(),
-      @required this.apiKey,
-      List<Flag> seeds,
-      bool update = false})
-      : assert(apiKey != null, 'Missing flagsmith.com apiKey') {
+      required this.apiKey,
+      List<Flag> seeds = const <Flag>[],
+      bool update = false}) {
     flagsmithDebug = config.isDebug;
+    _api = _apiClient();
     switch (config.storeType) {
       case StoreType.persistant:
         storage = StorageProvider(PersistantStore(), password: config.password);
@@ -59,15 +60,14 @@ class FlagsmithClient {
   ///
   /// Returns [FlagsmithClient] after seeds are ready
   static Future<FlagsmithClient> init(
-      {FlagsmithConfig config = const FlagsmithConfig(),
-      @required String apiKey,
-      List<Flag> seeds,
+      {FlagsmithConfig config = const FlagsmithConfig(isDebug: true),
+      required String apiKey,
+      List<Flag> seeds = const <Flag>[],
       bool update = false}) async {
-    assert(apiKey != null, 'Missing flagsmith.com apiKey');
     final client = FlagsmithClient(
       config: config,
       apiKey: apiKey,
-      seeds: <Flag>[],
+      seeds: seeds,
     );
     flagsmithDebug = config.isDebug;
     switch (config.storeType) {
@@ -98,7 +98,7 @@ class FlagsmithClient {
   }
 
   /// Simple implementation of Http Client
-  Dio _api() {
+  Dio _apiClient() {
     var dio = Dio(config.clientOptions)
       ..options.headers[userAgentHeader] =
           'FlagsmithFlutterSDK(${Platform.operatingSystem}/${Platform.version})'
@@ -106,9 +106,8 @@ class FlagsmithClient {
       ..options.headers[acceptHeader] = 'application/json';
 
     if (config.isDebug) {
-      dio.interceptors.add(config.isDebug
-          ? LogInterceptor(requestHeader: false, responseBody: true)
-          : null);
+      dio.interceptors
+          .add(LogInterceptor(requestHeader: false, responseBody: true));
     }
     if (config.isSelfSigned) {
       (dio.httpClientAdapter as DefaultHttpClientAdapter).onHttpClientCreate =
@@ -125,12 +124,12 @@ class FlagsmithClient {
   /// [user] a user in context
   /// Returns a list of feature flags
   Future<List<Flag>> getFeatureFlags(
-      {FeatureUser user, bool reload = true}) async {
+      {Identity? user, bool reload = true}) async {
     if (!reload) {
       var result = await storage.getAll();
 
-      if (result != null && result.isNotEmpty) {
-        result?.sort((a, b) => a.feature.name.compareTo(b.feature.name));
+      if (result.isNotEmpty) {
+        result.sort((a, b) => a.feature.name.compareTo(b.feature.name));
       }
       _updateCaches(list: result);
       return result;
@@ -146,13 +145,11 @@ class FlagsmithClient {
   /// [featureName] an identifier for the feature
   /// [user] an identifier for the user
   /// Returns true if feature flag exist and enabled, false otherwise
-  Future<bool> hasFeatureFlag(String featureName, {FeatureUser user}) async {
+  Future<bool> hasFeatureFlag(String featureName, {Identity? user}) async {
     try {
       var features = await getFeatureFlags(user: user, reload: false);
-      var feature = features.firstWhere(
-          (element) =>
-              element.feature.name == featureName && element.enabled == true,
-          orElse: () => null);
+      var feature = features.firstWhereOrNull((element) =>
+          element.feature.name == featureName && element.enabled == true);
       return feature != null;
     } on Exception catch (e) {
       log('Exception: hasFeatureFlag $e');
@@ -168,16 +165,14 @@ class FlagsmithClient {
   ///
   /// Returns only if [caches] are enabled in config exception otherwise
   ///
-  bool hasCachedFeatureFlag(String featureName, {FeatureUser user}) {
+  bool hasCachedFeatureFlag(String featureName, {Identity? user}) {
     if (!config.caches) {
       log('Exception: caches not enabled');
       throw FlagsmithException(FlagsmithExceptionType.cachesDisabled);
     }
     try {
-      var feature = _flags.firstWhere(
-          (element) =>
-              element.feature.name == featureName && element.enabled == true,
-          orElse: () => null);
+      var feature = _flags.firstWhereOrNull((element) =>
+          element.feature.name == featureName && element.enabled == true);
       return feature != null;
     } on Exception catch (e) {
       log('Exception: hasFeatureFlag $e');
@@ -190,13 +185,12 @@ class FlagsmithClient {
   /// [featureName] an identifier for the feature
   /// [user] an identifier for the user
   /// Returns true if feature flag exist and enabled, null otherwise
-  Future<bool> isFeatureFlagEnabled(String featureName,
-      {FeatureUser user}) async {
+  Future<bool?> isFeatureFlagEnabled(String featureName,
+      {Identity? user}) async {
     try {
       var features = await getFeatureFlags(user: user, reload: false);
-      var feature = features.firstWhere(
-          (element) => element.feature.name == featureName,
-          orElse: () => null);
+      var feature = features
+          .firstWhereOrNull((element) => element.feature.name == featureName);
       return feature?.enabled;
     } on Exception catch (e) {
       log('Exception: isFeatureFlagEnabled $e');
@@ -206,13 +200,12 @@ class FlagsmithClient {
 
   /// Get feature flag value by [featureId] and optionally for a [user]
   /// Returns String value of Feature Flag
-  Future<String> getFeatureFlagValue(String featureId,
-      {FeatureUser user}) async {
+  Future<String?> getFeatureFlagValue(String featureId,
+      {Identity? user}) async {
     try {
       var features = await getFeatureFlags(user: user, reload: false);
-      var feature = features.firstWhere(
-          (element) => element.feature.name == featureId,
-          orElse: () => null);
+      var feature = features
+          .firstWhereOrNull((element) => element.feature.name == featureId);
       return feature?.stateValue;
     } on DioError catch (e) {
       log('getFeatureFlagValue dioError: ${e.toString()}');
@@ -227,13 +220,12 @@ class FlagsmithClient {
   }
 
   /// Get user trait for [user] with by [key]
-  Future<Trait> getTrait(FeatureUser user, String key) async {
+  Future<Trait?> getTrait(Identity user, String key) async {
     try {
       var result = await _getUserTraits(user);
-      return result.firstWhere((element) => element.key == key,
-          orElse: () => null);
+      return result.firstWhereOrNull((element) => element.key == key);
     } on DioError catch (e) {
-      log('getTrait dioError: ${e?.error}');
+      log('getTrait dioError: ${e.error}');
 
       throw FlagsmithException(FlagsmithExceptionType.connectionSettings);
     } on FormatException catch (e) {
@@ -241,36 +233,15 @@ class FlagsmithClient {
       throw FlagsmithException(FlagsmithExceptionType.wrongFlagFormat);
     } on Exception catch (e) {
       log('Exception: getTrait $e');
-      throw FlagsmithException(FlagsmithExceptionType.genericError);
-    }
-  }
-
-  /// Get all [user] traits with [keys]
-  Future<List<Trait>> getTraits(FeatureUser user, {List<String> keys}) async {
-    try {
-      var result = await _getUserTraits(user);
-      if (keys == null) {
-        return result;
-      }
-
-      return result.where((element) => keys.contains(element.key)).toList();
-    } on DioError catch (e) {
-      log('getTraits dioError: ${e?.error}');
-      throw FlagsmithException(FlagsmithExceptionType.connectionSettings);
-    } on FormatException catch (e) {
-      log('Exception: getTraits $e');
-      throw FlagsmithException(FlagsmithExceptionType.wrongFlagFormat);
-    } on Exception catch (e) {
-      log('Exception: getTraits $e');
       throw FlagsmithException(FlagsmithExceptionType.genericError);
     }
   }
 
   Future<List<Flag>> _getFlags() async {
     try {
-      var response = await _api().get<List<dynamic>>(config.flagsURI);
+      var response = await _api.get<List<dynamic>>(config.flagsURI);
       if (response.statusCode == 200) {
-        var list = response.data
+        var list = response.data!
             .map<Flag>((dynamic e) => Flag.fromMap(e as Map<String, dynamic>))
             .toList();
         await storage.saveAll(list);
@@ -283,7 +254,7 @@ class FlagsmithClient {
       _flags.clear();
       return [];
     } on DioError catch (e) {
-      log('_getFlags dioError: ${e?.error}');
+      log('_getFlags dioError: ${e.error}');
       throw FlagsmithException(FlagsmithExceptionType.connectionSettings);
     } on FormatException catch (e) {
       log('Exception: _getFlags $e');
@@ -295,27 +266,31 @@ class FlagsmithClient {
   }
 
   // Internal list of [user] flags
-  Future<List<Flag>> _getUserFlags(FeatureUser user) async {
+  Future<List<Flag>> _getUserFlags(Identity user) async {
     try {
       var params = {'identifier': user.identifier};
-      var response = await _api().get<Map<String, dynamic>>(
+      var response = await _api.get<Map<String, dynamic>>(
           '${config.identitiesURI}',
           queryParameters: params);
 
       if (response.statusCode == 200) {
-        var data = FlagAndTraits.fromMap(response.data)?.flags ?? [];
+        if (response.data == null) {
+          return [];
+        }
+        var data = FlagsAndTraits.fromMap(response.data!).flags ?? [];
         if (data.isNotEmpty) {
           data.sort((a, b) => a.feature.name.compareTo(b.feature.name));
         }
         await storage.saveAll(data);
         _flags
           ..clear()
-          ..addAll((data ?? []).toSet());
+          ..addAll((data).toSet());
         return data;
       }
       return [];
     } on DioError catch (e) {
-      log('getUserTraits dioError: ${e?.error}');
+      log('getUserTraits dioError: ${e.error}');
+
       throw FlagsmithException(FlagsmithExceptionType.connectionSettings);
     } on FormatException catch (e) {
       log('Exception: _getUserFlags $e');
@@ -326,20 +301,48 @@ class FlagsmithClient {
     }
   }
 
-  /// Internal list of [user] traits
-  Future<List<Trait>> _getUserTraits(FeatureUser user) async {
+  /// TRAITS
+  ///
+  /// Get all `user` traits with `keys`
+  Future<List<Trait>> getTraits(Identity user, {List<String>? keys}) async {
+    try {
+      var result = await _getUserTraits(user);
+      if (keys == null) {
+        return result;
+      }
+
+      return result
+          .where((element) => keys.contains(element.key))
+          .toList();
+    } on DioError catch (e) {
+      log('getTraits dioError: ${e.error}');
+      throw FlagsmithException(FlagsmithExceptionType.connectionSettings);
+    } on FormatException catch (e) {
+      log('Exception: getTraits $e');
+      throw FlagsmithException(FlagsmithExceptionType.wrongFlagFormat);
+    } on Exception catch (e) {
+      log('Exception: getTraits $e');
+      throw FlagsmithException(FlagsmithExceptionType.genericError);
+    }
+  }
+
+  /// Internal list of `user` traits
+  Future<List<Trait>> _getUserTraits(Identity user) async {
     try {
       var params = {'identifier': user.identifier};
-      var response = await _api().get<Map<String, dynamic>>(
+      var response = await _api.get<Map<String, dynamic>>(
           '${config.identitiesURI}',
           queryParameters: params);
 
       if (response.statusCode == 200) {
-        return FlagAndTraits.fromMap(response.data)?.traits ?? [];
+        if (response.data == null) {
+          return [];
+        }
+        return FlagsAndTraits.fromMap(response.data!).traits ?? [];
       }
       return [];
     } on DioError catch (e) {
-      log('getUserTraits dioError: ${e?.error}');
+      log('getUserTraits dioError: ${e.error}');
 
       throw FlagsmithException(FlagsmithExceptionType.connectionSettings);
     } on FormatException catch (e) {
@@ -351,26 +354,54 @@ class FlagsmithClient {
     }
   }
 
-  /// Update trait for [user] with new value [toUpdate]
-  Future<Trait> updateTrait(FeatureUser user, Trait toUpdate) async {
-    return _postUserTraits(user, toUpdate);
-  }
-
-  /// Internal post of user traits
-  Future<Trait> _postUserTraits(FeatureUser user, Trait toUpdate) async {
+  // Update trait for `user` with new value `traits`
+  Future<TraitWithIdentity?> createTrait(
+      {required TraitWithIdentity value}) async {
     try {
-      var trait = toUpdate.copyWith(identity: user);
       var response =
-          await _api().post<dynamic>(config.traitsURI, data: trait.toJson());
-      return Trait.fromMap(response.data as Map<String, dynamic>);
+          await _api.post<dynamic>(config.traitsURI, data: value.toMap());
+      if (response.data == null) {
+        return null;
+      }
+      return TraitWithIdentity.fromMap(response.data as Map<String, dynamic>);
     } on DioError catch (e) {
-      log('_postUserTraits dioError: ${e?.error}');
+      log('createTrait dioError: ${e.error}');
       throw FlagsmithException(FlagsmithExceptionType.connectionSettings);
     } on FormatException catch (e) {
-      log('Exception: _postUserTraits $e');
+      log('Exception: createTrait $e');
       throw FlagsmithException(FlagsmithExceptionType.wrongFlagFormat);
     } on Exception catch (e) {
-      log('Exception: _postUserTraits $e');
+      log('Exception: createTrait $e');
+      throw FlagsmithException(FlagsmithExceptionType.genericError);
+    }
+  }
+
+  /// Bulk update of traits for `user` with list of `value`
+  Future<List<TraitWithIdentity>?> updateTraits(
+      {required List<TraitWithIdentity> value}) async {
+    try {
+      if (value.isEmpty) {
+        return null;
+      }
+      final data = value.map((e) => e.toMap()).toList();
+      var response = await _api.put<dynamic>(
+        '${config.traitsURI}bulk/',
+        data: data,
+      );
+      if (response.data == null) {
+        return null;
+      }
+      final _data =
+          List<Map<String, dynamic>>.from(response.data as List<dynamic>);
+      return _data.map((e) => TraitWithIdentity.fromMap(e)).toList();
+    } on DioError catch (e) {
+      log('updateTraits dioError: ${e.error}');
+      throw FlagsmithException(FlagsmithExceptionType.connectionSettings);
+    } on FormatException catch (e) {
+      log('Exception: updateTraits $e');
+      throw FlagsmithException(FlagsmithExceptionType.wrongFlagFormat);
+    } on Exception catch (e) {
+      log('Exception: updateTraits $e');
       throw FlagsmithException(FlagsmithExceptionType.genericError);
     }
   }
@@ -390,16 +421,16 @@ class FlagsmithClient {
   Future<bool> clearStore() async => storage.clear();
 
   /// stream for listener
-  Stream<Flag> stream(String key) => storage.stream(key);
+  Stream<Flag>? stream(String key) => storage.stream(key);
 
   /// basic stream
-  BehaviorSubject<Flag> subject(String key) => storage.subject(key);
+  BehaviorSubject<Flag>? subject(String key) => storage.subject(key);
 
   // Loading from API
   Stream<FlagsmithLoading> get loading => _loading.stream;
 
   void close() {
-    _loading?.close();
+    _loading.close();
   }
 
   /// test toggle feature
