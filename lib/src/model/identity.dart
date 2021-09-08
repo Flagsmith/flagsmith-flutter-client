@@ -1,45 +1,21 @@
 import 'dart:convert';
 
-import 'package:equatable/equatable.dart';
-
+import 'package:json_annotation/json_annotation.dart';
+part 'identity.g.dart';
 /// Personalized user
-class Identity extends Equatable {
+@JsonSerializable()
+class Identity {
   final String identifier;
   const Identity({
     required this.identifier,
   });
-  @override
-  List<Object?> get props => [identifier];
+  
+ factory Identity.fromJson(Map<String, dynamic> json) =>
+      _$IdentityFromJson(json);
 
-  @override
-  bool get stringify => true;
-
-  /// copy [Identity] to new instance
+  Map<String, dynamic> toJson() => _$IdentityToJson(this);
+  String asString() => jsonEncode(toJson());
   Identity copyWith({
-    String? identifier,
-  }) {
-    return Identity(
-      identifier: identifier ?? this.identifier,
-    );
-  }
-
-  /// map [Identity] to Json map
-  Map<String, dynamic> toMap() {
-    return <String, dynamic>{
-      'identifier': identifier,
-    };
-  }
-
-  /// create [Identity] from map
-  factory Identity.fromMap(Map<String, dynamic> map) {
-    return Identity(
-      identifier: map['identifier'] as String,
-    );
-  }
-
-  /// convert [Identity] to Json string
-  String toJson() => json.encode(toMap());
-
-  factory Identity.fromJson(String source) =>
-      Identity.fromMap(json.decode(source) as Map<String, dynamic>);
+    String? identifier}) =>
+      Identity(identifier: identifier ?? this.identifier);
 }

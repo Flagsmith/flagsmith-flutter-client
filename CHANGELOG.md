@@ -1,4 +1,25 @@
 
+## [2.0.1] - 09/08/2021
+**Breaking changes**
+* removing async update from constructor
+* removing FlagsmithException(type) and replacing with
+    - FlagsmithApiException
+    - FlagsmithConfigException 
+    - FlagsmithFormatException
+    - FlagsmithException
+
+**Features**
+* response conversion in isolate
+* adding json_serializable dependency
+* support for 
+
+**Fixes**
+* fixing InMemoryStorage return values instead of exceptions
+* fixing update caches
+* fixing name conversion
+* adding missing tests
+
+
 ## [2.0.0] - 06/20/2021
 * first official null-safety release of Flagsmith SDK for Flutter
 * expores Dio client `FlagsmithClient.client`

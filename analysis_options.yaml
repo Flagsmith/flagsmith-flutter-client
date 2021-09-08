@@ -3,7 +3,7 @@ include: package:pedantic/analysis_options.1.9.0.yaml
 analyzer:
   strong-mode:
     implicit-casts: false
-    implicit-dynamic: false
+    implicit-dynamic: true
   exclude: 
     - "build/**"
     - "lib/generated/**"
