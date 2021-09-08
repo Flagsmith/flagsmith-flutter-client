@@ -1,7 +1,7 @@
 
 ## [2.0.1] - 09/08/2021
 **Breaking changes**
-* removing async update from constructor
+* removing async update from constructor (anti-pattern)
 * removing FlagsmithException(type) and replacing with
     - FlagsmithApiException
     - FlagsmithConfigException 
