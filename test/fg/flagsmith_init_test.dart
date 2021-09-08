@@ -25,8 +25,6 @@ void main() {
       expect(() async => await fs.hasCachedFeatureFlag(notImplmentedFeature),
           throwsA(isA<FlagsmithConfigException>()));
     });
-
-    
   });
 
   group('[Init] persistatnt sync', () {

@@ -27,7 +27,7 @@ class Trait {
   String asString() => jsonEncode(toJson());
   Trait copyWith({
     int? id,
-    String? key,  
+    String? key,
     String? value,
   }) =>
       Trait(
@@ -36,6 +36,7 @@ class Trait {
         value: value ?? this.value,
       );
 }
+
 @JsonSerializable()
 class TraitWithIdentity {
   final Identity identity;
@@ -46,20 +47,20 @@ class TraitWithIdentity {
       fromJson: nonNullStringFromJson,
       toJson: stringToJson)
   final String value;
-  
+
   TraitWithIdentity({
     required this.identity,
     required this.key,
     required this.value,
   });
-factory TraitWithIdentity.fromJson(Map<String, dynamic> json) =>
+  factory TraitWithIdentity.fromJson(Map<String, dynamic> json) =>
       _$TraitWithIdentityFromJson(json);
 
   Map<String, dynamic> toJson() => _$TraitWithIdentityToJson(this);
   String asString() => jsonEncode(toJson());
   TraitWithIdentity copyWith({
     Identity? identity,
-    String? key,  
+    String? key,
     String? value,
   }) =>
       TraitWithIdentity(

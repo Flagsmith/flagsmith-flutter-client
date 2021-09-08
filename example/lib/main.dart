@@ -118,17 +118,13 @@ class FlagsmithSampleScreen extends StatelessWidget {
                         ),
                         Text(
                           title + '/${state.isEnabled(testFeature)}',
-                          style: Theme.of(context)
-                              .textTheme
-                              .caption,
+                          style: Theme.of(context).textTheme.caption,
                         ),
                       ],
                     )
                   : Text(
                       title + '/${state.isEnabled(testFeature)}',
-                      style: Theme.of(context)
-                          .textTheme
-                          .headline5,
+                      style: Theme.of(context).textTheme.headline5,
                     ),
               centerTitle: Platform.isIOS,
               flexibleSpace: Container(
@@ -212,16 +208,11 @@ class CardTileWidget extends StatelessWidget {
   const CardTileWidget({Key? key, required this.item}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-   
     return Card(
       elevation: 1,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            item.feature.name, style: context.textTheme.headline5
-          )
-        ],
+        children: [Text(item.feature.name, style: context.textTheme.headline5)],
       ),
     );
   }
@@ -326,7 +317,7 @@ class FlagBloc extends Bloc<FlagEvent, FlagState> {
         break;
       case FlagEvent.changeIdentity:
         yield state.copyWith(loading: LoadingState.isLoading);
-        
+
         break;
       default:
         addError(Exception('unsupported event'));

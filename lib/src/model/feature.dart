@@ -3,6 +3,7 @@ import 'dart:convert';
 import '../extensions/converters.dart';
 import 'package:json_annotation/json_annotation.dart';
 part 'feature.g.dart';
+
 /// Standard Flagsmith feature
 @JsonSerializable()
 class Feature {
@@ -14,7 +15,7 @@ class Feature {
   @JsonKey(
       name: 'initial_value', fromJson: stringFromJson, toJson: stringToJson)
   final String? initialValue;
-  
+
   @JsonKey(name: 'default_enabled')
   final bool? defaultValue;
   final String? description;
@@ -22,7 +23,7 @@ class Feature {
   Feature({
     this.id,
     required this.name,
-    this.createdDate, 
+    this.createdDate,
     this.initialValue,
     this.defaultValue,
     this.description,
@@ -49,7 +50,7 @@ class Feature {
   Map<String, dynamic> toJson() => _$FeatureToJson(this);
   String asString() => jsonEncode(toJson());
   Feature copyWith({
-     int? id,
+    int? id,
     String? name,
     DateTime? createdDate,
     String? initialValue,
@@ -63,6 +64,5 @@ class Feature {
         initialValue: initialValue ?? this.initialValue,
         defaultValue: defaultValue ?? this.defaultValue,
         description: description ?? this.description,
-
       );
 }

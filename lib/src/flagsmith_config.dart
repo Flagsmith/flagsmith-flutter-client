@@ -49,7 +49,7 @@ class FlagsmithConfig {
       this.isDebug = false,
       this.caches = false,
       this.isSelfSigned = false});
-      
+
   String get traitsBulkURI => '${traitsURI}bulk/';
 
   /// Client options from config

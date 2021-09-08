@@ -45,7 +45,7 @@ class StorageProvider with SecureStore {
   Future<bool> delete(String key) {
     _destroySubject(key);
     _streams.remove(key);
-    
+
     return _store.delete(key);
   }
 
@@ -72,9 +72,7 @@ class StorageProvider with SecureStore {
   Future<List<Flag>> getAll() async {
     var list = await _store.getAll();
     return list.map((item) {
-      
       var decrypted = _storageSecurity.decrypt(item!)!;
-      // print(decrypted);
       return Flag.fromJson(jsonDecode(decrypted) as Map<String, dynamic>);
     }).toList();
   }

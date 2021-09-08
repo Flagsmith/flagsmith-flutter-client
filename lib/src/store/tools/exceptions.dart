@@ -32,7 +32,6 @@ class FlagsmithApiException extends DioError {
             response: error.response,
             type: error.type,
             error: error.error);
-  
 }
 
 /// FlagsmithConfigException

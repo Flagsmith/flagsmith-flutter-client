@@ -28,7 +28,7 @@ class PersistantStore extends CrudStore with ExtendCrudStore {
     await init();
     if (!await containsKey(key)) {
       return await _prefs!.setString(key, item);
-    } 
+    }
     return false;
   }
 
@@ -60,7 +60,6 @@ class PersistantStore extends CrudStore with ExtendCrudStore {
       if (item != null) {
         items.add(item);
       }
-      
     }
     return items;
   }

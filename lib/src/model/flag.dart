@@ -22,15 +22,13 @@ class Flag {
   @JsonKey(name: 'feature_segment')
   final int? featureSegment;
   Flag(
-      {
-    this.id,
-    required this.feature,
-    this.stateValue,
-    this.enabled,
-    this.environment,
-    this.identity,
-    this.featureSegment
-  });
+      {this.id,
+      required this.feature,
+      this.stateValue,
+      this.enabled,
+      this.environment,
+      this.identity,
+      this.featureSegment});
 
   String get key => feature.name;
   @override
@@ -64,10 +62,9 @@ class Flag {
         id: id,
         stateValue: value,
         feature: Feature.named(
-            id: id,
-            name: featureName,
-            createdDate:
-                DateTime.now().add(
+          id: id,
+          name: featureName,
+          createdDate: DateTime.now().add(
             Duration(days: _generateNum(0, 10)),
           ),
           initialValue: '',
