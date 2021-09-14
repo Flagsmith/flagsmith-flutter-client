@@ -5,8 +5,6 @@ import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
 import 'package:encrypt/encrypt.dart';
 
-import '../../../flagsmith.dart';
-
 class StorageSecurity {
   final _random = Random.secure();
   final String? password;
@@ -44,11 +42,5 @@ class StorageSecurity {
 
     // Decode the input
     return json.decode(_enc.decrypt64(value, iv: IV(iv))) as String?;
-  }
-
-  String setFlag(Flag item) => encrypt(item.toJson());
-  Flag getFlag(String value) {
-    var decrypted = decrypt(value)!;
-    return Flag.fromJson(decrypted);
   }
 }

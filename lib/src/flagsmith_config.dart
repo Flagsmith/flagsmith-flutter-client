@@ -50,6 +50,8 @@ class FlagsmithConfig {
       this.caches = false,
       this.isSelfSigned = false});
 
+  String get traitsBulkURI => '${traitsURI}bulk/';
+
   /// Client options from config
   BaseOptions get clientOptions => BaseOptions(
         baseUrl: baseURI,

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:rxdart/rxdart.dart';
 
 import '../../flagsmith.dart';
@@ -36,7 +37,7 @@ class StorageProvider with SecureStore {
   }
 
   Future<bool> create(String key, Flag item) async {
-    var response = await setSecuredValue(key, item.toJson());
+    var response = await setSecuredValue(key, item.asString());
     _createSubject(await read(key));
     return response;
   }
@@ -44,6 +45,7 @@ class StorageProvider with SecureStore {
   Future<bool> delete(String key) {
     _destroySubject(key);
     _streams.remove(key);
+
     return _store.delete(key);
   }
 
@@ -52,11 +54,11 @@ class StorageProvider with SecureStore {
     if (decrypted == null) {
       return null;
     }
-    return Flag.fromJson(decrypted);
+    return Flag.fromJson(jsonDecode(decrypted) as Map<String, dynamic>);
   }
 
   Future<bool> update(String key, Flag item) async {
-    var result = await setSecuredValue(key, item.toJson(), update: true);
+    var result = await setSecuredValue(key, item.asString(), update: true);
     _updateSubject(await read(key));
     return result;
   }
@@ -71,20 +73,25 @@ class StorageProvider with SecureStore {
     var list = await _store.getAll();
     return list.map((item) {
       var decrypted = _storageSecurity.decrypt(item!)!;
-      return Flag.fromJson(decrypted);
+      return Flag.fromJson(jsonDecode(decrypted) as Map<String, dynamic>);
     }).toList();
   }
 
   Future<bool> saveAll(List<Flag> items) async {
     for (var item in items) {
-      await create(item.key, item);
+      final _current = await read(item.key);
+      if (_current != null) {
+        await update(item.key, item);
+      } else {
+        await create(item.key, item);
+      }
     }
     return true;
   }
 
   Future<bool> seed({required List<Flag> items}) async {
     var list = items
-        .map((e) => MapEntry(e.key, _storageSecurity.encrypt(e.toJson())))
+        .map((e) => MapEntry(e.key, _storageSecurity.encrypt(e.asString())))
         .toList();
     var result = await _store.seed(list);
     if (result) {
@@ -147,7 +154,6 @@ class StorageProvider with SecureStore {
     }
     var current = value.enabled!;
     var updated = value.copyWith(enabled: !current);
-
     return await update(featureName, updated);
   }
 }
