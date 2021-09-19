@@ -1,4 +1,10 @@
 
+## [2.0.1+2] - 20/08/2021
+**Fixes**
+* removing isolate
+## [2.0.1+1] - 20/08/2021
+**Fixes**
+* adding support for flutter web
 ## [2.0.1] - 09/08/2021
 **Breaking changes**
 * removing async update from constructor (anti-pattern)

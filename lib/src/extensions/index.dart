@@ -1,4 +1,3 @@
-export 'compute_transformer.dart';
 export 'converters.dart';
 export 'index.dart';
 export 'self_signed_adapter.dart';

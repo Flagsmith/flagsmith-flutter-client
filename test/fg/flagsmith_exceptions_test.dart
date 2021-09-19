@@ -2,14 +2,12 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flagsmith/flagsmith.dart';
-import 'package:flutter/material.dart';
 import 'package:test/test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../shared.dart';
 
 void main() {
-  WidgetsFlutterBinding.ensureInitialized();
   SharedPreferences.setMockInitialValues(<String, String>{});
   group('[Init] exceptions', () {
     test('When flag has wrong format, then fail', () async {

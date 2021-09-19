@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:rxdart/subjects.dart';
 
-import 'extensions/compute_transformer.dart';
 import 'extensions/self_signed_adapter.dart';
 import 'store/storage_provider.dart';
 import 'package:dio/dio.dart';
@@ -124,8 +123,8 @@ class FlagsmithClient {
     var dio = Dio(config.clientOptions)
       ..options.headers[authHeader] = apiKey
       ..options.headers[acceptHeader] = 'application/json'
-      ..options.followRedirects = true
-      ..transformer = ComputeTransformer();
+      ..options.followRedirects = true;
+    // ..transformer = ComputeTransformer();
 
     if (config.isDebug) {
       dio.interceptors.add(LogInterceptor(

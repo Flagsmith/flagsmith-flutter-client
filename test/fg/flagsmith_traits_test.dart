@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flagsmith/flagsmith.dart';
 import 'package:flagsmith/src/flagsmith_client.dart';
 import 'package:flagsmith/src/model/identity.dart';
-import 'package:flutter/widgets.dart';
 import 'package:test/test.dart';
 import 'package:http_mock_adapter/http_mock_adapter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -11,7 +10,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../shared.dart';
 
 void main() {
-  WidgetsFlutterBinding.ensureInitialized();
   SharedPreferences.setMockInitialValues(<String, String>{});
 
   group('[Flag manipulation]', () {
