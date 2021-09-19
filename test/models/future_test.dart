@@ -1,4 +1,4 @@
-import 'package:flutter_test/flutter_test.dart';
+import 'package:test/test.dart';
 import 'package:flagsmith/src/extensions/string_x.dart';
 
 void main() {

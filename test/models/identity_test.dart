@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:flagsmith/src/model/identity.dart';
-import 'package:flutter_test/flutter_test.dart';
+import 'package:test/test.dart';
 
 void main() {
   final identityId = '123-456-789';

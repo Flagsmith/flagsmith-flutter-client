@@ -4,7 +4,7 @@ import 'package:flagsmith/flagsmith.dart';
 import 'package:flagsmith/src/extensions/self_signed_adapter.dart';
 import 'package:flagsmith/src/flagsmith_client.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_test/flutter_test.dart';
+import 'package:test/test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../shared.dart';

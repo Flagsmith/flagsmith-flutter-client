@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flagsmith/flagsmith.dart';
 import 'package:flagsmith/src/model/flag.dart';
-import 'package:flutter_test/flutter_test.dart';
+import 'package:test/test.dart';
 
 import '../shared.dart';
 

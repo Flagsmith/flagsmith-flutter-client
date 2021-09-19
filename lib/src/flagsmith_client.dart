@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:rxdart/subjects.dart';
 
@@ -123,8 +122,6 @@ class FlagsmithClient {
   /// Simple implementation of Http Client
   Dio _apiClient() {
     var dio = Dio(config.clientOptions)
-      ..options.headers[userAgentHeader] =
-          'FlagsmithFlutterSDK(${Platform.operatingSystem}/${Platform.version})'
       ..options.headers[authHeader] = apiKey
       ..options.headers[acceptHeader] = 'application/json'
       ..options.followRedirects = true
