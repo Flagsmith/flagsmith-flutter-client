@@ -1,0 +1,31 @@
+targets:
+  $default:
+    builders:
+      source_gen|combining_builder:
+        options:
+          ignore_for_file:
+            - implicit_dynamic_parameter
+            - non_constant_identifier_names
+            - type_annotate_public_apis
+            - omit_local_variable_types
+            - unnecessary_this
+      json_serializable:
+        options:
+          any_map: false
+          create_to_json: true
+          disallow_unrecognized_keys: false
+          explicit_to_json: true
+          # # Options configure how source code is generated for every
+          # # `@JsonSerializable`-annotated class in the package.
+          # #
+          # # The default value for each is listed.
+          # any_map: false
+          # checked: false
+          # create_factory: true
+          # create_to_json: true
+          # disallow_unrecognized_keys: false
+          # explicit_to_json: false
+          # field_rename: none
+          # generic_argument_factories: false
+          # ignore_unannotated: false
+          # include_if_null: true

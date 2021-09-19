@@ -18,16 +18,18 @@ class PersistantStore extends CrudStore with ExtendCrudStore {
   }
 
   @override
-  Future<bool> clear() => _prefs!.clear();
+  Future<bool> clear() async {
+    await init();
+    return _prefs!.clear();
+  }
 
   @override
   Future<bool> create(String key, String item) async {
     await init();
     if (!await containsKey(key)) {
       return await _prefs!.setString(key, item);
-    } else {
-      return update(key, item);
     }
+    return false;
   }
 
   @override
@@ -49,13 +51,15 @@ class PersistantStore extends CrudStore with ExtendCrudStore {
   }
 
   @override
-  Future<List<String?>> getAll() async {
+  Future<List<String>> getAll() async {
     await init();
-    var items = <String?>[];
+    var items = <String>[];
     var keys = _prefs!.getKeys();
     for (var key in keys) {
       var item = await read(key);
-      items.add(item);
+      if (item != null) {
+        items.add(item);
+      }
     }
     return items;
   }
@@ -79,6 +83,6 @@ class PersistantStore extends CrudStore with ExtendCrudStore {
     if (await containsKey(key)) {
       return await _prefs!.setString(key, item);
     }
-    throw FlagsmithException(FlagsmithExceptionType.notSaved);
+    return false;
   }
 }

@@ -5,11 +5,18 @@ import 'bloc/flag_bloc.dart';
 
 /// Prepare DI for [FlagsmithSampleApp]
 final GetIt getIt = GetIt.instance;
-void setupPrefs() {
-  getIt.registerSingleton<FlagsmithClient>(FlagsmithClient(
+Future<void> setupPrefs() async {
+  getIt.registerSingletonAsync<FlagsmithClient>(() async {
+    final client = FlagsmithClient(
       apiKey: 'CoJErJUXmihfMDVwTzBff4',
-      config: FlagsmithConfig(storeType: StoreType.persistant, isDebug: true)));
-
-  getIt.registerFactory(() => FlagBloc(fs: getIt<FlagsmithClient>()));
-  return null;
+      config: FlagsmithConfig(storeType: StoreType.persistant, isDebug: true),
+    );
+    await client.initialize();
+    return client;
+  });
+  
+  getIt.registerSingletonWithDependencies(
+      () => FlagBloc(fs: getIt<FlagsmithClient>()),
+      dependsOn: [FlagsmithClient]);
+  // getIt.registerFactory(() => FlagBloc(fs: getIt<FlagsmithClient>()));
 }

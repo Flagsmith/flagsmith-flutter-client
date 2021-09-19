@@ -1,7 +1,4 @@
 import 'di.dart';
-import 'widgets/multi_fab.dart';
-import 'package:flagsmith/flagsmith.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -11,12 +8,9 @@ import 'bloc/theme_cubit.dart';
 import 'widgets/screen.dart';
 
 
-const String testFeature = 'show_title_logo';
-
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  setupPrefs();
+  await setupPrefs();
   runApp(FlagsmithSampleApp());
 }
 
@@ -84,12 +78,19 @@ class FlagsmithSampleApp extends StatelessWidget {
             theme: lightTheme(context),
             darkTheme: darkTheme(context),
             themeMode: state,
-            home: FlagsmithSampleScreen(title: 'Flagsmith Example'),
+            home: FutureBuilder(
+                future: getIt.allReady(),
+                builder: (BuildContext context, AsyncSnapshot snapshot) {
+                  if (snapshot.hasData) {
+                    return FlagsmithSampleScreen(title: 'Flagsmith Example');
+                  } else {
+                    return CircularProgressIndicator();
+                  }
+                }),
             builder: (context, child) {
               return BlocProvider(
                   create: (context) =>
-                      getIt<FlagBloc>()
-                    ..add(PersonalizeFlagEvent()),
+                      getIt<FlagBloc>()..add(InitFlagEvent()),
                   child: child);
             },
           );

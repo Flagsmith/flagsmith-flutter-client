@@ -1,31 +1,41 @@
-/// Custom exception type
-///
-/// [notSaved] - store could't save item
-/// [notFound] - store could't found item
-/// [notDeleted] - store could't delete item
-/// [connectionSettings] - internet connection issues
-/// [wrongFlagFormat] - flag/feature json format error
-/// [genericError] - unknown error
-/// [cachesDisabled] - enable cache in FlagsmithConfig
+import 'package:dio/dio.dart';
 
-enum FlagsmithExceptionType {
-  // store could't save item
-  notSaved,
-  // store could't found item
-  notFound,
-  // store could't delete item
-  notDeleted,
-  // internet connection issues
-  connectionSettings,
-  // flag/feature json format error
-  wrongFlagFormat,
-  // unknown error
-  genericError,
-  // trying to use query on caches without caches
-  cachesDisabled
+/// Generic FlagsmithException
+class FlagsmithException implements Exception {
+  final dynamic message;
+
+  FlagsmithException([this.message]);
+
+  @override
+  String toString() {
+    Object? message = this.message;
+    if (message == null) {
+      return 'FlagsmithException';
+    }
+    return 'FlagsmithException: $message';
+  }
 }
 
-class FlagsmithException implements Exception {
-  FlagsmithExceptionType type;
-  FlagsmithException(this.type);
+/// FlagsmithFormatException
+/// - FormatException wrapper
+class FlagsmithFormatException extends FormatException {
+  FlagsmithFormatException(FormatException e)
+      : super(e.message, e.source, e.offset);
+}
+
+/// FlagsmithApiException
+/// - DioError / Api error wrapper
+class FlagsmithApiException extends DioError {
+  FlagsmithApiException(DioError error)
+      : super(
+            requestOptions: error.requestOptions,
+            response: error.response,
+            type: error.type,
+            error: error.error);
+}
+
+/// FlagsmithConfigException
+/// - When client is misconfigured
+class FlagsmithConfigException extends FlagsmithException {
+  FlagsmithConfigException(Exception e) : super(e);
 }

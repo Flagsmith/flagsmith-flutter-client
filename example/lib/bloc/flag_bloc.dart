@@ -4,10 +4,9 @@ import 'package:equatable/equatable.dart';
 import 'package:flagsmith/flagsmith.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../main.dart';
 part 'flag_event.dart';
 part 'flag_state.dart';
-
+const String testFeature = 'show_title_logo';
 /// A simple [Bloc] which manages an `FlagState` as its state.
 class FlagBloc extends Bloc<FlagEvent, FlagState> {
   final FlagsmithClient fs;
@@ -20,12 +19,13 @@ class FlagBloc extends Bloc<FlagEvent, FlagState> {
       case InitFlagEvent:
         yield state.copyWith(loading: LoadingState.isInitial);
         add(RegisterFlagEvent());
+        add(PersonalizeFlagEvent());
+        
         break;
       case FetchFlagEvent:
         yield state.copyWith(loading: LoadingState.isLoading);
         var result = await fs.getFeatureFlags(user: state.identity);
         yield state.copyWith(loading: LoadingState.isComplete, flags: result);
-        add(RegisterFlagEvent());
         break;
       case ReloadFlagEvent:
         yield state.copyWith(loading: LoadingState.isLoading);
@@ -41,7 +41,7 @@ class FlagBloc extends Bloc<FlagEvent, FlagState> {
           key: 'age',
           value: '21',
         ));
-        add(ReloadFlagEvent());
+        add(FetchFlagEvent());
         break;
       case RegisterFlagEvent:
         _streamSubscription ??= fs.stream(testFeature);
@@ -49,7 +49,7 @@ class FlagBloc extends Bloc<FlagEvent, FlagState> {
           log('LISTEN: ${event.feature.name} => ${event.enabled}');
           add(ReloadFlagEvent());
         });
-        add(ReloadFlagEvent());
+        add(FetchFlagEvent());
         break;
       case ToggleFlagEvent:
         await fs.testToggle(testFeature);
@@ -60,14 +60,14 @@ class FlagBloc extends Bloc<FlagEvent, FlagState> {
           loading: LoadingState.isLoading,
           identity: Identity(identifier: value.identifier),
         );
-        add(ReloadFlagEvent());
+        add(FetchFlagEvent());
         break;
       case RemoveIdentityFlagEvent:
         yield state.copyWith(
           loading: LoadingState.isLoading,
           identity: null,
         );
-        add(ReloadFlagEvent());
+        add(FetchFlagEvent());
         break;
       default:
         addError(Exception('unsupported event'));

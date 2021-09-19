@@ -1,6 +1,5 @@
 import '../../model/flag.dart';
 import '../crud_store.dart';
-import '../tools/exceptions.dart';
 
 /// InMemoryStore storage
 class InMemoryStore extends CrudStore with ExtendCrudStore {
@@ -27,8 +26,9 @@ class InMemoryStore extends CrudStore with ExtendCrudStore {
   Future<bool> create(String key, String item) async {
     if (!_items.containsKey(key)) {
       _items[key] = item;
+      return true;
     }
-    return update(key, item);
+    return false;
   }
 
   /// delete [item]
@@ -38,17 +38,17 @@ class InMemoryStore extends CrudStore with ExtendCrudStore {
       _items.remove(key);
       return true;
     }
-    throw FlagsmithException(FlagsmithExceptionType.notDeleted);
+    return false;
   }
 
   /// read saved by [id]
   /// Retruns [Flag] or [null]
   @override
-  Future<String> read(String key) async {
+  Future<String?> read(String key) async {
     if (_items.containsKey(key)) {
       return Future<String>.value(_items[key]);
     }
-    throw FlagsmithException(FlagsmithExceptionType.notFound);
+    return null;
   }
 
   /// update or create [item]
@@ -58,7 +58,7 @@ class InMemoryStore extends CrudStore with ExtendCrudStore {
       _items[key] = item;
       return true;
     }
-    throw FlagsmithException(FlagsmithExceptionType.notSaved);
+    return false;
   }
 
   /// regturns all saved flags [List<Flag>]

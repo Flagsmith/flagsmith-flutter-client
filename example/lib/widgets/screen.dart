@@ -22,7 +22,7 @@ class FlagsmithSampleScreen extends StatelessWidget {
                 context.read<ThemeCubit>().toggle(context);
               },
               icon: Icon(Icons.change_circle_outlined)),
-          title: AppbarTitle(title: title),
+          title: const AppbarTitle(),
           centerTitle: true,
           bottom: PreferredSize(
               preferredSize: Size.fromHeight(1),
@@ -30,10 +30,12 @@ class FlagsmithSampleScreen extends StatelessWidget {
                 height: 1,
                 thickness: 0,
               ))),
-      body: ConstrainedBox(
-        constraints: BoxConstraints(maxWidth: 800),
-        child: const SafeArea(
-          child: Center(child: ContentListView()),
+      body: Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: 800),
+          child: const SafeArea(
+            child: Center(child: ContentListView()),
+          ),
         ),
       ),
       persistentFooterButtons: [
@@ -47,13 +49,13 @@ class FlagsmithSampleScreen extends StatelessWidget {
               context.read<FlagBloc>().add(
                   ChangeIdentityFlagEvent(identifier: 'test_another_user'));
             },
-            child: Text('test_another_user')),
+            child: Text('Test')),
         TextButton(
             onPressed: () {
               context.read<FlagBloc>().add(ChangeIdentityFlagEvent(
                   identifier: 'invalid_users_another_user'));
             },
-            child: Text('invalid_users_another_user')),
+            child: Text('Another')),
       ],
       floatingActionButton:
           const MultiFab(), // This trailing comma makes auto-formatting nicer for build methods.

@@ -1,98 +1,34 @@
 import 'dart:convert';
+
+import '../extensions/converters.dart';
+import 'package:json_annotation/json_annotation.dart';
 import 'dart:math';
 
-import 'package:equatable/equatable.dart';
-import '../extensions/string_x.dart';
 import 'feature.dart';
+part 'flag.g.dart';
 
-class Flag extends Equatable {
+@JsonSerializable()
+class Flag {
   final int? id;
   final Feature feature;
+  @JsonKey(
+      name: 'feature_state_value',
+      fromJson: stringFromJson,
+      toJson: stringToJson)
   final String? stateValue;
   final bool? enabled;
   final int? environment;
   final int? identity;
+  @JsonKey(name: 'feature_segment')
   final int? featureSegment;
-  @override
-  List<Object?> get props => [
-        id,
-        feature,
-        stateValue,
-        enabled,
-        environment,
-        identity,
-        featureSegment,
-      ];
-  @override
-  bool get stringify => true;
   Flag(
-    this.id,
-    this.feature,
-    this.stateValue,
-    this.enabled,
-    this.environment,
-    this.identity,
-    this.featureSegment,
-  );
-  Flag.named({
-    this.id,
-    required this.feature,
-    this.stateValue,
-    this.enabled,
-    this.environment,
-    this.identity,
-    this.featureSegment,
-  });
-
-  Flag copyWith({
-    int? id,
-    Feature? feature,
-    String? stateValue,
-    bool? enabled,
-    int? environment,
-    int? identity,
-    int? featureSegment,
-  }) {
-    return Flag(
-      id ?? this.id,
-      feature ?? this.feature,
-      stateValue ?? this.stateValue,
-      enabled ?? this.enabled,
-      environment ?? this.environment,
-      identity ?? this.identity,
-      featureSegment ?? this.featureSegment,
-    );
-  }
-
-  Map<String, dynamic> toMap() {
-    return <String, dynamic>{
-      'id': id,
-      'feature': feature.toMap(),
-      'feature_state_value': stateValue,
-      'enabled': enabled,
-      'environment': environment,
-      'identity': identity,
-      'feature_segment': featureSegment,
-    };
-  }
-
-  factory Flag.fromMap(Map<String, dynamic> map) {
-    final _feature = Feature.fromMap(map['feature'] as Map<String, dynamic>);
-    return Flag(
-      map['id'] as int?,
-      _feature,
-      map['feature_state_value'].toString().normalize(),
-      map['enabled'] as bool?,
-      map['environment'] as int?,
-      map['identity'] as int?,
-      map['feature_segment'] as int?,
-    );
-  }
-
-  String toJson() => json.encode(toMap());
-
-  factory Flag.fromJson(String source) =>
-      Flag.fromMap(json.decode(source) as Map<String, dynamic>);
+      {this.id,
+      required this.feature,
+      this.stateValue,
+      this.enabled,
+      this.environment,
+      this.identity,
+      this.featureSegment});
 
   String get key => feature.name;
   @override
@@ -102,17 +38,33 @@ class Flag extends Equatable {
 
   static int _generateNum(int min, int max) =>
       min + Random().nextInt(max - min);
-  static Flag seed(String featureName, {bool enabled = true, String? value}) {
+  factory Flag.named(
+          {int? id,
+          required Feature feature,
+          String? stateValue,
+          bool? enabled,
+          int? environment,
+          int? identity,
+          int? featureSegment}) =>
+      Flag(
+        id: id,
+        feature: feature,
+        stateValue: stateValue,
+        enabled: enabled,
+        environment: environment,
+        identity: identity,
+        featureSegment: featureSegment,
+      );
+  factory Flag.seed(String featureName, {bool enabled = true, String? value}) {
     var id = _generateNum(1, 100);
 
     return Flag.named(
         id: id,
         stateValue: value,
         feature: Feature.named(
-            id: id,
-            name: featureName,
-            createdDate:
-                DateTime.now().add(
+          id: id,
+          name: featureName,
+          createdDate: DateTime.now().add(
             Duration(days: _generateNum(0, 10)),
           ),
           initialValue: '',
@@ -120,4 +72,27 @@ class Flag extends Equatable {
         ),
         enabled: enabled);
   }
+
+  factory Flag.fromJson(Map<String, dynamic> json) => _$FlagFromJson(json);
+
+  Map<String, dynamic> toJson() => _$FlagToJson(this);
+  String asString() => jsonEncode(toJson());
+
+  Flag copyWith(
+          {int? id,
+          Feature? feature,
+          String? stateValue,
+          bool? enabled,
+          int? environment,
+          int? identity,
+          int? featureSegment}) =>
+      Flag(
+        id: id ?? this.id,
+        feature: feature ?? this.feature,
+        stateValue: stateValue ?? this.stateValue,
+        enabled: enabled ?? this.enabled,
+        environment: environment ?? this.environment,
+        identity: identity ?? this.identity,
+        featureSegment: featureSegment ?? this.featureSegment,
+      );
 }

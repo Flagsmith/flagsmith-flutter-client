@@ -51,7 +51,7 @@ class ContentListViewRow extends StatelessWidget {
     return SwitchListTile.adaptive(
         title: Text(item.feature.description ?? item.feature.name),
         subtitle: Text(
-            'feature: ${item.feature.name} ${item.feature.initialValue != null ? '\nvalue: ${item.feature.initialValue}' : ''}'),
+            'feature: ${item.feature.name}  \nstateValue: ${item.stateValue} initialValue: ${item.feature.initialValue}'),
         value: item.enabled ?? false,
         onChanged: (bool value) {});
   }
