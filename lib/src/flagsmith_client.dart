@@ -1,7 +1,8 @@
 import 'dart:async';
-import 'dart:io';
+import 'dart:io' if (dart.library.io) 'dart:html';
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:dio/adapter.dart';
+import 'package:flutter/foundation.dart';
 import 'package:rxdart/subjects.dart';
 
 import 'store/storage_provider.dart';
@@ -100,10 +101,14 @@ class FlagsmithClient {
   /// Simple implementation of Http Client
   Dio _apiClient() {
     var dio = Dio(config.clientOptions)
-      ..options.headers[userAgentHeader] =
-          'FlagsmithFlutterSDK(${Platform.operatingSystem}/${Platform.version})'
       ..options.headers[authHeader] = apiKey
       ..options.headers[acceptHeader] = 'application/json';
+      if (!kIsWeb) {
+      dio.options.headers[userAgentHeader] =
+          'FlagsmithFlutterSDK(${Platform.operatingSystem}/${Platform.version})';
+    } else {
+      dio.options.headers[userAgentHeader] = 'FlagsmithFlutterSDK(Web)';
+    }
 
     if (config.isDebug) {
       dio.interceptors
