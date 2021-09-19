@@ -3,14 +3,14 @@ description: >-
   Flutter Client SDK for https://www.flagsmith.com/, Flagsmith is 100% Open
   Source. Host yourself or let us take care of the hosting.
 
-version: 2.0.1+1
+version: 2.0.1+2
 homepage: https://github.com/Flagsmith/flagsmith-flutter-client
 repository: https://github.com/Flagsmith/flagsmith-flutter-client
 issue_tracker: https://github.com/Flagsmith/flagsmith-flutter-client/issues
 
 environment:
   sdk: '>=2.13.0 <3.0.0'
-  flutter: '>=2.0.0 <2.6.0'
+  flutter: '>=2.0.0'
 
 dependencies:
   collection: ^1.15.0
