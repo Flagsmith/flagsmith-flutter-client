@@ -32,18 +32,3 @@ jobs:
         with:
           # Token to connect to GitHub. Use secrets.GITHUB_TOKEN
           githubToken: ${{ secrets.GITHUB_TOKEN }}
-    
-  publishing:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: 'Checkout'
-        uses: actions/checkout@v2 # required!
-        
-      - name: '>> Dart package <<'
-        uses: k-paxian/dart-package-publisher@master
-        with:
-          accessToken: ${{ secrets.PUBDEV_ACCESSTOKEN }}
-          refreshToken: ${{ secrets.PUBDEV_REFRESHTOKEN }}
-          dryRunOnly: false
-          flutter: true
