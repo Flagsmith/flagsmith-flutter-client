@@ -1,4 +1,4 @@
-## [2.1.0+1] - 24/09/2021
+## [2.1.0-alpha.0] - 24/09/2021
 **Fixes**
 * adding support for flutter web with pana score
 
