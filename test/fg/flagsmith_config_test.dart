@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
 import 'package:flagsmith/flagsmith.dart';
@@ -71,7 +69,6 @@ void main() {
     test(
         'When self signed cert is disabled, then adapter is not SelfSigned type',
         () async {
-      print('object ${fs.client.httpClientAdapter.runtimeType}');
       expect(fs.client.httpClientAdapter, isNotNull);
       expect(fs.client.httpClientAdapter, isA<DefaultHttpClientAdapter>());
     });
