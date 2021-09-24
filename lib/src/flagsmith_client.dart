@@ -120,7 +120,6 @@ class FlagsmithClient {
       ..options.headers[authHeader] = apiKey
       ..options.headers[acceptHeader] = 'application/json'
       ..options.followRedirects = true;
-    // ..transformer = ComputeTransformer();
 
     if (config.isDebug) {
       dio.interceptors.add(LogInterceptor(
@@ -128,9 +127,6 @@ class FlagsmithClient {
         requestBody: true,
         responseBody: true,
       ));
-    }
-    if (config.isSelfSigned) {
-      dio.httpClientAdapter = SelfSignedHttpClientAdapter();
     }
     return dio;
   }
@@ -250,8 +246,7 @@ class FlagsmithClient {
   Future<List<Flag>> _getUserFlags(Identity user) async {
     try {
       var params = {'identifier': user.identifier};
-      var response = await _api.get<Map<String, dynamic>>(
-          config.identitiesURI,
+      var response = await _api.get<Map<String, dynamic>>(config.identitiesURI,
           queryParameters: params);
 
       if (response.statusCode == 200) {
@@ -293,8 +288,7 @@ class FlagsmithClient {
   Future<List<Trait>> _getUserTraits(Identity user) async {
     try {
       var params = {'identifier': user.identifier};
-      var response = await _api.get<Map<String, dynamic>>(
-          config.identitiesURI,
+      var response = await _api.get<Map<String, dynamic>>(config.identitiesURI,
           queryParameters: params);
 
       if (response.statusCode == 200) {

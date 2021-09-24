@@ -9,7 +9,6 @@ import 'bloc/flag_bloc.dart';
 import 'bloc/theme_cubit.dart';
 import 'widgets/screen.dart';
 
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await setupPrefs();
@@ -93,8 +92,7 @@ class FlagsmithSampleApp extends StatelessWidget {
                 }),
             builder: (context, child) {
               return BlocProvider(
-                  create: (context) =>
-                      getIt<FlagBloc>()..add(InitFlagEvent()),
+                  create: (context) => getIt<FlagBloc>()..add(InitFlagEvent()),
                   child: child);
             },
           );

@@ -46,8 +46,7 @@ class FlagsmithSampleScreen extends StatelessWidget {
             child: const Text('No user')),
         TextButton(
             onPressed: () {
-              context.read<FlagBloc>().add(
-                  const ChangeIdentityFlagEvent(
+              context.read<FlagBloc>().add(const ChangeIdentityFlagEvent(
                   identifier: 'test_another_user'));
             },
             child: const Text('Test')),

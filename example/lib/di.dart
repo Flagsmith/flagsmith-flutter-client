@@ -9,15 +9,14 @@ final GetIt getIt = GetIt.instance;
 Future<void> setupPrefs() async {
   getIt.registerSingletonAsync<FlagsmithClient>(() async {
     final client = FlagsmithClient(
-      apiKey: 'CoJErJUXmihfMDVwTzBff4',
-      config: const FlagsmithConfig(
+        apiKey: 'CoJErJUXmihfMDVwTzBff4',
+        config: const FlagsmithConfig(
             storageType: StorageType.custom, isDebug: true),
-        storage: FlagsmithSharedPreferenceStore()
-    );
+        storage: FlagsmithSharedPreferenceStore());
     await client.initialize();
     return client;
   });
-  
+
   getIt.registerSingletonWithDependencies(
       () => FlagBloc(fs: getIt<FlagsmithClient>()),
       dependsOn: [FlagsmithClient]);

@@ -9,7 +9,6 @@ import 'package:http_mock_adapter/http_mock_adapter.dart';
 import '../shared.dart';
 
 void main() {
-
   group('[Flag manipulation]', () {
     late FlagsmithClient fs;
     late DioAdapter _adapter;
@@ -194,12 +193,11 @@ void main() {
     test('When get User traits and success and data null', () async {
       var user = Identity(identifier: 'test_another_user');
       setupAdapter(fs, cb: (config, adapter) {
-        adapter
-          .onGet(fs.config.identitiesURI, (server) {
-            return server.reply(200, null);
-          }, queryParameters: <String, dynamic>{
-            'identifier': 'test_another_user'
-          });
+        adapter.onGet(fs.config.identitiesURI, (server) {
+          return server.reply(200, null);
+        }, queryParameters: <String, dynamic>{
+          'identifier': 'test_another_user'
+        });
       });
       var result = await fs.getTraits(user);
       expect(result, isNotNull);
@@ -208,12 +206,11 @@ void main() {
     test('When get User traits and success and data null', () async {
       var user = Identity(identifier: 'test_another_user');
       setupAdapter(fs, cb: (config, adapter) {
-        adapter
-          .onGet(fs.config.identitiesURI, (server) {
-            return server.reply(201, null);
-          }, queryParameters: <String, dynamic>{
-            'identifier': 'test_another_user'
-          });
+        adapter.onGet(fs.config.identitiesURI, (server) {
+          return server.reply(201, null);
+        }, queryParameters: <String, dynamic>{
+          'identifier': 'test_another_user'
+        });
       });
       var result = await fs.getTraits(user);
       expect(result, isNotNull);
@@ -226,10 +223,9 @@ void main() {
       fs = setupSyncClientAdapter(StorageType.inMemory);
       await fs.initialize();
       setupAdapter(fs, cb: (config, adapter) {
-        adapter
-          .onPost(fs.config.traitsURI, (server) {
-            return server.reply(200, null);
-          }, data: _data.toJson());
+        adapter.onPost(fs.config.traitsURI, (server) {
+          return server.reply(200, null);
+        }, data: _data.toJson());
       });
       final _result = await fs.createTrait(value: _data);
       expect(_result, isNull);

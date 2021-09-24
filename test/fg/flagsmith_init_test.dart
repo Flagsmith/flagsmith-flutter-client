@@ -5,7 +5,6 @@ import 'package:flagsmith_core/flagsmith_core.dart';
 import '../shared.dart';
 
 void main() {
-
   late FlagsmithClient fs;
   group('[Init] in memory sync', () {
     setUp(() async {
@@ -27,17 +26,14 @@ void main() {
   group('[Init] streams', () {
     final _flag =
         Flag.named(feature: Feature.named(name: myFeature), enabled: false);
-    
+
     setUp(() async {
       fs = setupSyncClientAdapter(
         StorageType.inMemory,
         isDebug: true,
       );
       setupEmptyAdapter(fs, cb: (config, adapter) {
-        adapter.onGet(
-            config.flagsURI,
-            (server) =>
-                server.reply(200, [_flag]));
+        adapter.onGet(config.flagsURI, (server) => server.reply(200, [_flag]));
       });
       await fs.initialize();
     });

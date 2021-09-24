@@ -711,17 +711,16 @@ Future<FlagsmithClient> setupClientAdapter(
   StorageType storeType, {
   bool caches = false,
   bool isDebug = false,
-  bool isSelfSigned = false,
 }) async {
   final fs = await FlagsmithClient.init(
     apiKey: apiKey,
     seeds: seeds,
     config: FlagsmithConfig(
-        storageType: storeType,
-        isDebug: isDebug,
-        baseURI: 'https://offline.net/',
-        caches: caches,
-        isSelfSigned: isSelfSigned),
+      storageType: storeType,
+      isDebug: isDebug,
+      baseURI: 'https://offline.net/',
+      caches: caches,
+    ),
     storage: storeType == StorageType.custom ? InMemoryStorage() : null,
   );
 
