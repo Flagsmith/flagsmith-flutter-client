@@ -1,4 +1,4 @@
-import '../enum/loading_state.dart';
+import '../models/loading_state.dart';
 import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flagsmith/flagsmith.dart';
@@ -37,7 +37,7 @@ class FlagBloc extends Bloc<FlagEvent, FlagState> {
         yield state.copyWith(loading: LoadingState.isLoading);
         await fs.createTrait(
             value: TraitWithIdentity(
-          identity: Identity(identifier: 'testUser'),
+          identity: const Identity(identifier: 'testUser'),
           key: 'age',
           value: '21',
         ));
@@ -46,7 +46,7 @@ class FlagBloc extends Bloc<FlagEvent, FlagState> {
       case RegisterFlagEvent:
         _streamSubscription ??= fs.stream(testFeature);
         _streamSubscription?.listen((event) {
-          log('LISTEN: ${event.feature.name} => ${event.enabled}');
+          fs.log('LISTEN: ${event.feature.name} => ${event.enabled}');
           add(ReloadFlagEvent());
         });
         add(FetchFlagEvent());

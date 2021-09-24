@@ -1,3 +1,5 @@
+import 'package:flagsmith_core/flagsmith_core.dart';
+
 import '../flagsmith.dart';
 import 'package:dio/dio.dart';
 
@@ -12,7 +14,7 @@ class FlagsmithConfig {
   final int receiveTimeout;
   final int sendTimeout;
 
-  final StoreType storeType;
+  final StorageType storageType;
   final String password;
 
   final bool isDebug;
@@ -44,7 +46,7 @@ class FlagsmithConfig {
       this.connectTimeout = 10000,
       this.receiveTimeout = 20000,
       this.sendTimeout = 20000,
-      this.storeType = StoreType.inMemory,
+      this.storageType = StorageType.inMemory,
       this.password = 'flagsmith_sdk_secure',
       this.isDebug = false,
       this.caches = false,

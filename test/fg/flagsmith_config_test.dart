@@ -1,20 +1,18 @@
 import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
 import 'package:flagsmith/flagsmith.dart';
-import 'package:flagsmith/src/extensions/self_signed_adapter.dart';
 import 'package:flagsmith/src/flagsmith_client.dart';
 import 'package:test/test.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flagsmith_core/flagsmith_core.dart';
 
 import '../shared.dart';
 
 void main() {
-  SharedPreferences.setMockInitialValues(<String, String>{});
-
+  
   group('[Config]', () {
     late FlagsmithClient fs;
     setUp(() async {
-      fs = await setupClientAdapter(StoreType.inMemory,
+      fs = await setupClientAdapter(StorageType.inMemory,
           caches: false, isDebug: true, isSelfSigned: true);
     });
     tearDown(() {
@@ -37,7 +35,7 @@ void main() {
     test(
         'When self signed cert is disabled, then adapter is not SelfSigned type',
         () async {
-      fs = await setupClientAdapter(StoreType.inMemory, isSelfSigned: false);
+      fs = await setupClientAdapter(StorageType.inMemory, isSelfSigned: false);
 
       expect(fs.client.httpClientAdapter, isNotNull);
       expect(fs.client.httpClientAdapter, isA<DefaultHttpClientAdapter>());

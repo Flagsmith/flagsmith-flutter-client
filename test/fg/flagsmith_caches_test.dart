@@ -1,24 +1,21 @@
 import 'package:flagsmith/flagsmith.dart';
-import 'package:flagsmith/src/flagsmith_client.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flagsmith_core/flagsmith_core.dart';
 import 'package:test/test.dart';
 
 import '../shared.dart';
 
 void main() {
-  SharedPreferences.setMockInitialValues(<String, String>{});
-
   group('[Caches] disabled', () {
     late FlagsmithClient fs;
     setUp(() async {
-      fs = await setupClientAdapter(StoreType.inMemory, caches: false);
+      fs = await setupClientAdapter(StorageType.inMemory, caches: false);
       setupAdapter(fs);
     });
     tearDown(() {
       fs.close();
     });
     test('When caches not enabled then fail', () async {
-      expect(() async => await fs.hasCachedFeatureFlag(notImplmentedFeature),
+      expect(() => fs.hasCachedFeatureFlag(notImplmentedFeature),
           throwsA(isA<FlagsmithConfigException>()));
     });
   });
@@ -26,7 +23,7 @@ void main() {
   group('[Caches] enabled', () {
     late FlagsmithClient fs;
     setUp(() async {
-      fs = await setupClientAdapter(StoreType.inMemory, caches: true);
+      fs = await setupClientAdapter(StorageType.inMemory, caches: true);
       setupAdapter(fs);
     });
     tearDown(() {
@@ -34,7 +31,7 @@ void main() {
     });
     test('When caches enabled then enabled', () async {
       await fs.getFeatureFlags();
-      final _value = await fs.hasCachedFeatureFlag(notImplmentedFeature);
+      final _value = fs.hasCachedFeatureFlag(notImplmentedFeature);
       expect(_value, false);
     });
 

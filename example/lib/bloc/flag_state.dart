@@ -11,7 +11,7 @@ class FlagState extends Equatable {
   @override
   List<Object> get props => [loading, flags];
 
-  FlagState(
+  const FlagState(
       {required this.loading, this.flags = const <Flag>[], this.identity});
 
   FlagState copyWith(
@@ -25,7 +25,7 @@ class FlagState extends Equatable {
 
   /// Initial state
   factory FlagState.initial() =>
-      FlagState(loading: LoadingState.isInitial, flags: []);
+      const FlagState(loading: LoadingState.isInitial, flags: []);
 
   bool isEnabled(String flag) {
     final found = flags.firstWhereOrNull(

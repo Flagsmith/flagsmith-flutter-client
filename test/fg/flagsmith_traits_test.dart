@@ -2,21 +2,19 @@ import 'dart:convert';
 
 import 'package:flagsmith/flagsmith.dart';
 import 'package:flagsmith/src/flagsmith_client.dart';
-import 'package:flagsmith/src/model/identity.dart';
+import 'package:flagsmith_core/flagsmith_core.dart';
 import 'package:test/test.dart';
 import 'package:http_mock_adapter/http_mock_adapter.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../shared.dart';
 
 void main() {
-  SharedPreferences.setMockInitialValues(<String, String>{});
 
   group('[Flag manipulation]', () {
     late FlagsmithClient fs;
     late DioAdapter _adapter;
     setUp(() async {
-      fs = await setupSyncClientAdapter(StoreType.inMemory);
+      fs = setupSyncClientAdapter(StorageType.inMemory);
       setupAdapter(fs, cb: (config, adapter) {
         _adapter = adapter;
         _adapter
@@ -61,7 +59,7 @@ void main() {
     });
 
     test('When change state of flag, then cache success', () async {
-      fs = await setupSyncClientAdapter(StoreType.inMemory, caches: true);
+      fs = setupSyncClientAdapter(StorageType.inMemory, caches: true);
       setupAdapter(fs, cb: (config, adapter) {});
       await fs.getFeatureFlags();
       expect(await fs.isFeatureFlagEnabled(myFeature), true);
@@ -73,7 +71,7 @@ void main() {
   group('[Traits]', () {
     late FlagsmithClient fs;
     setUp(() async {
-      fs = await setupClientAdapter(StoreType.inMemory);
+      fs = await setupClientAdapter(StorageType.inMemory);
       setupAdapter(fs, cb: (config, adapter) {
         adapter
           ..onGet(fs.config.identitiesURI, (server) {
@@ -169,7 +167,7 @@ void main() {
   group('[Users]', () {
     late FlagsmithClient fs;
     setUp(() async {
-      fs = await setupClientAdapter(StoreType.inMemory);
+      fs = await setupClientAdapter(StorageType.inMemory);
       setupAdapter(fs, cb: (config, adapter) {
         adapter
           ..onGet(fs.config.identitiesURI, (server) {
@@ -197,7 +195,7 @@ void main() {
       var user = Identity(identifier: 'test_another_user');
       setupAdapter(fs, cb: (config, adapter) {
         adapter
-          ..onGet(fs.config.identitiesURI, (server) {
+          .onGet(fs.config.identitiesURI, (server) {
             return server.reply(200, null);
           }, queryParameters: <String, dynamic>{
             'identifier': 'test_another_user'
@@ -211,7 +209,7 @@ void main() {
       var user = Identity(identifier: 'test_another_user');
       setupAdapter(fs, cb: (config, adapter) {
         adapter
-          ..onGet(fs.config.identitiesURI, (server) {
+          .onGet(fs.config.identitiesURI, (server) {
             return server.reply(201, null);
           }, queryParameters: <String, dynamic>{
             'identifier': 'test_another_user'
@@ -225,11 +223,11 @@ void main() {
     test('When create trait return data null', () async {
       var _user = Identity(identifier: 'test_another_user');
       final _data = TraitWithIdentity(identity: _user, key: 'age', value: '25');
-      fs = await setupSyncClientAdapter(StoreType.inMemory);
+      fs = setupSyncClientAdapter(StorageType.inMemory);
       await fs.initialize();
       setupAdapter(fs, cb: (config, adapter) {
         adapter
-          ..onPost(fs.config.traitsURI, (server) {
+          .onPost(fs.config.traitsURI, (server) {
             return server.reply(200, null);
           }, data: _data.toJson());
       });

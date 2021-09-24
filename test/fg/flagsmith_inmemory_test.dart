@@ -3,19 +3,16 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flagsmith/flagsmith.dart';
 import 'package:flagsmith/src/flagsmith_client.dart';
-import 'package:flagsmith/src/model/identity.dart';
+import 'package:flagsmith_core/flagsmith_core.dart';
 import 'package:test/test.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../shared.dart';
 
 void main() {
-  SharedPreferences.setMockInitialValues(<String, String>{});
-
   group('[InMemory storage]', () {
     late FlagsmithClient fs;
     setUp(() async {
-      fs = await setupClientAdapter(StoreType.inMemory, caches: true);
+      fs = await setupClientAdapter(StorageType.inMemory, caches: true);
       setupAdapter(fs, cb: (config, _adapter) {});
     });
     tearDown(() {
@@ -52,7 +49,7 @@ void main() {
       expect(result, isNotNull);
       expect(result.length, seeds.length);
 
-      final value = await fs.hasCachedFeatureFlag(notImplmentedFeature);
+      final value = fs.hasCachedFeatureFlag(notImplmentedFeature);
       expect(value, false);
 
       final value1 = await fs.hasFeatureFlag(notImplmentedFeature);
@@ -117,7 +114,7 @@ void main() {
     late FlagsmithClient fs;
     final _identity = Identity(identifier: 'invalid_users_another_user');
     setUp(() async {
-      fs = await setupClientAdapter(StoreType.inMemory, caches: true);
+      fs = await setupClientAdapter(StorageType.inMemory, caches: true);
     });
     tearDown(() {
       fs.close();

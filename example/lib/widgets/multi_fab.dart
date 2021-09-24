@@ -15,7 +15,7 @@ class MultiFab extends StatelessWidget {
         FloatingActionButton(
           mini: true,
           onPressed: () => context.read<FlagBloc>().add(ToggleFlagEvent()),
-          child: Icon(Icons.image),
+          child: const Icon(Icons.image),
         ),
         const SizedBox(
           height: 8,
@@ -23,8 +23,8 @@ class MultiFab extends StatelessWidget {
         FloatingActionButton.extended(
           onPressed: () => context.read<FlagBloc>().add(FetchFlagEvent()),
           tooltip: 'Fetch',
-          icon: Icon(Icons.assignment_returned_outlined),
-          label: Text('Fetch'),
+          icon: const Icon(Icons.assignment_returned_outlined),
+          label: const Text('Fetch'),
         ),
       ],
     );

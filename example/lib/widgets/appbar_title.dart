@@ -15,11 +15,11 @@ class AppbarTitle extends StatelessWidget {
           switch (snapshot.connectionState) {
             case ConnectionState.none:
             case ConnectionState.waiting:
-              return CircularProgressIndicator();
+              return const CircularProgressIndicator();
             case ConnectionState.active:
             case ConnectionState.done:
               if (snapshot.hasError) {
-                return Text('error');
+                return const Text('error');
               }
               if (snapshot.hasData) {
                 var flag = snapshot.data as Flag;
@@ -37,7 +37,7 @@ class AppbarTitle extends StatelessWidget {
                         style: Theme.of(context).textTheme.headline6,
                       );
               }
-              return SizedBox.shrink();
+              return const SizedBox.shrink();
           }
         });
   }

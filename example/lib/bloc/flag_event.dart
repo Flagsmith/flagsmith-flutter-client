@@ -28,7 +28,7 @@ class ToggleFlagEvent extends FlagEvent {}
 
 // Change identity for reloading of a feature flags from api
 class ChangeIdentityFlagEvent extends FlagEvent {
-  ChangeIdentityFlagEvent({required this.identifier});
+  const ChangeIdentityFlagEvent({required this.identifier});
   final String identifier;
 
   @override

@@ -1,16 +1,16 @@
 import 'package:flagsmith/flagsmith.dart';
 import 'package:flagsmith/src/flagsmith_client.dart';
 import 'package:test/test.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flagsmith_core/flagsmith_core.dart';
 import '../shared.dart';
 
 void main() {
-  SharedPreferences.setMockInitialValues(<String, String>{});
+
   late FlagsmithClient fs;
   group('[Init] in memory sync', () {
     setUp(() async {
       fs = setupSyncClientAdapter(
-        StoreType.inMemory,
+        StorageType.inMemory,
       );
       setupAdapter(fs);
       await fs.initialize();
@@ -20,41 +20,24 @@ void main() {
       fs.close();
     });
     test('When caches not enabled then fail', () async {
-      expect(() async => await fs.hasCachedFeatureFlag(notImplmentedFeature),
-          throwsA(isA<FlagsmithConfigException>()));
-    });
-  });
-
-  group('[Init] persistatnt sync', () {
-    setUp(() async {
-      fs = setupSyncClientAdapter(
-        StoreType.persistant,
-      );
-      setupAdapter(fs, cb: (config, adapter) {});
-      await fs.initialize();
-      await fs.getFeatureFlags();
-    });
-    tearDown(() {
-      fs.close();
-    });
-    test('When caches not enabled then fail', () async {
-      expect(() async => await fs.hasCachedFeatureFlag(notImplmentedFeature),
+      expect(() => fs.hasCachedFeatureFlag(notImplmentedFeature),
           throwsA(isA<FlagsmithConfigException>()));
     });
   });
   group('[Init] streams', () {
     final _flag =
         Flag.named(feature: Feature.named(name: myFeature), enabled: false);
-    // final _flagsResponse = jsonEncode([_flag]);
+    
     setUp(() async {
       fs = setupSyncClientAdapter(
-        StoreType.persistant,
+        StorageType.inMemory,
+        isDebug: true,
       );
       setupEmptyAdapter(fs, cb: (config, adapter) {
         adapter.onGet(
             config.flagsURI,
             (server) =>
-                server.reply(200, [_flag])); //jsonDecode(_flagsResponse)));
+                server.reply(200, [_flag]));
       });
       await fs.initialize();
     });

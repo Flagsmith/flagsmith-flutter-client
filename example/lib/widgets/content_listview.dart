@@ -1,5 +1,5 @@
 import '../bloc/flag_bloc.dart';
-import '../enum/loading_state.dart';
+import '../models/loading_state.dart';
 import 'package:flagsmith/flagsmith.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -12,7 +12,7 @@ class ContentListView extends StatelessWidget {
     return RefreshIndicator(
       onRefresh: () async {
         context.read<FlagBloc>().add(FetchFlagEvent());
-        return null;
+        return;
       },
       child: BlocBuilder<FlagBloc, FlagState>(
         builder: (context, state) {

@@ -1,17 +1,15 @@
 import 'package:flagsmith/flagsmith.dart';
 import 'package:flagsmith/src/flagsmith_client.dart';
 import 'package:test/test.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flagsmith_core/flagsmith_core.dart';
 
 import '../shared.dart';
 
 void main() {
-  SharedPreferences.setMockInitialValues(<String, String>{});
-
   group('[Streams]', () {
     late FlagsmithClient fs;
     setUp(() async {
-      fs = await setupClientAdapter(StoreType.inMemory, caches: true);
+      fs = await setupClientAdapter(StorageType.inMemory, caches: true);
       setupAdapter(fs, cb: (config, _adapter) {});
     });
     tearDown(() {
