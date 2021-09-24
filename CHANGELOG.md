@@ -1,3 +1,11 @@
+## [2.1.0-alpha.0] - 24/09/2021
+**Fixes**
+* adding support for flutter web with pana score
+
+**Breaking changes**
+* storage was moved to the separate package 
+* [flagsmith_core](https://pub.dev/packages/flagsmith_core) is a new package with models and storage implementation 
+* persistent storage is available as custom package [flagsmith_storage_sharedpreferences](https://pub.dev/packages/flagsmith_storage_sharedpreferences)
 
 ## [2.0.1+2] - 20/08/2021
 **Fixes**

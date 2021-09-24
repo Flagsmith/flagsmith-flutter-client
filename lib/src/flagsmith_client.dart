@@ -1,16 +1,12 @@
 import 'dart:async';
 import 'package:collection/collection.dart' show IterableExtension;
+import 'core/core.dart';
+import 'package:flagsmith_core/flagsmith_core.dart';
 import 'package:rxdart/subjects.dart';
-
-import 'extensions/self_signed_adapter.dart';
-import 'store/storage_provider.dart';
 import 'package:dio/dio.dart';
 
 import '../flagsmith.dart';
 import 'flagsmith_config.dart';
-import 'model/index.dart';
-import 'store/storage/in_memory_store.dart';
-import 'store/storage/persistant_store.dart';
 
 /// Flagsmith client initialization
 ///
@@ -23,12 +19,18 @@ class FlagsmithClient {
   static final String authHeader = 'X-Environment-Key';
   static final String acceptHeader = 'Accept';
   static final String userAgentHeader = 'User-Agent';
+  void log(String message) {
+    if (flagsmithDebug) {
+      // ignore: avoid_print
+      print('Flagsmith: $message');
+    }
+  }
 
   final String apiKey;
   final FlagsmithConfig config;
-  late StorageProvider storage;
+  late StorageProvider storageProvider;
+  CoreStorage? storage;
   late Dio _api;
-
   final Set<Flag> _flags = {};
   final List<Flag> seeds;
   Set<Flag> get cachedFlags => _flags;
@@ -36,37 +38,40 @@ class FlagsmithClient {
   final StreamController<FlagsmithLoading> _loading =
       StreamController.broadcast();
   Dio get client => _api;
-
-  FlagsmithClient({
-    this.config = const FlagsmithConfig(),
-    required this.apiKey,
-    this.seeds = const <Flag>[],
-  }) {
+  bool flagsmithDebug = false;
+  FlagsmithClient(
+      {this.config = const FlagsmithConfig(),
+      required this.apiKey,
+      this.seeds = const <Flag>[],
+      this.storage}) {
     flagsmithDebug = config.isDebug;
     _api = _apiClient();
-
-    switch (config.storeType) {
-      case StoreType.persistant:
-        storage = StorageProvider(PersistantStore(), password: config.password);
-        break;
-      default:
-        storage = StorageProvider(InMemoryStore(), password: config.password);
+    storageProvider = prepareStorage(storage: storage, config: config);
+  }
+  static StorageProvider prepareStorage(
+      {CoreStorage? storage, required FlagsmithConfig config}) {
+    late CoreStorage store;
+    if (storage != null) {
+      store = storage;
+    } else {
+      switch (config.storageType) {
+        case StorageType.custom:
+          store = storage!;
+          break;
+        default:
+          store = InMemoryStorage();
+          break;
+      }
     }
+    return StorageProvider(store,
+        password: config.password, logEnabled: config.isDebug);
   }
 
   /// Initialization throught custom init services
   ///
   ///
   Future<void> initialize() async {
-    flagsmithDebug = config.isDebug;
-    switch (config.storeType) {
-      case StoreType.persistant:
-        storage = StorageProvider(PersistantStore(), password: config.password);
-        break;
-      default:
-        storage = StorageProvider(InMemoryStore(), password: config.password);
-    }
-
+    storageProvider = prepareStorage(storage: storage, config: config);
     await initStore(seeds: seeds);
   }
 
@@ -77,22 +82,13 @@ class FlagsmithClient {
     FlagsmithConfig config = const FlagsmithConfig(isDebug: true),
     required String apiKey,
     List<Flag> seeds = const <Flag>[],
+    CoreStorage? storage,
   }) async {
     final client = FlagsmithClient(
       config: config,
       apiKey: apiKey,
       seeds: seeds,
-    );
-    flagsmithDebug = config.isDebug;
-    switch (config.storeType) {
-      case StoreType.persistant:
-        client.storage =
-            StorageProvider(PersistantStore(), password: config.password);
-        break;
-      default:
-        client.storage =
-            StorageProvider(InMemoryStore(), password: config.password);
-    }
+    )..storageProvider = prepareStorage(storage: storage, config: config);
     await client.initStore(seeds: seeds);
     return client;
   }
@@ -100,10 +96,10 @@ class FlagsmithClient {
   Future<bool> initStore(
       {List<Flag> seeds = const <Flag>[], bool clear = false}) async {
     if (clear) {
-      await storage.clear();
+      await storageProvider.clear();
     }
-    await storage.seed(items: seeds);
-    final _items = await storage.getAll();
+    await storageProvider.seed(items: seeds);
+    final _items = await storageProvider.getAll();
     _updateCaches(list: _items);
     return true;
   }
@@ -112,8 +108,8 @@ class FlagsmithClient {
   ///
   /// reseting storage and re-seed defalt values
   Future<bool> reset() async {
-    await storage.clear();
-    await storage.seed(items: seeds);
+    await storageProvider.clear();
+    await storageProvider.seed(items: seeds);
     _updateCaches(list: seeds, clear: true);
     return true;
   }
@@ -124,7 +120,6 @@ class FlagsmithClient {
       ..options.headers[authHeader] = apiKey
       ..options.headers[acceptHeader] = 'application/json'
       ..options.followRedirects = true;
-    // ..transformer = ComputeTransformer();
 
     if (config.isDebug) {
       dio.interceptors.add(LogInterceptor(
@@ -132,9 +127,6 @@ class FlagsmithClient {
         requestBody: true,
         responseBody: true,
       ));
-    }
-    if (config.isSelfSigned) {
-      dio.httpClientAdapter = SelfSignedHttpClientAdapter();
     }
     return dio;
   }
@@ -146,7 +138,7 @@ class FlagsmithClient {
   Future<List<Flag>> getFeatureFlags(
       {Identity? user, bool reload = true}) async {
     if (!reload) {
-      var result = await storage.getAll();
+      var result = await storageProvider.getAll();
       if (result.isNotEmpty) {
         result.sort((a, b) => a.feature.name.compareTo(b.feature.name));
       }
@@ -214,7 +206,7 @@ class FlagsmithClient {
   }
 
   Future<bool> removeFeatureFlag(String featureName) async {
-    var result = await storage.delete(featureName);
+    var result = await storageProvider.delete(featureName);
     if (config.caches) {
       _flags.removeWhere((element) => element.feature.name == featureName);
     }
@@ -234,8 +226,8 @@ class FlagsmithClient {
         var list = response.data!
             .map<Flag>((dynamic e) => Flag.fromJson(e as Map<String, dynamic>))
             .toList();
-        await storage.saveAll(list);
-        final _saved = await storage.getAll()
+        await storageProvider.saveAll(list);
+        final _saved = await storageProvider.getAll()
           ..sort((a, b) => a.feature.name.compareTo(b.feature.name));
         _updateCaches(clear: true, list: _saved);
         return list;
@@ -254,8 +246,7 @@ class FlagsmithClient {
   Future<List<Flag>> _getUserFlags(Identity user) async {
     try {
       var params = {'identifier': user.identifier};
-      var response = await _api.get<Map<String, dynamic>>(
-          '${config.identitiesURI}',
+      var response = await _api.get<Map<String, dynamic>>(config.identitiesURI,
           queryParameters: params);
 
       if (response.statusCode == 200) {
@@ -266,8 +257,8 @@ class FlagsmithClient {
         if (data.isNotEmpty) {
           data.sort((a, b) => a.feature.name.compareTo(b.feature.name));
         }
-        await storage.saveAll(data);
-        final _saved = await storage.getAll()
+        await storageProvider.saveAll(data);
+        final _saved = await storageProvider.getAll()
           ..sort((a, b) => a.feature.name.compareTo(b.feature.name));
         _updateCaches(clear: true, list: _saved);
         return data;
@@ -297,8 +288,7 @@ class FlagsmithClient {
   Future<List<Trait>> _getUserTraits(Identity user) async {
     try {
       var params = {'identifier': user.identifier};
-      var response = await _api.get<Map<String, dynamic>>(
-          '${config.identitiesURI}',
+      var response = await _api.get<Map<String, dynamic>>(config.identitiesURI,
           queryParameters: params);
 
       if (response.statusCode == 200) {
@@ -374,13 +364,13 @@ class FlagsmithClient {
   }
 
   /// clear all data from storage
-  Future<bool> clearStore() async => storage.clear();
+  Future<bool> clearStore() async => storageProvider.clear();
 
   /// stream for listener
-  Stream<Flag>? stream(String key) => storage.stream(key);
+  Stream<Flag>? stream(String key) => storageProvider.stream(key);
 
   /// basic stream
-  BehaviorSubject<Flag>? subject(String key) => storage.subject(key);
+  BehaviorSubject<Flag>? subject(String key) => storageProvider.subject(key);
 
   // Loading from API
   Stream<FlagsmithLoading> get loading => _loading.stream;
@@ -392,8 +382,8 @@ class FlagsmithClient {
   /// test toggle feature
   ///
   Future<bool> testToggle(String featureName) async {
-    final _result = await storage.togggleFeature(featureName);
-    final _value = await storage.read(featureName);
+    final _result = await storageProvider.togggleFeature(featureName);
+    final _value = await storageProvider.read(featureName);
     if (config.caches) {
       _flags.removeWhere((element) => element.feature.name == featureName);
       if (_value != null) {

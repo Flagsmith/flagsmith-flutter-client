@@ -1,21 +1,21 @@
 import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
 import 'package:flagsmith/flagsmith.dart';
-import 'package:flagsmith/src/extensions/self_signed_adapter.dart';
 import 'package:flagsmith/src/flagsmith_client.dart';
 import 'package:test/test.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flagsmith_core/flagsmith_core.dart';
 
 import '../shared.dart';
 
 void main() {
-  SharedPreferences.setMockInitialValues(<String, String>{});
-
   group('[Config]', () {
     late FlagsmithClient fs;
     setUp(() async {
-      fs = await setupClientAdapter(StoreType.inMemory,
-          caches: false, isDebug: true, isSelfSigned: true);
+      fs = await setupClientAdapter(
+        StorageType.inMemory,
+        caches: false,
+        isDebug: true,
+      );
     });
     tearDown(() {
       fs.close();
@@ -29,16 +29,46 @@ void main() {
               .where((element) => element.runtimeType == LogInterceptor),
           isNotEmpty);
     });
+  });
+  group('[External config]', () {
+    late FlagsmithClient fs;
+    setUp(() async {
+      fs = await setupClientAdapter(
+        StorageType.inMemory,
+        caches: false,
+        isDebug: true,
+      );
+      (fs.client.httpClientAdapter as DefaultHttpClientAdapter)
+          .onHttpClientCreate = (client) {
+        client.badCertificateCallback = (cert, host, port) => true;
+        return client;
+      };
+    });
+    tearDown(() {
+      fs.close();
+    });
     test('When self signed cert is enabled, then adapter is SelfSigned type',
         () async {
       expect(fs.client.httpClientAdapter, isNotNull);
-      expect(fs.client.httpClientAdapter, isA<SelfSignedHttpClientAdapter>());
+      expect(fs.client.httpClientAdapter, isA<DefaultHttpClientAdapter>());
     });
+  });
+  group('[Standard config]', () {
+    late FlagsmithClient fs;
+    setUp(() async {
+      fs = await setupClientAdapter(
+        StorageType.inMemory,
+        caches: false,
+        isDebug: true,
+      );
+    });
+    tearDown(() {
+      fs.close();
+    });
+
     test(
         'When self signed cert is disabled, then adapter is not SelfSigned type',
         () async {
-      fs = await setupClientAdapter(StoreType.inMemory, isSelfSigned: false);
-
       expect(fs.client.httpClientAdapter, isNotNull);
       expect(fs.client.httpClientAdapter, isA<DefaultHttpClientAdapter>());
     });

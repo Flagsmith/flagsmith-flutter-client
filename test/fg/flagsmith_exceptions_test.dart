@@ -3,12 +3,10 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flagsmith/flagsmith.dart';
 import 'package:test/test.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:flagsmith_core/flagsmith_core.dart';
 import '../shared.dart';
 
 void main() {
-  SharedPreferences.setMockInitialValues(<String, String>{});
   group('[Init] exceptions', () {
     test('When flag has wrong format, then fail', () async {
       expect(() => Mocked().wrongFlagFormat(message: 'wrong format'),
@@ -31,7 +29,7 @@ void main() {
     late FlagsmithClient fs;
     setUp(() async {
       fs = setupSyncClientAdapter(
-        StoreType.inMemory,
+        StorageType.inMemory,
       );
       setupAdapter(fs);
       await fs.initialize();
@@ -92,38 +90,36 @@ void main() {
     test('When create trait return error', () async {
       var _user = Identity(identifier: 'test_another_user');
       final _data = TraitWithIdentity(identity: _user, key: 'age', value: '25');
-      fs = await setupSyncClientAdapter(StoreType.inMemory);
+      fs = setupSyncClientAdapter(StorageType.inMemory);
       await fs.initialize();
       setupAdapter(fs, cb: (config, adapter) {
-        adapter
-          ..onPost(fs.config.traitsURI, (server) {
-            return server.throws(
-              404,
-              DioError(
-                requestOptions: RequestOptions(path: fs.config.identitiesURI),
-                error: Exception('404'),
-              ),
-            );
-          }, data: _data.toJson());
+        adapter.onPost(fs.config.traitsURI, (server) {
+          return server.throws(
+            404,
+            DioError(
+              requestOptions: RequestOptions(path: fs.config.identitiesURI),
+              error: Exception('404'),
+            ),
+          );
+        }, data: _data.toJson());
       });
 
       expect(() => fs.createTrait(value: _data),
           throwsA(isA<FlagsmithApiException>()));
     });
     test('When bulk update traits, then fail', () async {
-      fs = await setupSyncClientAdapter(StoreType.inMemory);
+      fs = setupSyncClientAdapter(StorageType.inMemory);
       await fs.initialize();
       setupAdapter(fs, cb: (config, adapter) {
-        adapter
-          ..onPut(fs.config.traitsBulkURI, (server) {
-            return server.throws(
-              404,
-              DioError(
-                requestOptions: RequestOptions(path: fs.config.identitiesURI),
-                error: Exception('404'),
-              ),
-            );
-          }, data: jsonDecode(bulkTraitUpdateResponse));
+        adapter.onPut(fs.config.traitsBulkURI, (server) {
+          return server.throws(
+            404,
+            DioError(
+              requestOptions: RequestOptions(path: fs.config.identitiesURI),
+              error: Exception('404'),
+            ),
+          );
+        }, data: jsonDecode(bulkTraitUpdateResponse));
       });
       final _user = Identity(identifier: 'test_another_user');
       final _data = [
@@ -144,20 +140,19 @@ void main() {
     });
 
     test('When bulk update list is empty then return null', () async {
-      fs = await setupSyncClientAdapter(StoreType.inMemory);
+      fs = setupSyncClientAdapter(StorageType.inMemory);
       await fs.initialize();
       setupAdapter(fs, cb: (config, adapter) {
-        adapter
-          ..onPut(fs.config.traitsBulkURI, (server) {
-            return server.reply(200, null);
-          }, data: []);
+        adapter.onPut(fs.config.traitsBulkURI, (server) {
+          return server.reply(200, null);
+        }, data: []);
       });
       final _response = await fs.updateTraits(value: <TraitWithIdentity>[]);
       expect(_response, isNull);
     });
 
     test('When fetch flags, but data are malformed, then fail', () async {
-      fs = await setupSyncClientAdapter(StoreType.inMemory);
+      fs = setupSyncClientAdapter(StorageType.inMemory);
       final _flag =
           Flag.named(feature: Feature.named(name: myFeature), enabled: false);
       setupEmptyAdapter(fs, cb: (config, adapter) {
@@ -183,7 +178,7 @@ void main() {
         )
       ];
 
-      fs = await setupSyncClientAdapter(StoreType.inMemory);
+      fs = setupSyncClientAdapter(StorageType.inMemory);
       setupEmptyAdapter(fs, cb: (config, adapter) {
         adapter.onGet(config.identitiesURI,
             (server) => server.reply(200, jsonDecode(jsonEncode([_data]))),

@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flagsmith/flagsmith.dart';
+import 'package:flagsmith_core/flagsmith_core.dart';
+
 import 'package:http_mock_adapter/http_mock_adapter.dart';
 import 'package:mockito/mockito.dart';
 
@@ -706,30 +708,30 @@ final traitAge25 = '''{
 }''';
 
 Future<FlagsmithClient> setupClientAdapter(
-  StoreType storeType, {
+  StorageType storeType, {
   bool caches = false,
   bool isDebug = false,
-  bool isSelfSigned = false,
 }) async {
   final fs = await FlagsmithClient.init(
     apiKey: apiKey,
     seeds: seeds,
     config: FlagsmithConfig(
-        storeType: storeType,
-        isDebug: isDebug,
-        baseURI: 'https://offline.net/',
-        caches: caches,
-        isSelfSigned: isSelfSigned),
+      storageType: storeType,
+      isDebug: isDebug,
+      baseURI: 'https://offline.net/',
+      caches: caches,
+    ),
+    storage: storeType == StorageType.custom ? InMemoryStorage() : null,
   );
 
   fs.loading.listen((event) {
-    log('loading [$storeType]: $event');
+    fs.log('loading [$storeType]: $event');
   });
   return fs;
 }
 
 FlagsmithClient setupSyncClientAdapter(
-  StoreType storeType, {
+  StorageType storeType, {
   bool caches = false,
   bool isDebug = false,
   VoidCallback? afterInit,
@@ -738,11 +740,12 @@ FlagsmithClient setupSyncClientAdapter(
     apiKey: apiKey,
     seeds: seeds,
     config: FlagsmithConfig(
-      storeType: storeType,
+      storageType: storeType,
       isDebug: isDebug,
       baseURI: 'https://offline.net/',
       caches: caches,
     ),
+    storage: storeType == StorageType.custom ? InMemoryStorage() : null,
   );
   return fs;
 }

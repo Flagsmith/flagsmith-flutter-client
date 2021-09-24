@@ -11,7 +11,7 @@ import 'multi_fab.dart';
 class FlagsmithSampleScreen extends StatelessWidget {
   // Screen title
   final String title;
-  FlagsmithSampleScreen({Key? key, this.title = ''}) : super(key: key);
+  const FlagsmithSampleScreen({Key? key, this.title = ''}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,18 +21,18 @@ class FlagsmithSampleScreen extends StatelessWidget {
               onPressed: () {
                 context.read<ThemeCubit>().toggle(context);
               },
-              icon: Icon(Icons.change_circle_outlined)),
+              icon: const Icon(Icons.change_circle_outlined)),
           title: const AppbarTitle(),
           centerTitle: true,
-          bottom: PreferredSize(
+          bottom: const PreferredSize(
               preferredSize: Size.fromHeight(1),
-              child: const Divider(
+              child: Divider(
                 height: 1,
                 thickness: 0,
               ))),
       body: Center(
         child: ConstrainedBox(
-          constraints: BoxConstraints(maxWidth: 800),
+          constraints: const BoxConstraints(maxWidth: 800),
           child: const SafeArea(
             child: Center(child: ContentListView()),
           ),
@@ -43,19 +43,19 @@ class FlagsmithSampleScreen extends StatelessWidget {
             onPressed: () {
               context.read<FlagBloc>().add(RemoveIdentityFlagEvent());
             },
-            child: Text('No user')),
+            child: const Text('No user')),
         TextButton(
             onPressed: () {
-              context.read<FlagBloc>().add(
-                  ChangeIdentityFlagEvent(identifier: 'test_another_user'));
+              context.read<FlagBloc>().add(const ChangeIdentityFlagEvent(
+                  identifier: 'test_another_user'));
             },
-            child: Text('Test')),
+            child: const Text('Test')),
         TextButton(
             onPressed: () {
-              context.read<FlagBloc>().add(ChangeIdentityFlagEvent(
+              context.read<FlagBloc>().add(const ChangeIdentityFlagEvent(
                   identifier: 'invalid_users_another_user'));
             },
-            child: Text('Another')),
+            child: const Text('Another')),
       ],
       floatingActionButton:
           const MultiFab(), // This trailing comma makes auto-formatting nicer for build methods.

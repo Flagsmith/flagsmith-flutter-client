@@ -5,15 +5,8 @@
 
 library flagsmith;
 
+export 'package:flagsmith_core/flagsmith_core.dart';
+
 export 'src/flagsmith_client.dart';
 export 'src/flagsmith_config.dart';
-export 'src/model/index.dart';
-export 'src/extensions/index.dart';
-export 'src/store/index.dart';
-
-bool flagsmithDebug = false;
-void log(String message) {
-  if (flagsmithDebug) {
-    print('Flagsmith: $message');
-  }
-}
+export 'src/core/core.dart';

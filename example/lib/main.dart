@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'di.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -6,7 +8,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'bloc/flag_bloc.dart';
 import 'bloc/theme_cubit.dart';
 import 'widgets/screen.dart';
-
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -66,6 +67,8 @@ ThemeData darkTheme(BuildContext context) {
 
 /// Simple [FlagsmithSampleApp]
 class FlagsmithSampleApp extends StatelessWidget {
+  const FlagsmithSampleApp({Key? key}) : super(key: key);
+
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -89,8 +92,7 @@ class FlagsmithSampleApp extends StatelessWidget {
                 }),
             builder: (context, child) {
               return BlocProvider(
-                  create: (context) =>
-                      getIt<FlagBloc>()..add(InitFlagEvent()),
+                  create: (context) => getIt<FlagBloc>()..add(InitFlagEvent()),
                   child: child);
             },
           );
