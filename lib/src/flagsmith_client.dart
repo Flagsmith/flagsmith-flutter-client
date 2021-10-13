@@ -36,7 +36,6 @@ class FlagsmithClient {
   final List<Flag> seeds;
   Set<Flag> get cachedFlags => _flags;
 
-
   //A map of flag names to the amount of times they have been evaluated in the last 10 seconds
   Map<String, int> flagAnalytics = {};
   Timer? _analyticsTimer;
@@ -60,10 +59,14 @@ class FlagsmithClient {
 
   Future<void> _setupAnalyticsTimer(int analyticsInterval) async {
     _analyticsTimer?.cancel();
-    _analyticsTimer = Timer.periodic(Duration(milliseconds: analyticsInterval), (_) async {
+    _analyticsTimer =
+        Timer.periodic(Duration(milliseconds: analyticsInterval), (_) async {
       try {
-        final res = await _api.post(config.baseURI + config.analyticsURI, data: json.encode(flagAnalytics));
-        if (res.statusCode != null && res.statusCode! >= 200 && res.statusCode! <= 202) {
+        final res = await _api.post(config.baseURI + config.analyticsURI,
+            data: json.encode(flagAnalytics));
+        if (res.statusCode != null &&
+            res.statusCode! >= 200 &&
+            res.statusCode! <= 202) {
           flagAnalytics.clear();
         }
       } catch (e) {
