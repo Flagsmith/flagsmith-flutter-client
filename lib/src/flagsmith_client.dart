@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:collection/collection.dart' show IterableExtension;
-import 'package:shared_preferences/shared_preferences.dart';
 import 'core/core.dart';
 import 'package:flagsmith_core/flagsmith_core.dart';
 import 'package:rxdart/subjects.dart';
