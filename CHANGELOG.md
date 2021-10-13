@@ -1,70 +1,104 @@
-## [2.1.0-alpha.0] - 24/09/2021
-**Fixes**
-* adding support for flutter web with pana score
+## [2.2.0-beta.0] - 13/10/2021
 
-**Breaking changes**
-* storage was moved to the separate package 
-* [flagsmith_core](https://pub.dev/packages/flagsmith_core) is a new package with models and storage implementation 
-* persistent storage is available as custom package [flagsmith_storage_sharedpreferences](https://pub.dev/packages/flagsmith_storage_sharedpreferences)
+Features:
+
+- [Flag Analytics](https://docs.flagsmith.com/advanced-use/flag-analytics)
+
+## [2.1.0-alpha.0] - 24/09/2021
+
+Fixes:
+
+- adding support for flutter web with pana score
+
+### Breaking Changes
+
+- storage was moved to the separate package
+- [flagsmith_core](https://pub.dev/packages/flagsmith_core) is a new package with models and storage implementation
+- persistent storage is available as custom package
+  [flagsmith_storage_sharedpreferences](https://pub.dev/packages/flagsmith_storage_sharedpreferences)
 
 ## [2.0.1+2] - 20/08/2021
-**Fixes**
-* removing isolate
+
+Fixes:
+
+- removing isolate
+
 ## [2.0.1+1] - 20/08/2021
-**Fixes**
-* adding support for flutter web
+
+Fixes:
+
+- adding support for flutter web
+
 ## [2.0.1] - 09/08/2021
-**Breaking changes**
-* removing async update from constructor (anti-pattern)
-* removing FlagsmithException(type) and replacing with
-    - FlagsmithApiException
-    - FlagsmithConfigException 
-    - FlagsmithFormatException
-    - FlagsmithException
 
-**Features**
-* response conversion in isolate
-* adding json_serializable dependency
-* support for 
+Breaking Changes:
 
-**Fixes**
-* fixing InMemoryStorage return values instead of exceptions
-* fixing update caches
-* fixing name conversion
-* adding missing tests
+- removing async update from constructor (anti-pattern)
+- removing FlagsmithException(type) and replacing with
+  - FlagsmithApiException
+  - FlagsmithConfigException
+  - FlagsmithFormatException
+  - FlagsmithException
 
+Features:
+
+- response conversion in isolate
+- adding json_serializable dependency
+- support for
+
+### Fixes
+
+- fixing InMemoryStorage return values instead of exceptions
+- fixing update caches
+- fixing name conversion
+- adding missing tests
 
 ## [2.0.0] - 06/20/2021
-* first official null-safety release of Flagsmith SDK for Flutter
-* expores Dio client `FlagsmithClient.client`
+
+- first official null-safety release of Flagsmith SDK for Flutter
+- expose Dio client `FlagsmithClient.client`
+
 ## [2.0.0-nullsafety.1] - 06/17/2021
-* remove reliance on `type` attribute of feature
-* minor fixes to example app
-* FeatureUser replaced by Identity model
-* new Trait function for create / bulk
-* fixing example app
+
+- remove reliance on `type` attribute of feature
+- minor fixes to example app
+- FeatureUser replaced by Identity model
+- new Trait function for create / bulk
+- fixing example app
+
 ## [2.0.0-nullsafety.0] - 03/27/2021
-* init version of nullsafety version
+
+- init version of nullsafety version
+
 ## [1.1.0] - 14/04/2021
-* remove reliance on type attribute of feature
-* minor fixes to example app
+
+- remove reliance on type attribute of feature
+- minor fixes to example app
 
 ## [1.0.1] - 03/27/2021
-* minor update
+
+- minor update
+
 ## [1.0.0-prev.0] - 03/27/2021
-*Bullet train client* is **Flagsmith**
-* rebranding to ***Flagsmith***
-* `isDebug` logs exceptions to console with prefix *Flagsmith:*.
 
-**Client**
-* adding `client.loading` stream [loading] [loaded] for detection api request state
-* adding `FlagsmithClient({ bool update = false})` for update from api directly after init
-* adding async init `FlagsmithClient.init({FlagsmithConfig config = const FlagsmithConfig(),@required String apiKey,List<Flag> seeds,bool update = false})`
-* adding `Flag.seed(String featureName, {bool enabled, String value})`
+_Bullet train client_ is **Flagsmith**
 
-**Config**
-* adding `caches` with default value `false`
-* adding caches to client and new `bool hasCachedFeatureFlag(String featureName, {FeatureUser user})`
+- rebranding to **_Flagsmith_**
+- `isDebug` logs exceptions to console with prefix _Flagsmith:_.
+
+Client:
+
+- adding `client.loading` stream [loading] [loaded] for detection api request state
+- adding `FlagsmithClient({ bool update = false})` for update from api directly after init
+- adding async init
+  `FlagsmithClient.init({FlagsmithConfig config = const FlagsmithConfig(),@required String apiKey,List<Flag> seeds,bool update = false})`
+- adding `Flag.seed(String featureName, {bool enabled, String value})`
+
+Config:
+
+- adding `caches` with default value `false`
+- adding caches to client and new `bool hasCachedFeatureFlag(String featureName, {FeatureUser user})`
+
 ## [0.1.5] - 11/26/2020
 
 - fix getFeatureFlagValue
@@ -72,6 +106,7 @@
 ## [0.1.4] - 10/26/2020
 
 - replace imports for using models in integration tests
+
 ## [0.1.3] - 10/21/2020
 
 - fixing seed function

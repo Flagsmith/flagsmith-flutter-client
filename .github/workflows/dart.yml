@@ -2,36 +2,40 @@ name: Analyze and Test
 on: [push]
 
 jobs:
-  analyze:
-    runs-on: ubuntu-latest
+    analyze:
+        runs-on: ubuntu-latest
+        name: Dart Analyze
 
-    steps:
-      - uses: actions/checkout@v2
-      - uses: axel-op/dart-package-analyzer@v3
-        with:
-          githubToken: ${{ secrets.GITHUB_TOKEN }}
+        steps:
+            - uses: actions/checkout@v2
+            - uses: axel-op/dart-package-analyzer@v3
+              with:
+                  githubToken: ${{ secrets.GITHUB_TOKEN }}
 
-  test:
-    runs-on: ubuntu-latest
+    test:
+        runs-on: ubuntu-latest
+        name: Test Flutter
 
-    steps:
-    - uses: actions/checkout@v2
-    - uses: subosito/flutter-action@v1
-    - run: flutter pub get
-    - run: flutter analyze
-    - run: flutter test
-    
-  publishing:
-    runs-on: ubuntu-latest
-    needs: test
-    steps:
-      - name: 'Checkout'
-        uses: actions/checkout@v2 # required!
-        
-      - name: '>> Dart package <<'
-        uses: k-paxian/dart-package-publisher@master
-        with:
-          accessToken: ${{ secrets.PUBDEV_ACCESSTOKEN }}
-          refreshToken: ${{ secrets.PUBDEV_REFRESHTOKEN }}
-          dryRunOnly: true
-          flutter: true
+        steps:
+            - uses: actions/checkout@v2
+            - uses: subosito/flutter-action@v1
+            - run: flutter pub get
+            - run: flutter analyze
+            - run: flutter test
+
+    publishing:
+        runs-on: ubuntu-latest
+        name: Dart Publish Package
+
+        needs: test
+        steps:
+            - name: 'Checkout'
+              uses: actions/checkout@v2 # required!
+
+            - name: '>> Dart package <<'
+              uses: k-paxian/dart-package-publisher@master
+              with:
+                  accessToken: ${{ secrets.PUBDEV_ACCESSTOKEN }}
+                  refreshToken: ${{ secrets.PUBDEV_REFRESHTOKEN }}
+                  dryRunOnly: true
+                  flutter: true

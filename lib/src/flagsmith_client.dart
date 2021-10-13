@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:collection/collection.dart' show IterableExtension;
 import 'core/core.dart';
 import 'package:flagsmith_core/flagsmith_core.dart';
@@ -35,6 +36,10 @@ class FlagsmithClient {
   final List<Flag> seeds;
   Set<Flag> get cachedFlags => _flags;
 
+  //A map of flag names to the amount of times they have been evaluated in the last 10 seconds
+  Map<String, int> flagAnalytics = {};
+  Timer? _analyticsTimer;
+
   final StreamController<FlagsmithLoading> _loading =
       StreamController.broadcast();
   Dio get client => _api;
@@ -47,7 +52,32 @@ class FlagsmithClient {
     flagsmithDebug = config.isDebug;
     _api = _apiClient();
     storageProvider = prepareStorage(storage: storage, config: config);
+    if (config.enableAnalytics) {
+      _setupAnalyticsTimer(config.analyticsInterval);
+    }
   }
+
+  Future<void> _setupAnalyticsTimer(int analyticsInterval) async {
+    _analyticsTimer?.cancel();
+    _analyticsTimer =
+        Timer.periodic(Duration(milliseconds: analyticsInterval), (_) async {
+      try {
+        final res = await _api.post(config.baseURI + config.analyticsURI,
+            data: json.encode(flagAnalytics));
+        if (res.statusCode != null &&
+            res.statusCode! >= 200 &&
+            res.statusCode! <= 202) {
+          flagAnalytics.clear();
+        }
+      } catch (e) {
+        if (flagsmithDebug) {
+          // ignore: avoid_print
+          print('Error posting analytics: ' + e.toString());
+        }
+      }
+    });
+  }
+
   static StorageProvider prepareStorage(
       {CoreStorage? storage, required FlagsmithConfig config}) {
     late CoreStorage store;
@@ -160,6 +190,7 @@ class FlagsmithClient {
     var features = await getFeatureFlags(user: user, reload: false);
     var feature = features.firstWhereOrNull((element) =>
         element.feature.name == featureName && element.enabled == true);
+    _incrementFlagAnalytics(feature);
     return feature != null;
   }
 
@@ -192,6 +223,7 @@ class FlagsmithClient {
     var features = await getFeatureFlags(user: user, reload: false);
     var feature = features
         .firstWhereOrNull((element) => element.feature.name == featureName);
+    _incrementFlagAnalytics(feature);
     return feature?.enabled ?? false;
   }
 
@@ -202,7 +234,18 @@ class FlagsmithClient {
     var features = await getFeatureFlags(user: user, reload: false);
     var feature = features
         .firstWhereOrNull((element) => element.feature.name == featureId);
+    _incrementFlagAnalytics(feature);
     return feature?.stateValue;
+  }
+
+  void _incrementFlagAnalytics(Flag? flag) {
+    if (flag != null && config.enableAnalytics) {
+      if (flagAnalytics.containsKey(flag.key)) {
+        flagAnalytics[flag.key] = flagAnalytics[flag.key]! + 1;
+      } else {
+        flagAnalytics[flag.key] = 1;
+      }
+    }
   }
 
   Future<bool> removeFeatureFlag(String featureName) async {
