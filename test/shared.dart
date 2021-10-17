@@ -707,6 +707,10 @@ final traitAge25 = '''{
   "trait_value": "25"
 }''';
 
+final analyticsData = '''{
+  "my_feature": 2
+}''';
+
 Future<FlagsmithClient> setupClientAdapter(
   StorageType storeType, {
   bool caches = false,
