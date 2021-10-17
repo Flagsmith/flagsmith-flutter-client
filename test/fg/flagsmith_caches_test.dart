@@ -39,7 +39,6 @@ void main() {
       final _value = fs.hasCachedFeatureFlag(notImplmentedFeature);
       expect(_value, false);
     });
-    
 
     test('When caches enabled then get value', () async {
       await fs.getFeatureFlags();
