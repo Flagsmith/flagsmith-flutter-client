@@ -9,27 +9,19 @@ on:
         branches:
             - main
             - release/*
-    pull_request:
-        branches:
-            - main
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-    # This workflow contains a single job called "build"
-    build:
-        # The type of runner that the job will run on
+    publishing:
         runs-on: ubuntu-latest
-        name: Build Package
+        name: Dart Publish Package
 
-        # Steps represent a sequence of tasks that will be executed as part of the job
         steps:
-            # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-            - uses: actions/checkout@v2
+            - name: 'Checkout'
+              uses: actions/checkout@v2 # required!
 
-            - name: Dart/Flutter Package Analyzer
-              # You may pin to the exact commit or the version.
-              # uses: axel-op/dart-package-analyzer@7a6c3c66bce78d82b729a1ffef2d9458fde6c8d2
-              uses: axel-op/dart-package-analyzer@v3
+            - name: '>> Dart package <<'
+              uses: k-paxian/dart-package-publisher@master
               with:
-                  # Token to connect to GitHub. Use secrets.GITHUB_TOKEN
-                  githubToken: ${{ secrets.GITHUB_TOKEN }}
+                  accessToken: ${{ secrets.PUBDEV_ACCESSTOKEN }}
+                  refreshToken: ${{ secrets.PUBDEV_REFRESHTOKEN }}

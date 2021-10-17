@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'package:collection/collection.dart' show IterableExtension;
 import 'core/core.dart';
 import 'package:flagsmith_core/flagsmith_core.dart';
@@ -37,7 +36,7 @@ class FlagsmithClient {
   Set<Flag> get cachedFlags => _flags;
 
   //A map of flag names to the amount of times they have been evaluated in the last 10 seconds
-  Map<String, int> flagAnalytics = {};
+  final Map<String, int> flagAnalytics = {};
   Timer? _analyticsTimer;
 
   final StreamController<FlagsmithLoading> _loading =
@@ -59,23 +58,26 @@ class FlagsmithClient {
 
   Future<void> _setupAnalyticsTimer(int analyticsInterval) async {
     _analyticsTimer?.cancel();
-    _analyticsTimer =
-        Timer.periodic(Duration(milliseconds: analyticsInterval), (_) async {
-      try {
-        final res = await _api.post(config.baseURI + config.analyticsURI,
-            data: json.encode(flagAnalytics));
-        if (res.statusCode != null &&
-            res.statusCode! >= 200 &&
-            res.statusCode! <= 202) {
-          flagAnalytics.clear();
-        }
-      } catch (e) {
-        if (flagsmithDebug) {
-          // ignore: avoid_print
-          print('Error posting analytics: ' + e.toString());
-        }
+    _analyticsTimer = Timer.periodic(
+        Duration(milliseconds: analyticsInterval), (_) => syncAnalyticsData());
+  }
+
+  Future<Response<dynamic>> syncAnalyticsData() async {
+    try {
+      final res = await _api.post<dynamic>(config.analyticsURI,
+          data: Map<String, dynamic>.from(flagAnalytics));
+
+      if ([200, 201, 202].contains(res.statusCode)) {
+        flagAnalytics.clear();
       }
-    });
+      return res;
+    } on DioError catch (e) {
+      log('_setupAnalyticsTimer dioError: ${e.error}');
+      throw FlagsmithApiException(e);
+    } catch (e) {
+      log('Exception: _setupAnalyticsTimer $e');
+      throw FlagsmithException(e);
+    }
   }
 
   static StorageProvider prepareStorage(
@@ -140,7 +142,7 @@ class FlagsmithClient {
   Future<bool> reset() async {
     await storageProvider.clear();
     await storageProvider.seed(items: seeds);
-    _updateCaches(list: seeds, clear: true);
+    _updateCaches(list: seeds);
     return true;
   }
 
@@ -238,6 +240,22 @@ class FlagsmithClient {
     return feature?.stateValue;
   }
 
+  /// Get cached feature flag value by [featureId]
+  /// Returns String value of Feature Flag
+  String? getCachedFeatureFlagValue(
+    String featureId,
+  ) {
+    if (!config.caches) {
+      log('Exception: caches are NOT enabled!');
+      throw FlagsmithConfigException(Exception('caches are NOT enabled!'));
+    }
+    var feature = cachedFlags
+        .firstWhereOrNull((element) => element.feature.name == featureId);
+    _incrementFlagAnalytics(feature);
+    return feature?.stateValue;
+  }
+
+  /// Internal function for collecting analytical data on flag usage
   void _incrementFlagAnalytics(Flag? flag) {
     if (flag != null && config.enableAnalytics) {
       if (flagAnalytics.containsKey(flag.key)) {
@@ -248,6 +266,7 @@ class FlagsmithClient {
     }
   }
 
+  /// Remove feature flag from storage and caches
   Future<bool> removeFeatureFlag(String featureName) async {
     var result = await storageProvider.delete(featureName);
     if (config.caches) {
@@ -272,7 +291,7 @@ class FlagsmithClient {
         await storageProvider.saveAll(list);
         final _saved = await storageProvider.getAll()
           ..sort((a, b) => a.feature.name.compareTo(b.feature.name));
-        _updateCaches(clear: true, list: _saved);
+        _updateCaches(list: _saved);
         return list;
       }
       return [];
@@ -303,7 +322,7 @@ class FlagsmithClient {
         await storageProvider.saveAll(data);
         final _saved = await storageProvider.getAll()
           ..sort((a, b) => a.feature.name.compareTo(b.feature.name));
-        _updateCaches(clear: true, list: _saved);
+        _updateCaches(list: _saved);
         return data;
       }
       return [];
@@ -397,17 +416,21 @@ class FlagsmithClient {
   }
 
   /// Internal updadte caches from list of featurs
-  void _updateCaches({List<Flag> list = const <Flag>[], bool clear = false}) {
+  void _updateCaches({List<Flag> list = const <Flag>[]}) {
     if (config.caches) {
-      if (clear) {
-        _flags.clear();
-      }
-      _flags.addAll(list.toSet());
+      _flags
+        ..clear()
+        ..addAll(list.toSet());
     }
   }
 
   /// clear all data from storage
-  Future<bool> clearStore() async => storageProvider.clear();
+  Future<bool> clearStore() async {
+    if (config.caches) {
+      _flags.clear();
+    }
+    return storageProvider.clear();
+  }
 
   /// stream for listener
   Stream<Flag>? stream(String key) => storageProvider.stream(key);
@@ -419,6 +442,7 @@ class FlagsmithClient {
   Stream<FlagsmithLoading> get loading => _loading.stream;
 
   void close() {
+    _analyticsTimer?.cancel();
     _loading.close();
   }
 

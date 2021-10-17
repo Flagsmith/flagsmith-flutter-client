@@ -1,3 +1,13 @@
+## [2.2.0-beta.1] - 17/10/2021
+Features:
+  - new function **getCachedFeatureFlagValue** 
+  - adding analytics test, refac. of api request
+
+Fixes:
+  - cancel timer on close
+  - reloading of caches
+
+
 ## [2.2.0-beta.0] - 13/10/2021
 
 Features:
