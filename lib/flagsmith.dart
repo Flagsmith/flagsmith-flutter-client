@@ -5,7 +5,7 @@
 
 library flagsmith;
 
-export 'package:flagsmith_core/flagsmith_core.dart';
+export 'package:flagsmith_flutter_core/flagsmith_flutter_core.dart';
 
 export 'src/flagsmith_client.dart';
 export 'src/flagsmith_config.dart';
