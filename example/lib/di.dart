@@ -12,7 +12,7 @@ Future<void> setupPrefs() async {
         apiKey: 'CoJErJUXmihfMDVwTzBff4',
         config: const FlagsmithConfig(
             storageType: StorageType.custom, isDebug: true),
-        storage: FlagsmithSharedPreferenceStore());
+        storage: InMemoryStorage());
     await client.initialize();
     return client;
   });
