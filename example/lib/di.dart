@@ -1,5 +1,4 @@
 import 'package:flagsmith/flagsmith.dart';
-import 'package:flagsmith_storage_sharedpreferences/sharedpreferences_store.dart';
 import 'package:get_it/get_it.dart';
 
 import 'bloc/flag_bloc.dart';

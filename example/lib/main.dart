@@ -19,9 +19,9 @@ ThemeData lightTheme(BuildContext context) {
   var theme = ThemeData.from(
     colorScheme: ColorScheme.light(
       primary: Color(0xff5d60cc),
-      primaryVariant: Color(0xff5d60cc),
+      primaryContainer: Color(0xff5d60cc),
       secondary: Color(0xFFBFA6E9),
-      secondaryVariant: Color(0xFF9D88C0),
+      secondaryContainer: Color(0xFF9D88C0),
     ),
     textTheme: GoogleFonts.varelaRoundTextTheme(
       ThemeData.light().textTheme,
@@ -43,9 +43,9 @@ ThemeData darkTheme(BuildContext context) {
   var theme = ThemeData.from(
     colorScheme: ColorScheme.dark(
       primary: Color(0xff5d60cc),
-      primaryVariant: Color(0xff5d60cc),
+      primaryContainer: Color(0xff5d60cc),
       secondary: Color(0xFFBFA6E9),
-      secondaryVariant: Color(0xFF9D88C0),
+      secondaryContainer: Color(0xFF9D88C0),
       surface: Color(0xFF1a1c26),
       background: Color(0xFF1a1c26),
     ),

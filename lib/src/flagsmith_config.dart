@@ -1,5 +1,3 @@
-import 'package:flagsmith_flutter_core/flagsmith_flutter_core.dart';
-
 import '../flagsmith.dart';
 import 'package:dio/dio.dart';
 

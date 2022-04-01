@@ -2,10 +2,8 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flagsmith/flagsmith.dart';
-import 'package:flagsmith/src/flagsmith_client.dart';
 import 'package:http_mock_adapter/http_mock_adapter.dart';
 import 'package:test/test.dart';
-import 'package:flagsmith_flutter_core/flagsmith_flutter_core.dart';
 
 import '../shared.dart';
 
