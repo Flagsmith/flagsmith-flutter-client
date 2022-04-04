@@ -2,7 +2,7 @@ name: Analyze, test and publish
 on:
   push:
     branches:
-      - 'clean-up-CI-add-tokens'
+      - 'feature/clean-up-CI-add-tokens'
 
 jobs:
   analyze:
