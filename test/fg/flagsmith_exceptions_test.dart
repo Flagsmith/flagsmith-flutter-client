@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flagsmith/flagsmith.dart';
 import 'package:test/test.dart';
-import 'package:flagsmith_core/flagsmith_core.dart';
 import '../shared.dart';
 
 void main() {

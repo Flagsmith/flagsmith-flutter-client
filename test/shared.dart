@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flagsmith/flagsmith.dart';
-import 'package:flagsmith_core/flagsmith_core.dart';
 
 import 'package:http_mock_adapter/http_mock_adapter.dart';
 import 'package:mockito/mockito.dart';
@@ -266,11 +265,11 @@ final fakeResponse = r'''[
             "name": "oauth_google",
             "created_date": "2020-03-28T21:04:51.557946Z",
             "description": "Google login key",
-            "initial_value": "{\n \"clientId\":\"232959427810-br6ltnrgouktp0ngsbs04o14ueb9rch0.apps.googleusercontent.com\",\n \"apiKey\":\"AIzaSyCnHuN-y6BIEAM5vTISXaz3X9GpEPSxWjo\"\n}",
+            "initial_value": "{\n \"clientId\":\"*****9427810-*****nrgouktp0ngsbs04o14ueb*****.apps.googleusercontent.com\",\n \"apiKey\":\"AIza****HuN-y6B********SXaz3X9GpEP*****\"\n}",
             "default_enabled": false,
             "type": "STANDARD"
         },
-        "feature_state_value": "{\n \"clientId\":\"232959427810-br6ltnrgouktp0ngsbs04o14ueb9rch0.apps.googleusercontent.com\",\n \"apiKey\":\"AIzaSyCnHuN-y6BIEAM5vTISXaz3X9GpEPSxWjo\"\n}",
+        "feature_state_value": "{\n \"clientId\":\"*****9427810-*****nrgouktp0ngsbs04o14ueb*****.apps.googleusercontent.com\",\n \"apiKey\":\"AIza****HuN-y6B********SXaz3X9GpEP*****\"\n}",
         "enabled": true,
         "environment": 23,
         "identity": null,

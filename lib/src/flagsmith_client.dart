@@ -1,12 +1,9 @@
 import 'dart:async';
 import 'package:collection/collection.dart' show IterableExtension;
-import 'core/core.dart';
-import 'package:flagsmith_core/flagsmith_core.dart';
 import 'package:rxdart/subjects.dart';
 import 'package:dio/dio.dart';
 
 import '../flagsmith.dart';
-import 'flagsmith_config.dart';
 
 /// Flagsmith client initialization
 ///

@@ -155,13 +155,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.0"
-  flagsmith_core:
+  flagsmith_flutter_core:
     dependency: "direct main"
     description:
-      name: flagsmith_core
+      name: flagsmith_flutter_core
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.1.0+1"
+    version: "2.2.0"
   frontend_server_client:
     dependency: transitive
     description:
