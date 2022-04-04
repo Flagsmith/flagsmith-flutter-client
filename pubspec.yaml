@@ -14,11 +14,11 @@ environment:
 dependencies:
   flagsmith_flutter_core: ^2.2.0
   collection: ^1.15.0
-  dio: ^4.0.6
+  dio: ^4.0.0
   rxdart: ">=0.26.0 <=0.27.2"
 dev_dependencies:
   test:  ">=1.16.0 <=1.17.12"
   lints: ^1.0.1
   http_mock_adapter: ^0.3.2
-  mockito: ^5.1.0
+  mockito: ^5.0.15
   test_coverage_badge: ^0.2.0
