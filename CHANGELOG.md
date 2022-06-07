@@ -1,5 +1,9 @@
 # Changelog
 
+## [3.0.0]
+
+ - Update default URL to Edge API.
+
 ## [2.3.0]
 
 - Refactor to rely on https://github.com/Flagsmith/flagsmith-flutter-core

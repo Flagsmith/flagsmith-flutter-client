@@ -43,7 +43,7 @@ class FlagsmithConfig {
   /// The [analyticsInterval] is how often the analytics will be pushed to the server in milliseconds, defaults to 10000 (10 seconds)
 
   const FlagsmithConfig({
-    this.baseURI = 'https://api.flagsmith.com/api/v1/',
+    this.baseURI = 'https://edge.api.flagsmith.com/api/v1/',
     this.flagsURI = 'flags/',
     this.identitiesURI = 'identities/',
     this.traitsURI = 'traits/',
