@@ -184,6 +184,7 @@ class FlagsmithClient {
   ///
   /// [featureName] an identifier for the feature
   /// [user] an identifier for the user
+  /// [reload] force reload from API
   /// Returns true if feature flag exist and enabled, false otherwise
   Future<bool> hasFeatureFlag(String featureName,
       {Identity? user, bool? reload}) async {
@@ -214,6 +215,7 @@ class FlagsmithClient {
   ///
   /// [featureName] an identifier for the feature
   /// [user] an identifier for the user
+  /// [reload] force reload from API
   /// Returns true if feature flag exist and enabled, null otherwise
   Future<bool> isFeatureFlagEnabled(String featureName,
       {Identity? user, bool? reload}) async {
@@ -222,6 +224,8 @@ class FlagsmithClient {
   }
 
   /// Get feature flag value by [featureId] and optionally for a [user]
+  ///
+  /// [reload] force reload from API
   /// Returns String value of Feature Flag
   Future<String?> getFeatureFlagValue(String featureId,
       {Identity? user, bool? reload}) async {
