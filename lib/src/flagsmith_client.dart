@@ -231,7 +231,7 @@ class FlagsmithClient {
 
   Future<Flag?> _getFlagByName(String featureName,
       {Identity? user, bool? reload}) async {
-    var flags = await getFeatureFlags(user: user, reload: reload!);
+    var flags = await getFeatureFlags(user: user, reload: reload ?? false);
     var flag = flags
         .firstWhereOrNull((element) => element.feature.name == featureName);
     _incrementFlagAnalytics(flag);
