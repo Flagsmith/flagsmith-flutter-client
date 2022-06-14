@@ -16,6 +16,7 @@ class FlagsmithClient {
   static final String authHeader = 'X-Environment-Key';
   static final String acceptHeader = 'Accept';
   static final String userAgentHeader = 'User-Agent';
+
   void log(String message) {
     if (flagsmithDebug) {
       // ignore: avoid_print
@@ -30,21 +31,19 @@ class FlagsmithClient {
   late Dio _api;
   final Set<Flag> _flags = {};
   final List<Flag> seeds;
+
   Set<Flag> get cachedFlags => _flags;
 
   //A map of flag names to the amount of times they have been evaluated in the last 10 seconds
   final Map<String, int> flagAnalytics = {};
   Timer? _analyticsTimer;
 
-  final StreamController<FlagsmithLoading> _loading =
-      StreamController.broadcast();
+  final StreamController<FlagsmithLoading> _loading = StreamController.broadcast();
+
   Dio get client => _api;
   bool flagsmithDebug = false;
-  FlagsmithClient(
-      {this.config = const FlagsmithConfig(),
-      required this.apiKey,
-      this.seeds = const <Flag>[],
-      this.storage}) {
+
+  FlagsmithClient({this.config = const FlagsmithConfig(), required this.apiKey, this.seeds = const <Flag>[], this.storage}) {
     flagsmithDebug = config.isDebug;
     _api = _apiClient();
     storageProvider = prepareStorage(storage: storage, config: config);
@@ -55,14 +54,12 @@ class FlagsmithClient {
 
   Future<void> _setupAnalyticsTimer(int analyticsInterval) async {
     _analyticsTimer?.cancel();
-    _analyticsTimer = Timer.periodic(
-        Duration(milliseconds: analyticsInterval), (_) => syncAnalyticsData());
+    _analyticsTimer = Timer.periodic(Duration(milliseconds: analyticsInterval), (_) => syncAnalyticsData());
   }
 
   Future<Response<dynamic>> syncAnalyticsData() async {
     try {
-      final res = await _api.post<dynamic>(config.analyticsURI,
-          data: Map<String, dynamic>.from(flagAnalytics));
+      final res = await _api.post<dynamic>(config.analyticsURI, data: Map<String, dynamic>.from(flagAnalytics));
 
       if ([200, 201, 202].contains(res.statusCode)) {
         flagAnalytics.clear();
@@ -77,8 +74,7 @@ class FlagsmithClient {
     }
   }
 
-  static StorageProvider prepareStorage(
-      {CoreStorage? storage, required FlagsmithConfig config}) {
+  static StorageProvider prepareStorage({CoreStorage? storage, required FlagsmithConfig config}) {
     late CoreStorage store;
     if (storage != null) {
       store = storage;
@@ -92,8 +88,7 @@ class FlagsmithClient {
           break;
       }
     }
-    return StorageProvider(store,
-        password: config.password, logEnabled: config.isDebug);
+    return StorageProvider(store, password: config.password, logEnabled: config.isDebug);
   }
 
   /// Initialization throught custom init services
@@ -122,8 +117,7 @@ class FlagsmithClient {
     return client;
   }
 
-  Future<bool> initStore(
-      {List<Flag> seeds = const <Flag>[], bool clear = false}) async {
+  Future<bool> initStore({List<Flag> seeds = const <Flag>[], bool clear = false}) async {
     if (clear) {
       await storageProvider.clear();
     }
@@ -164,8 +158,7 @@ class FlagsmithClient {
   ///
   /// [user] a user in context
   /// Returns a list of feature flags
-  Future<List<Flag>> getFeatureFlags(
-      {Identity? user, bool reload = true}) async {
+  Future<List<Flag>> getFeatureFlags({Identity? user, bool reload = true}) async {
     if (!reload) {
       var result = await storageProvider.getAll();
       if (result.isNotEmpty) {
@@ -187,8 +180,7 @@ class FlagsmithClient {
   /// Returns true if feature flag exist and enabled, false otherwise
   Future<bool> hasFeatureFlag(String featureName, {Identity? user}) async {
     var features = await getFeatureFlags(user: user, reload: false);
-    var feature = features.firstWhereOrNull((element) =>
-        element.feature.name == featureName && element.enabled == true);
+    var feature = features.firstWhereOrNull((element) => element.feature.name == featureName && element.enabled == true);
     _incrementFlagAnalytics(feature);
     return feature != null;
   }
@@ -207,8 +199,7 @@ class FlagsmithClient {
       throw FlagsmithConfigException(Exception('caches are NOT enabled!'));
     }
 
-    var feature = _flags.firstWhereOrNull((element) =>
-        element.feature.name == featureName && element.enabled == true);
+    var feature = _flags.firstWhereOrNull((element) => element.feature.name == featureName && element.enabled == true);
     return feature != null;
   }
 
@@ -217,22 +208,18 @@ class FlagsmithClient {
   /// [featureName] an identifier for the feature
   /// [user] an identifier for the user
   /// Returns true if feature flag exist and enabled, null otherwise
-  Future<bool> isFeatureFlagEnabled(String featureName,
-      {Identity? user}) async {
+  Future<bool> isFeatureFlagEnabled(String featureName, {Identity? user}) async {
     var features = await getFeatureFlags(user: user, reload: false);
-    var feature = features
-        .firstWhereOrNull((element) => element.feature.name == featureName);
+    var feature = features.firstWhereOrNull((element) => element.feature.name == featureName);
     _incrementFlagAnalytics(feature);
     return feature?.enabled ?? false;
   }
 
   /// Get feature flag value by [featureId] and optionally for a [user]
   /// Returns String value of Feature Flag
-  Future<String?> getFeatureFlagValue(String featureId,
-      {Identity? user}) async {
+  Future<String?> getFeatureFlagValue(String featureId, {Identity? user}) async {
     var features = await getFeatureFlags(user: user, reload: false);
-    var feature = features
-        .firstWhereOrNull((element) => element.feature.name == featureId);
+    var feature = features.firstWhereOrNull((element) => element.feature.name == featureId);
     _incrementFlagAnalytics(feature);
     return feature?.stateValue;
   }
@@ -246,8 +233,7 @@ class FlagsmithClient {
       log('Exception: caches are NOT enabled!');
       throw FlagsmithConfigException(Exception('caches are NOT enabled!'));
     }
-    var feature = cachedFlags
-        .firstWhereOrNull((element) => element.feature.name == featureId);
+    var feature = cachedFlags.firstWhereOrNull((element) => element.feature.name == featureId);
     _incrementFlagAnalytics(feature);
     return feature?.stateValue;
   }
@@ -282,9 +268,7 @@ class FlagsmithClient {
     try {
       var response = await _api.get<List<dynamic>>(config.flagsURI);
       if (response.statusCode == 200) {
-        var list = response.data!
-            .map<Flag>((dynamic e) => Flag.fromJson(e as Map<String, dynamic>))
-            .toList();
+        var list = response.data!.map<Flag>((dynamic e) => Flag.fromJson(e as Map<String, dynamic>)).toList();
         await storageProvider.saveAll(list);
         final _saved = await storageProvider.getAll()
           ..sort((a, b) => a.feature.name.compareTo(b.feature.name));
@@ -305,8 +289,7 @@ class FlagsmithClient {
   Future<List<Flag>> _getUserFlags(Identity user) async {
     try {
       var params = {'identifier': user.identifier};
-      var response = await _api.get<Map<String, dynamic>>(config.identitiesURI,
-          queryParameters: params);
+      var response = await _api.get<Map<String, dynamic>>(config.identitiesURI, queryParameters: params);
 
       if (response.statusCode == 200) {
         if (response.data == null) {
@@ -347,8 +330,7 @@ class FlagsmithClient {
   Future<List<Trait>> _getUserTraits(Identity user) async {
     try {
       var params = {'identifier': user.identifier};
-      var response = await _api.get<Map<String, dynamic>>(config.identitiesURI,
-          queryParameters: params);
+      var response = await _api.get<Map<String, dynamic>>(config.identitiesURI, queryParameters: params);
 
       if (response.statusCode == 200) {
         if (response.data == null) {
@@ -367,11 +349,9 @@ class FlagsmithClient {
   }
 
   // Update trait for `user` with new value `traits`
-  Future<TraitWithIdentity?> createTrait(
-      {required TraitWithIdentity value}) async {
+  Future<TraitWithIdentity?> createTrait({required TraitWithIdentity value}) async {
     try {
-      var response =
-          await _api.post<dynamic>(config.traitsURI, data: value.toJson());
+      var response = await _api.post<dynamic>(config.traitsURI, data: value.toJson());
       if (response.data == null) {
         return null;
       }
@@ -386,23 +366,37 @@ class FlagsmithClient {
   }
 
   /// Bulk update of traits for `user` with list of `value`
-  Future<List<TraitWithIdentity>?> updateTraits(
-      {required List<TraitWithIdentity> value}) async {
+  Future<List<TraitWithIdentity>?> updateTraits({required List<TraitWithIdentity> value}) async {
     try {
       if (value.isEmpty) {
         return null;
       }
-      final data = value.map((e) => e.toJson()).toList();
-      var response = await _api.put<dynamic>(
-        config.traitsBulkURI,
+      final identifier = value[0].identity.identifier;
+      final traitList = value
+          .map((e) => <String, dynamic>{
+                'trait_key': e.key,
+                'trait_value': stringToJson(e.value),
+              })
+          .toList();
+      final data = <String, dynamic>{
+        'identifier': identifier,
+        'traits': traitList,
+      };
+      var response = await _api.post<dynamic>(
+        config.identitiesURI,
         data: data,
       );
-      if (response.data == null) {
+      if (response.data == null || response.data['traits'] == null) {
         return null;
       }
-      final _data =
-          List<Map<String, dynamic>>.from(response.data as List<dynamic>);
-      return _data.map((e) => TraitWithIdentity.fromJson(e)).toList();
+      final _data = List<Map<String, dynamic>>.from(response.data['traits'] as List<dynamic>);
+      return _data
+          .map((e) => TraitWithIdentity(
+                identity: Identity(identifier: identifier),
+                key: e['trait_key'] as String,
+                value: e['trait_value'] as String,
+              ))
+          .toList();
     } on DioError catch (e) {
       log('_getFlags dioError: ${e.error}');
       throw FlagsmithApiException(e);

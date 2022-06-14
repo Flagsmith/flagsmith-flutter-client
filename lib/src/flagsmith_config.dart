@@ -59,8 +59,6 @@ class FlagsmithConfig {
     this.analyticsInterval = 10000,
   });
 
-  String get traitsBulkURI => '${traitsURI}bulk/';
-
   /// Client options from config
   BaseOptions get clientOptions => BaseOptions(
         baseUrl: baseURI,

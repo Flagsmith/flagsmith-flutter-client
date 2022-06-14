@@ -25,7 +25,7 @@ void main() {
           }, queryParameters: <String, dynamic>{
             'identifier': 'invalid_users_another_user'
           })
-          ..onPut(fs.config.traitsBulkURI, (server) {
+          ..onPost(fs.config.identitiesURI, (server) {
             return server.reply(200, jsonDecode(bulkTraitUpdateResponse));
           }, data: jsonDecode(bulkTraitUpdateResponse))
           ..onPost(fs.config.traitsURI, (server) {
@@ -81,7 +81,7 @@ void main() {
           }, queryParameters: <String, dynamic>{
             'identifier': 'invalid_users_another_user'
           })
-          ..onPut(fs.config.traitsBulkURI, (server) {
+          ..onPost(fs.config.identitiesURI, (server) {
             return server.reply(200, jsonDecode(bulkTraitUpdateResponse));
           }, data: jsonDecode(bulkTraitUpdateResponse))
           ..onPost(fs.config.traitsURI, (server) {
@@ -177,7 +177,7 @@ void main() {
           }, queryParameters: <String, dynamic>{
             'identifier': 'invalid_users_another_user'
           })
-          ..onPut(fs.config.traitsBulkURI, (server) {
+          ..onPost(fs.config.identitiesURI, (server) {
             return server.reply(200, jsonDecode(bulkTraitUpdateResponse));
           }, data: jsonDecode(bulkTraitUpdateResponse))
           ..onPost(fs.config.traitsURI, (server) {

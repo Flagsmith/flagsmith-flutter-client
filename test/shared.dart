@@ -667,22 +667,19 @@ final fakeIdentitiesResponse = r'''{
     ]
 }''';
 
-final bulkTraitUpdateResponse = '''[
-  {
-      "identity": {
-          "identifier": "test_another_user"
+final bulkTraitUpdateResponse = '''{
+    "identifier": "test_another_user",
+    "traits": [
+      {
+        "trait_key": "age",
+        "trait_value": "21"
       },
-      "trait_key": "age",
-      "trait_value": "21"
-  },
-  {
-    "identity": {
-        "identifier": "test_another_user"
-    },
-    "trait_key": "age2",
-    "trait_value": "21"
-  }
-]''';
+      {
+        "trait_key": "age2",
+        "trait_value": "21"
+      }
+    ]
+}''';
 
 final createTraitRequest = '''{
   "identifier": "test_another_user"
