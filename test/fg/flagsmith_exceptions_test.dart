@@ -110,7 +110,7 @@ void main() {
       fs = setupSyncClientAdapter(StorageType.inMemory);
       await fs.initialize();
       setupAdapter(fs, cb: (config, adapter) {
-        adapter.onPut(fs.config.traitsBulkURI, (server) {
+        adapter.onPut(fs.config.identitiesURI, (server) {
           return server.throws(
             404,
             DioError(
@@ -142,7 +142,7 @@ void main() {
       fs = setupSyncClientAdapter(StorageType.inMemory);
       await fs.initialize();
       setupAdapter(fs, cb: (config, adapter) {
-        adapter.onPut(fs.config.traitsBulkURI, (server) {
+        adapter.onPut(fs.config.identitiesURI, (server) {
           return server.reply(200, null);
         }, data: []);
       });
