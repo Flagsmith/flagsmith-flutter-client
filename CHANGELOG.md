@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.0.1]
+
+ - Expose `reload` option on all methods for retrieving flag information for a user
+ - Fix `updateTraits` method following move to edge (which deprecated `/traits/bulk/` endpoint)
+
 ## [3.0.0]
 
  - Update default URL to Edge API.
