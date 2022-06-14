@@ -184,13 +184,12 @@ class FlagsmithClient {
   ///
   /// [featureName] an identifier for the feature
   /// [user] an identifier for the user
+  /// [reload] force reload from API
   /// Returns true if feature flag exist and enabled, false otherwise
-  Future<bool> hasFeatureFlag(String featureName, {Identity? user}) async {
-    var features = await getFeatureFlags(user: user, reload: false);
-    var feature = features.firstWhereOrNull((element) =>
-        element.feature.name == featureName && element.enabled == true);
-    _incrementFlagAnalytics(feature);
-    return feature != null;
+  Future<bool> hasFeatureFlag(String featureName,
+      {Identity? user, bool? reload}) async {
+    var flag = await _getFlagByName(featureName, user: user, reload: reload);
+    return flag != null;
   }
 
   /// Check if Feature flag exist and is enabled in cache
@@ -216,25 +215,31 @@ class FlagsmithClient {
   ///
   /// [featureName] an identifier for the feature
   /// [user] an identifier for the user
+  /// [reload] force reload from API
   /// Returns true if feature flag exist and enabled, null otherwise
   Future<bool> isFeatureFlagEnabled(String featureName,
-      {Identity? user}) async {
-    var features = await getFeatureFlags(user: user, reload: false);
-    var feature = features
-        .firstWhereOrNull((element) => element.feature.name == featureName);
-    _incrementFlagAnalytics(feature);
-    return feature?.enabled ?? false;
+      {Identity? user, bool? reload}) async {
+    var flag = await _getFlagByName(featureName, user: user, reload: reload);
+    return flag?.enabled ?? false;
   }
 
   /// Get feature flag value by [featureId] and optionally for a [user]
+  ///
+  /// [reload] force reload from API
   /// Returns String value of Feature Flag
   Future<String?> getFeatureFlagValue(String featureId,
-      {Identity? user}) async {
-    var features = await getFeatureFlags(user: user, reload: false);
-    var feature = features
-        .firstWhereOrNull((element) => element.feature.name == featureId);
-    _incrementFlagAnalytics(feature);
-    return feature?.stateValue;
+      {Identity? user, bool? reload}) async {
+    var flag = await _getFlagByName(featureId, user: user, reload: reload);
+    return flag?.stateValue;
+  }
+
+  Future<Flag?> _getFlagByName(String featureName,
+      {Identity? user, bool? reload}) async {
+    var flags = await getFeatureFlags(user: user, reload: reload ?? false);
+    var flag = flags
+        .firstWhereOrNull((element) => element.feature.name == featureName);
+    _incrementFlagAnalytics(flag);
+    return flag;
   }
 
   /// Get cached feature flag value by [featureId]
