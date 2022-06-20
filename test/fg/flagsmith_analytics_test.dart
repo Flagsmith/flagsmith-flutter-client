@@ -68,7 +68,7 @@ void main() {
       expect(fs.flagAnalytics.containsKey('my_feature'), isTrue);
       expect(fs.flagAnalytics['my_feature'], 2);
       final _response = await fs.syncAnalyticsData();
-      expect(_response.statusCode, 200);
+      expect(_response?.statusCode, 200);
       expect(fs.flagAnalytics.isEmpty, isTrue);
     });
     test('When analytics was sent and failed, then current store is not empty',
