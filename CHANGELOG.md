@@ -1,5 +1,9 @@
 # Changelog
 
+## [3.0.2]
+
+ - Only call analytics if there are feature evaluations to track
+
 ## [3.0.1]
 
  - Expose `reload` option on all methods for retrieving flag information for a user

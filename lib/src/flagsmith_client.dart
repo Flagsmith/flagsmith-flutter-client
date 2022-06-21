@@ -57,14 +57,18 @@ class FlagsmithClient {
     _analyticsTimer = Timer.periodic(Duration(milliseconds: analyticsInterval), (_) => syncAnalyticsData());
   }
 
-  Future<Response<dynamic>> syncAnalyticsData() async {
+  Future<Response<dynamic>?> syncAnalyticsData() async {
     try {
-      final res = await _api.post<dynamic>(config.analyticsURI, data: Map<String, dynamic>.from(flagAnalytics));
+      final valGreaterThan0 = flagAnalytics.values.firstWhereOrNull((element) => element > 0);
 
-      if ([200, 201, 202].contains(res.statusCode)) {
-        flagAnalytics.clear();
+      if (valGreaterThan0 != null) {
+        final res = await _api.post<dynamic>(config.analyticsURI, data: Map<String, dynamic>.from(flagAnalytics));
+
+        if ([200, 201, 202].contains(res.statusCode)) {
+          flagAnalytics.clear();
+        }
+        return res;
       }
-      return res;
     } on DioError catch (e) {
       log('_setupAnalyticsTimer dioError: ${e.error}');
       throw FlagsmithApiException(e);
@@ -72,6 +76,8 @@ class FlagsmithClient {
       log('Exception: _setupAnalyticsTimer $e');
       throw FlagsmithException(e);
     }
+
+    return null;
   }
 
   static StorageProvider prepareStorage({CoreStorage? storage, required FlagsmithConfig config}) {
