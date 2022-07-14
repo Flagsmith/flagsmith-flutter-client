@@ -127,27 +127,20 @@ packages:
       relative: true
     source: path
     version: "3.0.2"
-  flagsmith_core:
-    dependency: transitive
-    description:
-      name: flagsmith_core
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "2.1.0+1"
   flagsmith_flutter_core:
     dependency: transitive
     description:
       name: flagsmith_flutter_core
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.2.0"
-  flagsmith_storage_sharedpreferences:
+    version: "2.3.0"
+  flagsmith_storage:
     dependency: "direct main"
     description:
-      name: flagsmith_storage_sharedpreferences
+      name: flagsmith_storage
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.1.0+2"
+    version: "3.0.0"
   flutter:
     dependency: "direct main"
     description: flutter
@@ -386,7 +379,21 @@ packages:
       name: shared_preferences
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.8"
+    version: "2.0.15"
+  shared_preferences_android:
+    dependency: transitive
+    description:
+      name: shared_preferences_android
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.12"
+  shared_preferences_ios:
+    dependency: transitive
+    description:
+      name: shared_preferences_ios
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.1.1"
   shared_preferences_linux:
     dependency: transitive
     description:
