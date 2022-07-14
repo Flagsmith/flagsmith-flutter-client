@@ -12,7 +12,7 @@ environment:
   sdk: '>=2.13.0 <3.0.0'
 
 dependencies:
-  flagsmith_flutter_core: ^2.2.0
+  flagsmith_flutter_core: ^2.3.0
   collection: ^1.15.0
   dio: ^4.0.0
   rxdart: ">=0.26.0 <=0.27.2"

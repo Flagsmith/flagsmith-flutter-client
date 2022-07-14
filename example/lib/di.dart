@@ -1,4 +1,5 @@
 import 'package:flagsmith/flagsmith.dart';
+import 'package:flagsmith_storage/flagsmith_storage_sharedpreferences.dart';
 import 'package:get_it/get_it.dart';
 
 import 'bloc/flag_bloc.dart';
@@ -11,7 +12,7 @@ Future<void> setupPrefs() async {
         apiKey: 'CoJErJUXmihfMDVwTzBff4',
         config: const FlagsmithConfig(
             storageType: StorageType.custom, isDebug: true),
-        storage: InMemoryStorage());
+        storage: FlagsmithSharedPreferenceStore());
     await client.initialize();
     return client;
   });
