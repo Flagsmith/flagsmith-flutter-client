@@ -1,5 +1,9 @@
 # Changelog
 
+## [3.0.3]
+
+ - Upgrade rxdart dependency
+
 ## [3.0.2]
 
  - Only call analytics if there are feature evaluations to track
