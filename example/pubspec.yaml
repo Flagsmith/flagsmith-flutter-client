@@ -21,7 +21,7 @@ dependencies:
   get_it: ^7.2.0
   google_fonts: ^2.3.1
   hexcolor: ^2.0.6
-  rxdart: ">=0.23.1 <0.27.5"
+  rxdart: ^0.27.5
 dev_dependencies:
   flutter_lints: ^1.0.4
   flutter_test:

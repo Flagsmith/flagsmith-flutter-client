@@ -126,14 +126,14 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "3.0.2"
+    version: "3.0.3"
   flagsmith_flutter_core:
     dependency: transitive
     description:
       name: flagsmith_flutter_core
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.3.0"
+    version: "2.3.1"
   flagsmith_storage:
     dependency: "direct main"
     description:
@@ -372,7 +372,7 @@ packages:
       name: rxdart
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.27.1"
+    version: "0.27.5"
   shared_preferences:
     dependency: transitive
     description:
