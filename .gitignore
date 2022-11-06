@@ -81,3 +81,4 @@ test/.test_coverage.dart
 # macOS
 **/macos/Flutter/GeneratedPluginRegistrant.swift
 **/macos/Flutter/ephemeral/
+**/.fvm/

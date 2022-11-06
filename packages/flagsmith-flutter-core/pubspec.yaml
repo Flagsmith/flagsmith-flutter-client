@@ -1,0 +1,26 @@
+name: flagsmith_flutter_core
+description: >-
+  Core Package of Flutter Client SDK for https://www.flagsmith.com/, Flagsmith is 100% Open
+  Source. Host yourself or let us take care of the hosting.
+
+version: 2.3.1
+homepage: https://github.com/Flagsmith/flagsmith-flutter-client/packages/flagsmith-flutter-core/
+repository: https://github.com/Flagsmith/flagsmith-flutter-client/packages/flagsmith-flutter-core/
+issue_tracker: https://github.com/Flagsmith/flagsmith-flutter-client/issues
+
+environment:
+  sdk: ">=2.13.0 <3.0.0"
+
+dependencies:
+  crypto: ^3.0.1
+  encrypt: ^5.0.1
+  rxdart: ^0.27.5
+  json_annotation: ">=4.3.0 <4.8.0"
+  collection: ">=1.15.0 <1.19.0"
+dev_dependencies:
+  flutter_lints: ">=1.0.0 <2.1.0"
+  test: ">=1.21.0 <1.23.0"
+  http_mock_adapter: ^0.3.2
+  mockito: ^5.0.15
+  json_serializable: ">=6.0.0 <6.5.0"
+  build_runner: ^2.1.2

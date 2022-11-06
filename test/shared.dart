@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flagsmith/flagsmith.dart';
-
 import 'package:http_mock_adapter/http_mock_adapter.dart';
 import 'package:mockito/mockito.dart';
 
@@ -734,7 +733,7 @@ FlagsmithClient setupSyncClientAdapter(
   StorageType storeType, {
   bool caches = false,
   bool isDebug = false,
-  VoidCallback? afterInit,
+  void Function()? afterInit,
 }) {
   final fs = FlagsmithClient(
     apiKey: apiKey,

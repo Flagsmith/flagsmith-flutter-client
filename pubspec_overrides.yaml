@@ -1,0 +1,5 @@
+dependency_overrides:
+  flagsmith_flutter_core:
+    path: packages/flagsmith-flutter-core
+  flagsmith_storage:
+    path: packages/flagsmith-flutter-sharedpreferences

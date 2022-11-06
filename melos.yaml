@@ -1,0 +1,61 @@
+name: flagsmith-flutter-client
+repository: https://github.com/Flagsmith/flagsmith-flutter-client
+ide:
+  intellij: false
+packages:
+  - packages/**
+  - .
+sdkPath: .fvm/flutter_sdk
+command:
+  version:
+    # Generate commit links in package changelogs.
+    linkToCommits: true
+    # # Only allow versioning to happen on main branch.
+    # branch: main
+    # Additionally build a changelog at the root of the workspace.
+    workspaceChangelog: true
+  bootstrap:
+    runPubGetInParallel: true
+
+scripts:
+  fix: 
+    description: Automatically fix dart issues
+    run: |
+      melos exec -- \
+      "dart fix --apply"
+  format: 
+    description: Format code
+    run:  |
+      melos exec -- \
+      "dart format ."
+  analyze: 
+    description: Run analyzer on packages
+    run: |
+      melos exec -- \
+      "dart analyze ."
+  test:flutter:
+    description: Run dart unit tests
+    run: |
+      melos exec --dir-exists="test" --ignore="**example**" -- \
+      "flutter test --no-pub --coverage"
+  tests:
+    description: |
+      Run all tests available.
+    run: |
+      melos run test:flutter --no-select
+      melos run coverage:combine --no-select
+      melos run coverage:report --no-select
+
+  coverage:combine: melos exec -- "\$MELOS_ROOT_PATH/.scripts/coverage_combine.sh"
+  coverage:report: melos exec -- "\$MELOS_ROOT_PATH/.scripts/coverage_report.sh"
+  ba:
+    run: |
+      melos exec --depends-on="build_runner" -- \
+      "flutter pub get && flutter pub run build_runner build --delete-conflicting-outputs"
+  postclean: >
+    melos exec --flutter --concurrency=3 -- "flutter clean && flutter pub get"
+  clean:deep: >
+    git clean -x -d -f -q
+  coverage: >
+    melos exec -c 1 --fail-fast --dir-exists=test --ignore="*example*" --ignore="*exmaple*" --ignore="*web*" -- \
+      flutter test --coverage

@@ -17,7 +17,6 @@ class FlagBloc extends Bloc<FlagEvent, FlagState> {
 
   @override
   Stream<FlagState> mapEventToState(FlagEvent event) async* {
-
     switch (event.runtimeType) {
       case InitFlagEvent:
         yield state.copyWith(loading: LoadingState.isInitial);

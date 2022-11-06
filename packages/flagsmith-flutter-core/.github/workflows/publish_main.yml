@@ -1,0 +1,48 @@
+name: Analyze, test and publish
+on:
+  push:
+    branches:
+      - 'main'
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    name: Dart Analyze
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: subosito/flutter-action@v1
+      - run: flutter pub get
+      - run: flutter analyze
+  score:
+    runs-on: ubuntu-latest
+    name: Dart package score
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: axel-op/dart-package-analyzer@v3
+        with:
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+
+  publishing:
+    runs-on: ubuntu-latest
+    container:
+      image: google/dart:latest
+    name: Dart Publish Package
+    needs: analyze
+    steps:
+      - uses: actions/checkout@v1
+      - name: Setup credentials
+        run: |
+          mkdir -p ~/.pub-cache
+          cat <<EOF > ~/.pub-cache/credentials.json
+          {
+            "accessToken":"${{ secrets.OAUTH_ACCESS_TOKEN }}",
+            "refreshToken":"${{ secrets.OAUTH_REFRESH_TOKEN }}",
+            "tokenEndpoint":"https://accounts.google.com/o/oauth2/token",
+            "scopes": [ "openid", "https://www.googleapis.com/auth/userinfo.email" ],
+            "expiration": 1649072931936
+          }
+          EOF
+      - name: Publish package
+        run: pub publish -f
