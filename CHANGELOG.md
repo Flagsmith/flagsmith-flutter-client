@@ -1,3 +1,72 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## 2022-11-06
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`flagsmith` - `v3.1.0-dev.0`](#flagsmith---v310-dev0)
+ - [`flagsmith_flutter_core` - `v2.4.0-dev.0`](#flagsmith_flutter_core---v240-dev0)
+ - [`flagsmith_storage` - `v3.1.0-dev.0`](#flagsmith_storage---v310-dev0)
+
+---
+
+#### `flagsmith` - `v3.1.0-dev.0`
+
+ - **REFACTOR**: :zap: analytics requests. ([0e63b412](https://github.com/Flagsmith/flagsmith-flutter-client/commit/0e63b412846dbebfbe0d02bf282fed55526b6523))
+ - **REFACTOR**: flagsmith transoformation. ([0b69b4cb](https://github.com/Flagsmith/flagsmith-flutter-client/commit/0b69b4cb0e105910abeafdaf5df3274a1dc0f450))
+ - **REFACTOR**: bullet train to flagsmith. ([6d4676f3](https://github.com/Flagsmith/flagsmith-flutter-client/commit/6d4676f3a7b91166ddbb40cb657574a609a42a48))
+ - **FIX**: analysis issues. ([6d480ec6](https://github.com/Flagsmith/flagsmith-flutter-client/commit/6d480ec685f31245c7703c172b01ed547ab25a6a))
+ - **FIX**: prepublish. ([2efd7d53](https://github.com/Flagsmith/flagsmith-flutter-client/commit/2efd7d53e9e100747538346427741e15a6bfa36c))
+ - **FIX**: await). ([83d507c3](https://github.com/Flagsmith/flagsmith-flutter-client/commit/83d507c341e2a4c38dad1bfb9660a194a63eff9b))
+ - **FIX**: style). ([519ceb96](https://github.com/Flagsmith/flagsmith-flutter-client/commit/519ceb96e6a10cbffb58be07848071df5e1f7bca))
+ - **FIX**: missing field. ([221b43ea](https://github.com/Flagsmith/flagsmith-flutter-client/commit/221b43ea5e5b9016952abb13fe1b42b22e3b4415))
+ - **FEAT**: adding melos. ([2402af12](https://github.com/Flagsmith/flagsmith-flutter-client/commit/2402af12d2465210b66ce8e2e63531e26b9cf8ad))
+ - **FEAT**: revert flutter support. ([03d29c45](https://github.com/Flagsmith/flagsmith-flutter-client/commit/03d29c45595900c1b11f1f8d8534533a8c56fe92))
+ - **FEAT**: web support. ([e70f239c](https://github.com/Flagsmith/flagsmith-flutter-client/commit/e70f239cc763d3ba56f2ffec69e2fd7a88bf6eca))
+ - **FEAT**: rebranding to flagsmith. ([0b6bfdf3](https://github.com/Flagsmith/flagsmith-flutter-client/commit/0b6bfdf32e612dc1669146bbd2c78358071e471d))
+ - **FEAT**: storage). ([e384d50a](https://github.com/Flagsmith/flagsmith-flutter-client/commit/e384d50a23fc09ac0c7867217304ed742349a38e))
+ - **FEAT**: storage) persistant storage. ([30f6ab3c](https://github.com/Flagsmith/flagsmith-flutter-client/commit/30f6ab3cc9a495f5f03dbc2d8946ae0eb430f2c6))
+ - **FEAT**: store) new storage type. ([bf25caa9](https://github.com/Flagsmith/flagsmith-flutter-client/commit/bf25caa9842ac531aa787b718b2f0312b5da4758))
+ - **DOCS**: :sparkles: new features. ([bd3a7fdd](https://github.com/Flagsmith/flagsmith-flutter-client/commit/bd3a7fddb12d235acaa7a511cb9f8c6e24361d8a))
+
+#### `flagsmith_flutter_core` - `v2.4.0-dev.0`
+
+ - **FEAT**: adding melos. ([2402af12](https://github.com/Flagsmith/flagsmith-flutter-client/commit/2402af12d2465210b66ce8e2e63531e26b9cf8ad))
+
+#### `flagsmith_storage` - `v3.1.0-dev.0`
+
+ - **FEAT**: adding melos. ([2402af12](https://github.com/Flagsmith/flagsmith-flutter-client/commit/2402af12d2465210b66ce8e2e63531e26b9cf8ad))
+
+## 3.1.0-dev.0
+
+ - **REFACTOR**: :zap: analytics requests. ([0e63b412](https://github.com/Flagsmith/flagsmith-flutter-client/commit/0e63b412846dbebfbe0d02bf282fed55526b6523))
+ - **REFACTOR**: flagsmith transoformation. ([0b69b4cb](https://github.com/Flagsmith/flagsmith-flutter-client/commit/0b69b4cb0e105910abeafdaf5df3274a1dc0f450))
+ - **REFACTOR**: bullet train to flagsmith. ([6d4676f3](https://github.com/Flagsmith/flagsmith-flutter-client/commit/6d4676f3a7b91166ddbb40cb657574a609a42a48))
+ - **FIX**: analysis issues. ([6d480ec6](https://github.com/Flagsmith/flagsmith-flutter-client/commit/6d480ec685f31245c7703c172b01ed547ab25a6a))
+ - **FIX**: prepublish. ([2efd7d53](https://github.com/Flagsmith/flagsmith-flutter-client/commit/2efd7d53e9e100747538346427741e15a6bfa36c))
+ - **FIX**: await). ([83d507c3](https://github.com/Flagsmith/flagsmith-flutter-client/commit/83d507c341e2a4c38dad1bfb9660a194a63eff9b))
+ - **FIX**: style). ([519ceb96](https://github.com/Flagsmith/flagsmith-flutter-client/commit/519ceb96e6a10cbffb58be07848071df5e1f7bca))
+ - **FIX**: missing field. ([221b43ea](https://github.com/Flagsmith/flagsmith-flutter-client/commit/221b43ea5e5b9016952abb13fe1b42b22e3b4415))
+ - **FEAT**: adding melos. ([2402af12](https://github.com/Flagsmith/flagsmith-flutter-client/commit/2402af12d2465210b66ce8e2e63531e26b9cf8ad))
+ - **FEAT**: revert flutter support. ([03d29c45](https://github.com/Flagsmith/flagsmith-flutter-client/commit/03d29c45595900c1b11f1f8d8534533a8c56fe92))
+ - **FEAT**: web support. ([e70f239c](https://github.com/Flagsmith/flagsmith-flutter-client/commit/e70f239cc763d3ba56f2ffec69e2fd7a88bf6eca))
+ - **FEAT**: rebranding to flagsmith. ([0b6bfdf3](https://github.com/Flagsmith/flagsmith-flutter-client/commit/0b6bfdf32e612dc1669146bbd2c78358071e471d))
+ - **FEAT**: storage). ([e384d50a](https://github.com/Flagsmith/flagsmith-flutter-client/commit/e384d50a23fc09ac0c7867217304ed742349a38e))
+ - **FEAT**: storage) persistant storage. ([30f6ab3c](https://github.com/Flagsmith/flagsmith-flutter-client/commit/30f6ab3cc9a495f5f03dbc2d8946ae0eb430f2c6))
+ - **FEAT**: store) new storage type. ([bf25caa9](https://github.com/Flagsmith/flagsmith-flutter-client/commit/bf25caa9842ac531aa787b718b2f0312b5da4758))
+ - **DOCS**: :sparkles: new features. ([bd3a7fdd](https://github.com/Flagsmith/flagsmith-flutter-client/commit/bd3a7fddb12d235acaa7a511cb9f8c6e24361d8a))
+
 # Changelog
 
 ## [3.0.3]
