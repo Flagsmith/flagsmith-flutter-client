@@ -1,5 +1,5 @@
-import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
+import 'package:dio/io.dart';
 import 'package:flagsmith/flagsmith.dart';
 import 'package:test/test.dart';
 
@@ -36,8 +36,8 @@ void main() {
         caches: false,
         isDebug: true,
       );
-      (fs.client.httpClientAdapter as DefaultHttpClientAdapter)
-          .onHttpClientCreate = (client) {
+      (fs.client.httpClientAdapter as IOHttpClientAdapter).onHttpClientCreate =
+          (client) {
         client.badCertificateCallback = (cert, host, port) => true;
         return client;
       };
@@ -48,7 +48,7 @@ void main() {
     test('When self signed cert is enabled, then adapter is SelfSigned type',
         () async {
       expect(fs.client.httpClientAdapter, isNotNull);
-      expect(fs.client.httpClientAdapter, isA<DefaultHttpClientAdapter>());
+      expect(fs.client.httpClientAdapter, isA<IOHttpClientAdapter>());
     });
   });
   group('[Standard config]', () {
@@ -68,7 +68,7 @@ void main() {
         'When self signed cert is disabled, then adapter is not SelfSigned type',
         () async {
       expect(fs.client.httpClientAdapter, isNotNull);
-      expect(fs.client.httpClientAdapter, isA<DefaultHttpClientAdapter>());
+      expect(fs.client.httpClientAdapter, isA<IOHttpClientAdapter>());
     });
   });
 }
