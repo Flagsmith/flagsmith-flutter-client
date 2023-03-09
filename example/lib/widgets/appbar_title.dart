@@ -34,7 +34,7 @@ class AppbarTitle extends StatelessWidget {
                       )
                     : Text(
                         'Flagsmith',
-                        style: Theme.of(context).textTheme.headline6,
+                        style: Theme.of(context).textTheme.titleLarge,
                       );
               }
               return const SizedBox.shrink();
