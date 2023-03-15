@@ -305,7 +305,7 @@ class FlagsmithClient {
   Future<List<Flag>> _getUserFlags(Identity user) async {
     try {
       var params = {'identifier': user.identifier};
-      var response = await _api.get<Map<String, dynamic>>(config.identitiesURI, queryParameters: params);
+      var response = await _api.get<Map<String, dynamic>?>(config.identitiesURI, queryParameters: params);
 
       if (response.statusCode == 200) {
         if (response.data == null) {
@@ -346,7 +346,7 @@ class FlagsmithClient {
   Future<List<Trait>> _getUserTraits(Identity user) async {
     try {
       var params = {'identifier': user.identifier};
-      var response = await _api.get<Map<String, dynamic>>(config.identitiesURI, queryParameters: params);
+      var response = await _api.get<Map<String, dynamic>?>(config.identitiesURI, queryParameters: params);
 
       if (response.statusCode == 200) {
         if (response.data == null) {
