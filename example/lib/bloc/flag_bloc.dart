@@ -79,9 +79,4 @@ class FlagBloc extends Bloc<FlagEvent, FlagState> {
 
   Future<bool> isEnabled(String featureName, {Identity? user}) =>
       fs.hasFeatureFlag(featureName, user: user);
-
-  @override
-  Future<void> close() {
-    return super.close();
-  }
 }

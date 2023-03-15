@@ -13,7 +13,7 @@ class CardTileWidget extends StatelessWidget {
         children: [
           Text(
             item.feature.name,
-            style: Theme.of(context).textTheme.headline5,
+            style: Theme.of(context).textTheme.headlineSmall,
           )
         ],
       ),

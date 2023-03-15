@@ -4,7 +4,7 @@ analyzer:
   strong-mode:
     implicit-casts: false
     implicit-dynamic: true
-  exclude: 
+  exclude:
     - "build/**"
     - "lib/generated/**"
 linter:
@@ -12,11 +12,10 @@ linter:
     always_put_control_body_on_new_line: true
     avoid_print: true
     flutter_style_todos: true
-    nont_constatnt_identifier_names: false
+    non_constant_identifier_names: false
     public_member_api_docs: false
     prefer_relative_imports: true
     prefer_single_quotes: true
     prefer_void_to_null: true
     avoid_equals_and_hash_code_on_mutable_classes: true
     avoid_relative_lib_imports: true
-    prefer_bool_in_asserts: true

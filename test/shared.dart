@@ -172,7 +172,7 @@ final fakeResponse = r'''[
         "identity": null,
         "feature_segment": null
     },
-    
+
     {
         "id": 58,
         "feature": {
@@ -734,7 +734,6 @@ FlagsmithClient setupSyncClientAdapter(
   StorageType storeType, {
   bool caches = false,
   bool isDebug = false,
-  VoidCallback? afterInit,
 }) {
   final fs = FlagsmithClient(
     apiKey: apiKey,
