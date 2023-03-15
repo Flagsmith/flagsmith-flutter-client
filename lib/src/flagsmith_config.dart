@@ -62,8 +62,8 @@ class FlagsmithConfig {
   /// Client options from config
   BaseOptions get clientOptions => BaseOptions(
         baseUrl: baseURI,
-        connectTimeout: connectTimeout,
-        receiveTimeout: receiveTimeout,
-        sendTimeout: sendTimeout,
+        connectTimeout: Duration(milliseconds: connectTimeout),
+        receiveTimeout: Duration(milliseconds: receiveTimeout),
+        sendTimeout: Duration(milliseconds: sendTimeout),
       );
 }
