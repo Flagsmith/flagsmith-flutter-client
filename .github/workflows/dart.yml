@@ -31,6 +31,8 @@ jobs:
                   githubToken: ${{ secrets.GITHUB_TOKEN }}
 
     publishing:
+        # don't run this on PRs from forks (as the secrets are not available)
+        if: github.repository == 'Flagsmith/flagsmith-flutter-client'
         runs-on: ubuntu-latest
         name: Dart Publish Package Test
 
