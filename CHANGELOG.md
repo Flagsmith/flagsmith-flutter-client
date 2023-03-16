@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.1.0]
+
+ - Upgrade dio
+ - Github Workflows improvements
+
 ## [3.0.3]
 
  - Upgrade rxdart dependency
