@@ -11,6 +11,11 @@ on:
             - ready_for_review
 
 jobs:
+    debug-actions:
+        runs-on: ubuntu-latest
+        steps: 
+            - run: echo ${{ github.repository }}
+
     analyze:
         runs-on: ubuntu-latest
         name: Dart Analyze
