@@ -663,6 +663,21 @@ final fakeIdentitiesResponse = r'''{
             "id": 17043796,
             "trait_key": "age2",
             "trait_value": true
+        },
+        {
+            "id": 17043790,
+            "trait_key": "bool_trait",
+            "trait_value": true
+        },
+        {
+            "id": 17043797,
+            "trait_key": "string_trait",
+            "trait_value": "some-string"
+        },
+        {
+            "id": 17043798,
+            "trait_key": "double_trait",
+            "trait_value": 10.1
         }
     ]
 }''';
@@ -700,7 +715,7 @@ final traitAge25 = '''{
     "identifier": "test_another_user"
   },
   "trait_key": "age",
-  "trait_value": "25"
+  "trait_value": 25
 }''';
 
 final analyticsData = '''{
