@@ -1,6 +1,8 @@
 include: package:lints/recommended.yaml
 
 analyzer:
+    implicit-casts: false
+    implicit-dynamic: true
   exclude:
     - "build/**"
     - "lib/generated/**"
