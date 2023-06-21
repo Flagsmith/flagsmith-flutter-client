@@ -11,39 +11,51 @@ on:
             - ready_for_review
 
 jobs:
-    analyze:
-        runs-on: ubuntu-latest
-        name: Dart Analyze
+  analyze:
+    runs-on: ubuntu-latest
+    name: Dart Analyze
+    steps:
+      - uses: actions/checkout@v3
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '2.x'
+          channel: 'any'
+      - run: flutter pub get
+      - run: flutter analyze
 
-        steps:
-            - uses: actions/checkout@v2
-            - uses: subosito/flutter-action@v2
-            - run: flutter pub get
-            - run: flutter analyze
-    score:
-        runs-on: ubuntu-latest
-        name: Dart package score
+  tests:
+    runs-on: ubuntu-latest
+    name: Flutter Test
+    steps:
+    - uses: actions/checkout@v3
+    - uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '2.x'
+        channel: 'any'
 
-        steps:
-            - uses: actions/checkout@v2
-            - uses: axel-op/dart-package-analyzer@v3
-              with:
-                  githubToken: ${{ secrets.GITHUB_TOKEN }}
+    - run: flutter pub get
+    - run: flutter pub test
 
-    publishing:
-        # don't run this on PRs from forks (as the secrets are not available)
-        if: github.repository == 'Flagsmith/flagsmith-flutter-client'
-        runs-on: ubuntu-latest
-        name: Dart Publish Package Test
+  score:
+    runs-on: ubuntu-latest
+    name: Dart package score
 
-        needs: analyze
-        steps:
-            - name: 'Checkout'
-              uses: actions/checkout@v2 # required!
+    steps:
+      - uses: actions/checkout@v3
+      - uses: axel-op/dart-package-analyzer@v3
+        with:
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
 
-            - name: '>> Dart package <<'
-              uses: k-paxian/dart-package-publisher@master
-              with:
-                  accessToken: ${{ secrets.OAUTH_ACCESS_TOKEN }}
-                  refreshToken: ${{ secrets.OAUTH_REFRESH_TOKEN }}
-                  dryRunOnly: true
+  publishing:
+    runs-on: ubuntu-latest
+    name: Dart Publish Package Test
+    needs: tests
+    steps:
+    - uses: actions/checkout@v3
+    - uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '2.x'
+        channel: 'any'
+
+    - run: flutter pub publish --dry-run
+
