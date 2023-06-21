@@ -408,13 +408,15 @@ class FlagsmithClient {
       if (value.isEmpty) {
         return null;
       }
+
       final identifier = value[0].identity.identifier;
       final traitList = value
           .map((e) => <String, dynamic>{
                 'trait_key': e.key,
-                'trait_value': stringToJson(e.value),
+                'trait_value': e.value,
               })
           .toList();
+
       final data = <String, dynamic>{
         'identifier': identifier,
         'traits': traitList,
@@ -432,7 +434,7 @@ class FlagsmithClient {
           .map((e) => TraitWithIdentity(
                 identity: Identity(identifier: identifier),
                 key: e['trait_key'] as String,
-                value: e['trait_value'] as String,
+                value: e['trait_value'],
               ))
           .toList();
     } on DioError catch (e) {

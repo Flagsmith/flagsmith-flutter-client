@@ -151,9 +151,9 @@ packages:
   flagsmith_flutter_core:
     dependency: "direct main"
     description:
-      path: "/home/gagan/Flag/flagsmith-flutter-core"
-      relative: false
-    source: path
+      name: flagsmith_flutter_core
+      url: "https://pub.dartlang.org"
+    source: hosted
     version: "3.0.0"
   frontend_server_client:
     dependency: transitive
