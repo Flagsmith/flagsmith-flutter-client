@@ -35,16 +35,8 @@ jobs:
 
     - run: flutter pub get
     - run: flutter pub test
-  # TODO enable this after upgrading to dart 3.x
-  # score:
-  #   runs-on: ubuntu-latest
-  #   name: Dart package score
 
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - uses: axel-op/dart-package-analyzer@v3
-  #       with:
-  #         githubToken: ${{ secrets.GITHUB_TOKEN }}
+  # TODO https://github.com/Flagsmith/flagsmith-flutter-client/issues/57
 
   publishing:
     runs-on: ubuntu-latest
