@@ -115,10 +115,25 @@ void main() {
     test('When get User trait then success', () async {
       var user = Identity(identifier: 'test_another_user');
 
+      // for int trait
       var result = await fs.getTraits(user, keys: ['age']);
-
       expect(result, isNotNull);
-      expect(result, isNotEmpty);
+      expect(result.first.value, 25);
+
+      // for double trait
+      result = await fs.getTraits(user, keys: ['double_trait']);
+      expect(result, isNotNull);
+      expect(result.first.value, 10.1);
+
+      // for string trait
+      result = await fs.getTraits(user, keys: ['string_trait']);
+      expect(result, isNotNull);
+      expect(result.first.value, 'some-string');
+
+      // for bool trait
+      result = await fs.getTraits(user, keys: ['bool_trait']);
+      expect(result, isNotNull);
+      expect(result.first.value, true);
     });
 
     test('When get User trait Update then Updated', () async {
@@ -132,10 +147,10 @@ void main() {
           value: TraitWithIdentity(
         identity: user,
         key: 'age',
-        value: '25',
+        value: 25,
       ));
       expect(updateResult, isNotNull);
-      expect(updateResult?.value, '25');
+      expect(updateResult?.value, 25);
     });
 
     test('When get User trait Update then bulk Updated', () async {
@@ -148,12 +163,22 @@ void main() {
         TraitWithIdentity(
           identity: user,
           key: 'age',
-          value: '21',
+          value: 21,
         ),
         TraitWithIdentity(
           identity: user,
-          key: 'age2',
-          value: '21',
+          key: 'double_trait',
+          value: 10.1,
+        ),
+        TraitWithIdentity(
+          identity: user,
+          key: 'string_trait',
+          value: 'some-string',
+        ),
+        TraitWithIdentity(
+          identity: user,
+          key: 'bool_trait',
+          value: true,
         )
       ]);
       expect(updateResult, isNotNull);

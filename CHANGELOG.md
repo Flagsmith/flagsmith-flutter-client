@@ -1,5 +1,11 @@
 # Changelog
 
+## [4.0.0]
+
+ - trait/value: Add support for int,float, bool and string
+ - Upgrade [flagsmith_core](https://pub.dev/packages/flagsmith_core)
+
+
 ## [3.1.0]
 
  - Upgrade dio

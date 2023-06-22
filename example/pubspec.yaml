@@ -9,9 +9,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flagsmith: 
+  flagsmith:
     path: ../
-  flagsmith_storage: ^3.0.0
+  flagsmith_storage: ^4.0.0
 
   platform: ^3.1.0
   collection: ^1.15.0

@@ -17,7 +17,6 @@ class FlagBloc extends Bloc<FlagEvent, FlagState> {
 
   @override
   Stream<FlagState> mapEventToState(FlagEvent event) async* {
-
     switch (event.runtimeType) {
       case InitFlagEvent:
         yield state.copyWith(loading: LoadingState.isInitial);
@@ -42,7 +41,7 @@ class FlagBloc extends Bloc<FlagEvent, FlagState> {
             value: TraitWithIdentity(
           identity: const Identity(identifier: 'testUser'),
           key: 'age',
-          value: '21',
+          value: 21,
         ));
         add(FetchFlagEvent());
         break;
