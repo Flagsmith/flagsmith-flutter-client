@@ -25,8 +25,8 @@ class FlagsmithFormatException extends FormatException {
 
 /// FlagsmithApiException
 /// - DioError / Api error wrapper
-class FlagsmithApiException extends DioError {
-  FlagsmithApiException(DioError error)
+class FlagsmithApiException extends DioException {
+  FlagsmithApiException(DioException error)
       : super(
             requestOptions: error.requestOptions,
             response: error.response,

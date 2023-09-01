@@ -18,8 +18,8 @@ jobs:
       - uses: actions/checkout@v3
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '2.x'
-          channel: 'any'
+          flutter-version: '3.10.6'
+          channel: 'stable'
       - run: flutter pub get
       - run: flutter analyze
 
@@ -30,8 +30,8 @@ jobs:
     - uses: actions/checkout@v3
     - uses: subosito/flutter-action@v2
       with:
-        flutter-version: '2.x'
-        channel: 'any'
+        flutter-version: '3.10.6'
+        channel: 'stable'
 
     - run: flutter pub get
     - run: flutter pub test
@@ -46,8 +46,8 @@ jobs:
     - uses: actions/checkout@v3
     - uses: subosito/flutter-action@v2
       with:
-        flutter-version: '2.x'
-        channel: 'any'
+        flutter-version: '3.10.6'
+        channel: 'stable'
 
     - run: flutter pub publish --dry-run
 

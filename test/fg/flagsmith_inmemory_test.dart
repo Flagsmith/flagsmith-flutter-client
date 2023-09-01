@@ -124,7 +124,7 @@ void main() {
             config.flagsURI,
             (server) => server.throws(
               404,
-              DioError(
+              DioException(
                 requestOptions: RequestOptions(path: config.flagsURI),
               ),
             ),
@@ -132,7 +132,7 @@ void main() {
           ..onGet(fs.config.identitiesURI, (server) {
             return server.throws(
               404,
-              DioError(
+              DioException(
                 requestOptions: RequestOptions(path: config.flagsURI),
               ),
             );
