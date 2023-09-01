@@ -124,9 +124,12 @@ class FlagsmithClient {
       },
     );
 
-    Future.delayed(Duration(seconds: config.reconnectToSSEInterval), () async {
-      _setupRealtimeUpdates(config.realtimeUpdatesBaseURI);
-    });
+    Future.delayed(
+      Duration(milliseconds: config.reconnectToSSEInterval),
+      () async {
+        _setupRealtimeUpdates(config.realtimeUpdatesBaseURI);
+      },
+    );
   }
 
   Future<bool> onEventReceived(
