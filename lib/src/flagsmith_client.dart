@@ -1,5 +1,8 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:collection/collection.dart' show IterableExtension;
+import 'package:flutter_client_sse/constants/sse_request_type_enum.dart';
+import 'package:flutter_client_sse/flutter_client_sse.dart';
 import 'package:rxdart/subjects.dart';
 import 'package:dio/dio.dart';
 
@@ -10,12 +13,14 @@ import '../flagsmith.dart';
 /// [config] configuration for http client and endpoints
 /// [apiKey] api key for your enviornment
 /// [seeds] default values before update from Flagsmith env.
-///
 
 class FlagsmithClient {
   static final String authHeader = 'X-Environment-Key';
   static final String acceptHeader = 'Accept';
   static final String userAgentHeader = 'User-Agent';
+  static final String applicationJson = 'application/json';
+  static final String environmentUpdatedEvent = 'environment_updated';
+  static final String updatedAtKey = 'updated_at';
 
   void log(String message) {
     if (flagsmithDebug) {
@@ -44,6 +49,10 @@ class FlagsmithClient {
   Dio get client => _api;
   bool flagsmithDebug = false;
 
+  late Stream<SSEModel> _sseStream;
+  double? lastGetFlags;
+  Identity? cachedUser;
+
   FlagsmithClient(
       {this.config = const FlagsmithConfig(),
       required this.apiKey,
@@ -54,6 +63,9 @@ class FlagsmithClient {
     storageProvider = prepareStorage(storage: storage, config: config);
     if (config.enableAnalytics) {
       _setupAnalyticsTimer(config.analyticsInterval);
+    }
+    if (config.enableRealtimeUpdates) {
+      _setupRealtimeUpdates(config.realtimeUpdatesBaseURI);
     }
   }
 
@@ -77,7 +89,7 @@ class FlagsmithClient {
         }
         return res;
       }
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       log('_setupAnalyticsTimer dioError: ${e.error}');
       throw FlagsmithApiException(e);
     } catch (e) {
@@ -86,6 +98,56 @@ class FlagsmithClient {
     }
 
     return null;
+  }
+
+  Future<void> _setupRealtimeUpdates(String realtimeUpdatesBaseUrl) async {
+    final sseUrl = '$realtimeUpdatesBaseUrl$apiKey/stream';
+
+    _sseStream = SSEClient.subscribeToSSE(
+      method: SSERequestType.GET,
+      url: sseUrl,
+      header: {
+        acceptHeader: '$applicationJson , text/event-stream',
+      },
+    );
+
+    _sseStream.listen(
+      (event) async {
+        final shouldGetFlags = await onEventReceived(
+          event,
+          lastGetFlags,
+        );
+
+        if (shouldGetFlags) {
+          await getFeatureFlags(user: cachedUser);
+        }
+      },
+    );
+
+    Future.delayed(Duration(seconds: config.reconnectToSSEInterval), () async {
+      _setupRealtimeUpdates(config.realtimeUpdatesBaseURI);
+    });
+  }
+
+  Future<bool> onEventReceived(
+    SSEModel event,
+    double? lastGetFlags,
+  ) async {
+    if (event.event != environmentUpdatedEvent) {
+      return false;
+    }
+
+    final eventData = jsonDecode(event.data ?? '{}') as Map<String, dynamic>;
+    final updatedAt = eventData[updatedAtKey];
+
+    double? lastEventUpdate;
+    if (updatedAt != null && updatedAt is double) {
+      lastEventUpdate = updatedAt;
+    }
+
+    //If the last event update is newer than the last time we got flags,
+    // then we should update the flags
+    return (lastEventUpdate ?? 0) > (lastGetFlags ?? 0);
   }
 
   static StorageProvider prepareStorage(
@@ -158,7 +220,7 @@ class FlagsmithClient {
   Dio _apiClient() {
     var dio = Dio(config.clientOptions)
       ..options.headers[authHeader] = apiKey
-      ..options.headers[acceptHeader] = 'application/json'
+      ..options.headers[acceptHeader] = applicationJson
       ..options.followRedirects = true;
 
     if (config.isDebug) {
@@ -246,6 +308,7 @@ class FlagsmithClient {
 
   Future<Flag?> _getFlagByName(String featureName,
       {Identity? user, bool? reload}) async {
+    cachedUser = user;
     var flags = await getFeatureFlags(user: user, reload: reload ?? false);
     var flag = flags
         .firstWhereOrNull((element) => element.feature.name == featureName);
@@ -298,17 +361,22 @@ class FlagsmithClient {
     try {
       var response = await _api.get<List<dynamic>>(config.flagsURI);
       if (response.statusCode == 200) {
+        lastGetFlags = DateTime.now().millisecondsSinceEpoch /
+            Duration.millisecondsPerSecond;
+
         var list = response.data!
             .map<Flag>((dynamic e) => Flag.fromJson(e as Map<String, dynamic>))
             .toList();
+
         await storageProvider.saveAll(list);
         final _saved = await storageProvider.getAll()
           ..sort((a, b) => a.feature.name.compareTo(b.feature.name));
         _updateCaches(list: _saved);
+
         return list;
       }
       return [];
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       log('_getFlags dioError: ${e.error}');
       throw FlagsmithApiException(e);
     } catch (e) {
@@ -320,26 +388,33 @@ class FlagsmithClient {
   // Internal list of [user] flags
   Future<List<Flag>> _getUserFlags(Identity user) async {
     try {
+      cachedUser = user;
       var params = {'identifier': user.identifier};
       var response = await _api.get<Map<String, dynamic>?>(config.identitiesURI,
           queryParameters: params);
 
       if (response.statusCode == 200) {
+        lastGetFlags = DateTime.now().millisecondsSinceEpoch /
+            Duration.millisecondsPerSecond;
+
         if (response.data == null) {
           return [];
         }
+
         var data = FlagsAndTraits.fromJson(response.data!).flags ?? [];
         if (data.isNotEmpty) {
           data.sort((a, b) => a.feature.name.compareTo(b.feature.name));
         }
+
         await storageProvider.saveAll(data);
         final _saved = await storageProvider.getAll()
           ..sort((a, b) => a.feature.name.compareTo(b.feature.name));
         _updateCaches(list: _saved);
+
         return data;
       }
       return [];
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       log('_getFlags dioError: ${e.error}');
       throw FlagsmithApiException(e);
     } catch (e) {
@@ -362,6 +437,7 @@ class FlagsmithClient {
   /// Internal list of `user` traits
   Future<List<Trait>> _getUserTraits(Identity user) async {
     try {
+      cachedUser = user;
       var params = {'identifier': user.identifier};
       var response = await _api.get<Map<String, dynamic>?>(config.identitiesURI,
           queryParameters: params);
@@ -373,7 +449,7 @@ class FlagsmithClient {
         return FlagsAndTraits.fromJson(response.data!).traits ?? [];
       }
       return [];
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       log('_getFlags dioError: ${e.error}');
       throw FlagsmithApiException(e);
     } catch (e) {
@@ -392,7 +468,7 @@ class FlagsmithClient {
         return null;
       }
       return TraitWithIdentity.fromJson(response.data as Map<String, dynamic>);
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       log('_getFlags dioError: ${e.error}');
       throw FlagsmithApiException(e);
     } catch (e) {
@@ -437,7 +513,7 @@ class FlagsmithClient {
                 value: e['trait_value'],
               ))
           .toList();
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       log('_getFlags dioError: ${e.error}');
       throw FlagsmithApiException(e);
     } catch (e) {
@@ -474,6 +550,7 @@ class FlagsmithClient {
 
   void close() {
     _analyticsTimer?.cancel();
+    SSEClient.unsubscribeFromSSE();
     _loading.close();
   }
 

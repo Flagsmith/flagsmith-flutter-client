@@ -6,12 +6,16 @@ import 'bloc/flag_bloc.dart';
 
 /// Prepare DI for [FlagsmithSampleApp]
 final GetIt getIt = GetIt.instance;
+
 Future<void> setupPrefs() async {
   getIt.registerSingletonAsync<FlagsmithClient>(() async {
     final client = FlagsmithClient(
-        apiKey: 'CoJErJUXmihfMDVwTzBff4',
+        apiKey: 'Ufj74JHbHFevTt9v6Bq3ru',
         config: const FlagsmithConfig(
-            storageType: StorageType.custom, isDebug: true),
+          storageType: StorageType.custom,
+          isDebug: true,
+          enableRealtimeUpdates: true,
+        ),
         storage: FlagsmithSharedPreferenceStore());
     await client.initialize();
     return client;

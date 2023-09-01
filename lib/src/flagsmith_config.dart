@@ -21,6 +21,10 @@ class FlagsmithConfig {
   final bool enableAnalytics;
   final int analyticsInterval;
 
+  final bool enableRealtimeUpdates;
+  final String realtimeUpdatesBaseURI;
+  final int reconnectToSSEInterval;
+
   /// Flagsmith config initialization
   /// change only if you have self-hosted Flagsmith
   /// [baseURI], [flagsURI], [identitiesURI], [traitsURI], [analyticsURI]
@@ -41,9 +45,13 @@ class FlagsmithConfig {
   /// Analytics is enabled by default, to disable analytics set [enableAnalytics] to *false*
   ///
   /// The [analyticsInterval] is how often the analytics will be pushed to the server in milliseconds, defaults to 10000 (10 seconds)
+  ///
+  /// If you would like to use realtime updates, set [enableRealtimeUpdates] to *true*
+  ///
+  /// You can configure the realtime updates source URL by setting the [realtimeUpdatesBaseURI] parameter
 
   const FlagsmithConfig({
-    this.baseURI = 'https://edge.api.flagsmith.com/api/v1/',
+    this.baseURI = 'https://api.flagsmith.com/api/v1/',
     this.flagsURI = 'flags/',
     this.identitiesURI = 'identities/',
     this.traitsURI = 'traits/',
@@ -57,6 +65,10 @@ class FlagsmithConfig {
     this.caches = false,
     this.enableAnalytics = true,
     this.analyticsInterval = 10000,
+    this.enableRealtimeUpdates = false,
+    this.realtimeUpdatesBaseURI =
+        'https://realtime.flagsmith.com/sse/environments/',
+    this.reconnectToSSEInterval = 30000,
   });
 
   /// Client options from config
