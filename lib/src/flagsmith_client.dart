@@ -137,12 +137,16 @@ class FlagsmithClient {
       return false;
     }
 
-    final eventData = jsonDecode(event.data ?? '{}') as Map<String, dynamic>;
-    final updatedAt = eventData[updatedAtKey];
-
     double? lastEventUpdate;
-    if (updatedAt != null && updatedAt is double) {
-      lastEventUpdate = updatedAt;
+
+    try {
+      final eventData = jsonDecode(event.data ?? '{}') as Map<String, dynamic>;
+      final updatedAt = eventData[updatedAtKey];
+      if (updatedAt != null && updatedAt is double) {
+        lastEventUpdate = updatedAt;
+      }
+    } catch (e) {
+      log('Error parsing JSON: $e');
     }
 
     //If the last event update is newer than the last time we got flags,

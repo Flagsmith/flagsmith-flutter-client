@@ -10,11 +10,10 @@ final GetIt getIt = GetIt.instance;
 Future<void> setupPrefs() async {
   getIt.registerSingletonAsync<FlagsmithClient>(() async {
     final client = FlagsmithClient(
-        apiKey: 'Ufj74JHbHFevTt9v6Bq3ru',
+        apiKey: 'CoJErJUXmihfMDVwTzBff4',
         config: const FlagsmithConfig(
           storageType: StorageType.custom,
           isDebug: true,
-          enableRealtimeUpdates: true,
         ),
         storage: FlagsmithSharedPreferenceStore());
     await client.initialize();
