@@ -77,7 +77,7 @@ void main() {
         adapter.onPost(fs.config.analyticsURI, (server) {
           return server.throws(
             400,
-            DioError(
+            DioException(
               requestOptions: RequestOptions(path: config.analyticsURI),
             ),
           );

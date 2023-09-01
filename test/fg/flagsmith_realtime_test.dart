@@ -1,10 +1,6 @@
-import 'dart:convert';
-
 import 'package:flagsmith/flagsmith.dart';
 import 'package:flutter_client_sse/flutter_client_sse.dart';
 import 'package:http_mock_adapter/http_mock_adapter.dart';
-import 'package:mockito/mockito.dart';
-import 'package:test/scaffolding.dart';
 import 'package:test/test.dart';
 
 import '../shared.dart';

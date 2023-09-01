@@ -17,7 +17,7 @@ class Mocked extends Mock implements FlagsmithException {
 
   void apiException({Object? message}) {
     throw FlagsmithApiException(
-        DioError(requestOptions: RequestOptions(path: 'path')));
+        DioException(requestOptions: RequestOptions(path: 'path')));
   }
 
   void configException({Object? message}) {
