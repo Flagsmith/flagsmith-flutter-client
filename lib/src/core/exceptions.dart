@@ -24,14 +24,15 @@ class FlagsmithFormatException extends FormatException {
 }
 
 /// FlagsmithApiException
-/// - DioError / Api error wrapper
+/// - DioException / Api error wrapper
 class FlagsmithApiException extends DioException {
   FlagsmithApiException(DioException error)
       : super(
-            requestOptions: error.requestOptions,
-            response: error.response,
-            type: error.type,
-            error: error.error);
+          requestOptions: error.requestOptions,
+          response: error.response,
+          type: error.type,
+          error: error.error,
+        );
 }
 
 /// FlagsmithConfigException

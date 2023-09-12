@@ -68,7 +68,7 @@ class FlagsmithConfig {
     this.enableRealtimeUpdates = false,
     this.realtimeUpdatesBaseURI =
         'https://realtime.flagsmith.com/sse/environments/',
-    this.reconnectToSSEInterval = 30000,
+    this.reconnectToSSEInterval = 29000,
   });
 
   /// Client options from config
