@@ -19,6 +19,7 @@ class FlagsmithClient {
   static final String acceptHeader = 'Accept';
   static final String userAgentHeader = 'User-Agent';
   static final String applicationJson = 'application/json';
+  static final String textEventStream = 'text/event-stream';
   static final String environmentUpdatedEvent = 'environment_updated';
   static final String updatedAtKey = 'updated_at';
 
@@ -107,7 +108,7 @@ class FlagsmithClient {
       method: SSERequestType.GET,
       url: sseUrl,
       header: {
-        acceptHeader: '$applicationJson , text/event-stream',
+        acceptHeader: '$applicationJson , $textEventStream',
       },
     );
 
@@ -368,8 +369,7 @@ class FlagsmithClient {
     try {
       var response = await _api.get<List<dynamic>>(config.flagsURI);
       if (response.statusCode == 200) {
-        lastGetFlags = DateTime.now().millisecondsSinceEpoch /
-            Duration.millisecondsPerSecond;
+        lastGetFlags = DateTime.now().secondsSinceEpoch;
 
         var list = response.data!
             .map<Flag>((dynamic e) => Flag.fromJson(e as Map<String, dynamic>))
@@ -401,8 +401,7 @@ class FlagsmithClient {
           queryParameters: params);
 
       if (response.statusCode == 200) {
-        lastGetFlags = DateTime.now().millisecondsSinceEpoch /
-            Duration.millisecondsPerSecond;
+        lastGetFlags = DateTime.now().secondsSinceEpoch;
 
         if (response.data == null) {
           return [];
