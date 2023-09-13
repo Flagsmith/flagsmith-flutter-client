@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 import 'package:flagsmith/flagsmith.dart';
@@ -36,8 +38,9 @@ void main() {
         caches: false,
         isDebug: true,
       );
-      (fs.client.httpClientAdapter as IOHttpClientAdapter).onHttpClientCreate =
-          (client) {
+      (fs.client.httpClientAdapter as IOHttpClientAdapter).createHttpClient =
+          () {
+        final client = HttpClient();
         client.badCertificateCallback = (cert, host, port) => true;
         return client;
       };

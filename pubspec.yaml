@@ -13,12 +13,13 @@ environment:
 
 dependencies:
   flagsmith_flutter_core: ^3.0.0
-  collection: ^1.15.0
-  dio: ^5.0.0
-  rxdart: ^0.27.5
+  flutter_client_sse: ^2.0.0
+  collection: ^1.17.0
+  dio: ^5.3.2
+  rxdart: ^0.27.7
 dev_dependencies:
-  test:  ">=1.16.0 <=1.17.12"
+  test: ^1.24.6
   lints: ^1.0.1
   http_mock_adapter: ^0.4.0
-  mockito: ^5.0.15
+  mockito: ^5.4.2
   test_coverage_badge: ^0.2.0

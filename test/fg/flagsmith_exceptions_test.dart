@@ -66,7 +66,7 @@ void main() {
           ..onGet(fs.config.identitiesURI, (server) {
             return server.throws(
               404,
-              DioError(
+              DioException(
                 requestOptions: RequestOptions(path: fs.config.identitiesURI),
                 error: Exception('404'),
               ),
@@ -75,7 +75,7 @@ void main() {
           ..onGet(fs.config.flagsURI, (server) {
             return server.throws(
               404,
-              DioError(
+              DioException(
                 requestOptions: RequestOptions(path: fs.config.identitiesURI),
                 error: Exception('404'),
               ),
@@ -95,7 +95,7 @@ void main() {
         adapter.onPost(fs.config.traitsURI, (server) {
           return server.throws(
             404,
-            DioError(
+            DioException(
               requestOptions: RequestOptions(path: fs.config.identitiesURI),
               error: Exception('404'),
             ),
@@ -113,7 +113,7 @@ void main() {
         adapter.onPut(fs.config.identitiesURI, (server) {
           return server.throws(
             404,
-            DioError(
+            DioException(
               requestOptions: RequestOptions(path: fs.config.identitiesURI),
               error: Exception('404'),
             ),
