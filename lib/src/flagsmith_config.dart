@@ -51,7 +51,7 @@ class FlagsmithConfig {
   /// You can configure the realtime updates source URL by setting the [realtimeUpdatesBaseURI] parameter
 
   const FlagsmithConfig({
-    this.baseURI = 'https://api.flagsmith.com/api/v1/',
+    this.baseURI = 'https://edge.api.flagsmith.com/api/v1/',
     this.flagsURI = 'flags/',
     this.identitiesURI = 'identities/',
     this.traitsURI = 'traits/',
