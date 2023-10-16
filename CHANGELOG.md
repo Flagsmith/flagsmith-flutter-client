@@ -1,4 +1,8 @@
 # Changelog
+## [5.0.1]
+
+- Change the base url to https://edge.api.flagsmith.com/api/v1/
+
 
 ## [5.0.0]
 
