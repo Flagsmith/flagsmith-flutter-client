@@ -19,7 +19,7 @@ dependencies:
   rxdart: ^0.27.7
 dev_dependencies:
   test: ^1.24.6
-  lints: ^1.0.1
-  http_mock_adapter: ^0.4.0
+  lints: ^5.0.0
+  http_mock_adapter: ^0.6.1
   mockito: ^5.4.2
-  test_coverage_badge: ^0.2.0
+  test_coverage_badge: ^0.3.2
