@@ -47,7 +47,6 @@ ThemeData darkTheme(BuildContext context) {
       secondary: Color(0xFFBFA6E9),
       secondaryContainer: Color(0xFF9D88C0),
       surface: Color(0xFF1a1c26),
-      background: Color(0xFF1a1c26),
     ),
     textTheme: GoogleFonts.varelaRoundTextTheme(
       ThemeData.dark().textTheme,

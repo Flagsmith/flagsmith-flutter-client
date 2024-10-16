@@ -2,21 +2,19 @@ import 'dart:convert';
 
 import 'package:flagsmith/flagsmith.dart';
 import 'package:test/test.dart';
-import 'package:http_mock_adapter/http_mock_adapter.dart';
 
 import '../shared.dart';
 
 void main() {
   group('[Flag manipulation]', () {
     late FlagsmithClient fs;
-    late DioAdapter _adapter;
     setUp(() async {
       fs = setupSyncClientAdapter(StorageType.inMemory);
       setupAdapter(fs, cb: (config, adapter) {
-        _adapter = adapter;
-        _adapter
+        adapter = adapter;
+        adapter
           ..onGet(fs.config.identitiesURI, (server) {
-            return server.reply(200, jsonDecode(fakeIdentitiesResponse));
+            return server.reply(200, jsonDecode(identitiesResponseData));
           }, queryParameters: <String, dynamic>{
             'identifier': 'test_another_user'
           })
@@ -26,8 +24,8 @@ void main() {
             'identifier': 'invalid_users_another_user'
           })
           ..onPost(fs.config.identitiesURI, (server) {
-            return server.reply(200, jsonDecode(bulkTraitUpdateResponse));
-          }, data: jsonDecode(bulkTraitUpdateResponse))
+            return server.reply(200, jsonDecode(identitiesResponseData));
+          }, data: jsonDecode(identitiesResponseData))
           ..onPost(fs.config.traitsURI, (server) {
             return server.reply(200, jsonDecode(traitAge25));
           }, data: jsonDecode(traitAge25));
@@ -50,18 +48,18 @@ void main() {
     });
     test('When localy change state of flag, then success', () async {
       await fs.getFeatureFlags();
-      expect(await fs.isFeatureFlagEnabled(myFeature), true);
-      await fs.testToggle(myFeature);
-      expect(await fs.isFeatureFlagEnabled(myFeature), false);
+      expect(await fs.isFeatureFlagEnabled(myFeatureName), true);
+      await fs.testToggle(myFeatureName);
+      expect(await fs.isFeatureFlagEnabled(myFeatureName), false);
     });
 
     test('When change state of flag, then cache success', () async {
       fs = setupSyncClientAdapter(StorageType.inMemory, caches: true);
       setupAdapter(fs, cb: (config, adapter) {});
       await fs.getFeatureFlags();
-      expect(await fs.isFeatureFlagEnabled(myFeature), true);
-      await fs.testToggle(myFeature);
-      expect(await fs.isFeatureFlagEnabled(myFeature), false);
+      expect(await fs.isFeatureFlagEnabled(myFeatureName), true);
+      await fs.testToggle(myFeatureName);
+      expect(await fs.isFeatureFlagEnabled(myFeatureName), false);
     });
   });
 
@@ -72,7 +70,7 @@ void main() {
       setupAdapter(fs, cb: (config, adapter) {
         adapter
           ..onGet(fs.config.identitiesURI, (server) {
-            return server.reply(200, jsonDecode(fakeIdentitiesResponse));
+            return server.reply(200, jsonDecode(identitiesResponseData));
           }, queryParameters: <String, dynamic>{
             'identifier': 'test_another_user'
           })
@@ -82,8 +80,8 @@ void main() {
             'identifier': 'invalid_users_another_user'
           })
           ..onPost(fs.config.identitiesURI, (server) {
-            return server.reply(200, jsonDecode(bulkTraitUpdateResponse));
-          }, data: jsonDecode(bulkTraitUpdateResponse))
+            return server.reply(200, jsonDecode(identitiesResponseData));
+          }, data: jsonDecode(identitiesRequestData))
           ..onPost(fs.config.traitsURI, (server) {
             return server.reply(200, jsonDecode(traitAge25));
           }, data: jsonDecode(traitAge25));
@@ -193,7 +191,7 @@ void main() {
       setupAdapter(fs, cb: (config, adapter) {
         adapter
           ..onGet(fs.config.identitiesURI, (server) {
-            return server.reply(200, jsonDecode(fakeIdentitiesResponse));
+            return server.reply(200, jsonDecode(identitiesResponseData));
           }, queryParameters: <String, dynamic>{
             'identifier': 'test_another_user'
           })
@@ -203,8 +201,8 @@ void main() {
             'identifier': 'invalid_users_another_user'
           })
           ..onPost(fs.config.identitiesURI, (server) {
-            return server.reply(200, jsonDecode(bulkTraitUpdateResponse));
-          }, data: jsonDecode(bulkTraitUpdateResponse))
+            return server.reply(200, jsonDecode(identitiesResponseData));
+          }, data: jsonDecode(identitiesResponseData)) // request
           ..onPost(fs.config.traitsURI, (server) {
             return server.reply(200, jsonDecode(traitAge25));
           }, data: jsonDecode(traitAge25));
@@ -241,17 +239,17 @@ void main() {
     });
 
     test('When create trait return data null', () async {
-      var _user = Identity(identifier: 'test_another_user');
-      final _data = TraitWithIdentity(identity: _user, key: 'age', value: '25');
+      var user = Identity(identifier: 'test_another_user');
+      final data = TraitWithIdentity(identity: user, key: 'age', value: '25');
       fs = setupSyncClientAdapter(StorageType.inMemory);
       await fs.initialize();
       setupAdapter(fs, cb: (config, adapter) {
         adapter.onPost(fs.config.traitsURI, (server) {
           return server.reply(200, null);
-        }, data: _data.toJson());
+        }, data: data.toJson());
       });
-      final _result = await fs.createTrait(value: _data);
-      expect(_result, isNull);
+      final result0 = await fs.createTrait(value: data);
+      expect(result0, isNull);
     });
   });
 }

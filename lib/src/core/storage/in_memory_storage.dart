@@ -1,16 +1,16 @@
-import 'package:flagsmith/flagsmith.dart';
+import '../crud_storage.dart';
 
-/// CustomInMemoryStore storage
-class CustomInMemoryStore extends CoreStorage {
+/// InMemoryStore storage
+class InMemoryStorage extends CoreStorage {
   final Map<String, String> _items = <String, String>{};
 
-  CustomInMemoryStore() {
+  InMemoryStorage() {
     init();
   }
 
   @override
   Future<void> init() async {
-    return Future(() => null);
+    return Future.value(null);
   }
 
   /// Clear items

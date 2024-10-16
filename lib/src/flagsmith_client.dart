@@ -209,8 +209,8 @@ class FlagsmithClient {
       await storageProvider.clear();
     }
     await storageProvider.seed(items: seeds);
-    final _items = await storageProvider.getAll();
-    _updateCaches(list: _items);
+    final items = await storageProvider.getAll();
+    _updateCaches(list: items);
     return true;
   }
 
@@ -244,9 +244,11 @@ class FlagsmithClient {
   /// Get a list of existing Features for the given environment and user
   ///
   /// [user] a user in context
+  /// [traits] a list of user traits
+  /// [reload] force reload from API
   /// Returns a list of feature flags
   Future<List<Flag>> getFeatureFlags(
-      {Identity? user, bool reload = true}) async {
+      {Identity? user, List<Trait>? traits, bool reload = true}) async {
     if (!reload) {
       var result = await storageProvider.getAll();
       if (result.isNotEmpty) {
@@ -256,7 +258,8 @@ class FlagsmithClient {
       return result;
     }
     _loading.add(FlagsmithLoading.loading);
-    final list = user == null ? await _getFlags() : await _getUserFlags(user);
+    final list =
+        user == null ? await _getFlags() : await _getUserFlags(user, traits);
     _loading.add(FlagsmithLoading.loaded);
     return list;
   }
@@ -376,9 +379,9 @@ class FlagsmithClient {
             .toList();
 
         await storageProvider.saveAll(list);
-        final _saved = await storageProvider.getAll()
+        final saved = await storageProvider.getAll()
           ..sort((a, b) => a.feature.name.compareTo(b.feature.name));
-        _updateCaches(list: _saved);
+        _updateCaches(list: saved);
 
         return list;
       }
@@ -393,12 +396,15 @@ class FlagsmithClient {
   }
 
   // Internal list of [user] flags
-  Future<List<Flag>> _getUserFlags(Identity user) async {
+  Future<List<Flag>> _getUserFlags(Identity user, List<Trait>? traits) async {
     try {
       cachedUser = user;
-      var params = {'identifier': user.identifier};
-      var response = await _api.get<Map<String, dynamic>?>(config.identitiesURI,
-          queryParameters: params);
+      var identityData = user.toJson();
+      if (traits != null && traits.isNotEmpty) {
+        identityData['traits'] = traits.map((t) => t.toJson());
+      }
+
+      var response = await _api.post(config.identitiesURI, data: identityData);
 
       if (response.statusCode == 200) {
         lastGetFlags = DateTime.now().secondsSinceEpoch;
@@ -413,9 +419,9 @@ class FlagsmithClient {
         }
 
         await storageProvider.saveAll(data);
-        final _saved = await storageProvider.getAll()
+        final saved = await storageProvider.getAll()
           ..sort((a, b) => a.feature.name.compareTo(b.feature.name));
-        _updateCaches(list: _saved);
+        _updateCaches(list: saved);
 
         return data;
       }
@@ -445,6 +451,9 @@ class FlagsmithClient {
     try {
       cachedUser = user;
       var params = {'identifier': user.identifier};
+      if (user.transient ?? false) {
+        params['transient'] = 'true';
+      }
       var response = await _api.get<Map<String, dynamic>?>(config.identitiesURI,
           queryParameters: params);
 
@@ -510,9 +519,9 @@ class FlagsmithClient {
       if (response.data == null || response.data['traits'] == null) {
         return null;
       }
-      final _data = List<Map<String, dynamic>>.from(
+      final responseData = List<Map<String, dynamic>>.from(
           response.data['traits'] as List<dynamic>);
-      return _data
+      return responseData
           .map((e) => TraitWithIdentity(
                 identity: Identity(identifier: identifier),
                 key: e['trait_key'] as String,
@@ -563,14 +572,14 @@ class FlagsmithClient {
   /// test toggle feature
   ///
   Future<bool> testToggle(String featureName) async {
-    final _result = await storageProvider.togggleFeature(featureName);
-    final _value = await storageProvider.read(featureName);
+    final result = await storageProvider.togggleFeature(featureName);
+    final value = await storageProvider.read(featureName);
     if (config.caches) {
       _flags.removeWhere((element) => element.feature.name == featureName);
-      if (_value != null) {
-        _flags.add(_value);
+      if (value != null) {
+        _flags.add(value);
       }
     }
-    return _result;
+    return result;
   }
 }

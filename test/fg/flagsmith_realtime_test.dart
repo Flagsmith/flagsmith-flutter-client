@@ -1,6 +1,5 @@
 import 'package:flagsmith/flagsmith.dart';
 import 'package:flutter_client_sse/flutter_client_sse.dart';
-import 'package:http_mock_adapter/http_mock_adapter.dart';
 import 'package:test/test.dart';
 
 import '../shared.dart';
@@ -10,13 +9,12 @@ const userIdentifier = 'test__user';
 void main() {
   group('[Realtime updates]', () {
     late FlagsmithClient fs;
-    late DioAdapter _adapter;
 
     setUp(() async {
       fs = setupSyncClientAdapter(StorageType.inMemory);
       setupAdapter(fs, cb: (config, adapter) {
-        _adapter = adapter;
-        _adapter.onGet(fs.config.identitiesURI, (server) {
+        adapter = adapter;
+        adapter.onGet(fs.config.identitiesURI, (server) {
           return server.reply(200, null);
         }, queryParameters: <String, dynamic>{
           'identifier': userIdentifier,

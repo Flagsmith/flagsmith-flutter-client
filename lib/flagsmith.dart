@@ -3,10 +3,9 @@
 ///
 /// Flagsmith allows you to manage feature flags and remote config across multiple projects, environments and organisations.
 
-library flagsmith;
-
-export 'package:flagsmith_flutter_core/flagsmith_flutter_core.dart';
+library;
 
 export 'src/flagsmith_client.dart';
 export 'src/flagsmith_config.dart';
 export 'src/core/core.dart';
+export 'src/storage/storage.dart';

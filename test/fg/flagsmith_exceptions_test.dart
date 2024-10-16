@@ -40,21 +40,21 @@ void main() {
     test(
         'When exception with description raised, then we are able to read error description',
         () async {
-      final _description = 'generic error';
+      final description = 'generic error';
       expect(
-          () => Mocked().genericError(message: _description),
+          () => Mocked().genericError(message: description),
           throwsA(TypeMatcher<FlagsmithException>().having(
               (s) => s.toString(),
               'correct error description',
-              'FlagsmithException: $_description')));
+              'FlagsmithException: $description')));
     });
 
     test(
         'When exception without description raised, then we`ll see only type of exception',
         () async {
-      final String? _description = null;
+      final String? description = null;
       expect(
-          () => Mocked().genericError(message: _description),
+          () => Mocked().genericError(message: description),
           throwsA(TypeMatcher<FlagsmithException>().having((s) => s.toString(),
               'correct error description', 'FlagsmithException')));
     });
@@ -87,8 +87,8 @@ void main() {
           throwsA(isA<FlagsmithApiException>()));
     });
     test('When create trait return error', () async {
-      var _user = Identity(identifier: 'test_another_user');
-      final _data = TraitWithIdentity(identity: _user, key: 'age', value: '25');
+      var user = Identity(identifier: 'test_another_user');
+      final data = TraitWithIdentity(identity: user, key: 'age', value: '25');
       fs = setupSyncClientAdapter(StorageType.inMemory);
       await fs.initialize();
       setupAdapter(fs, cb: (config, adapter) {
@@ -100,10 +100,10 @@ void main() {
               error: Exception('404'),
             ),
           );
-        }, data: _data.toJson());
+        }, data: data.toJson());
       });
 
-      expect(() => fs.createTrait(value: _data),
+      expect(() => fs.createTrait(value: data),
           throwsA(isA<FlagsmithApiException>()));
     });
     test('When bulk update traits, then fail', () async {
@@ -118,23 +118,23 @@ void main() {
               error: Exception('404'),
             ),
           );
-        }, data: jsonDecode(bulkTraitUpdateResponse));
+        }, data: jsonDecode(identitiesRequestData));
       });
-      final _user = Identity(identifier: 'test_another_user');
-      final _data = [
+      final user = Identity(identifier: 'test_another_user');
+      final data = [
         TraitWithIdentity(
-          identity: _user,
+          identity: user,
           key: 'age',
           value: '21',
         ),
         TraitWithIdentity(
-          identity: _user,
+          identity: user,
           key: 'age2',
           value: '21',
         )
       ];
 
-      expect(() => fs.updateTraits(value: _data),
+      expect(() => fs.updateTraits(value: data),
           throwsA(isA<FlagsmithApiException>()));
     });
 
@@ -146,32 +146,32 @@ void main() {
           return server.reply(200, null);
         }, data: []);
       });
-      final _response = await fs.updateTraits(value: <TraitWithIdentity>[]);
-      expect(_response, isNull);
+      final response = await fs.updateTraits(value: <TraitWithIdentity>[]);
+      expect(response, isNull);
     });
 
     test('When fetch flags, but data are malformed, then fail', () async {
       fs = setupSyncClientAdapter(StorageType.inMemory);
-      final _flag =
-          Flag.named(feature: Feature.named(name: myFeature), enabled: false);
+      final flag = Flag.named(
+          feature: Feature.named(name: myFeatureName), enabled: false);
       setupEmptyAdapter(fs, cb: (config, adapter) {
-        adapter.onGet(config.flagsURI,
-            (server) => server.reply(200, jsonEncode([_flag])));
+        adapter.onGet(
+            config.flagsURI, (server) => server.reply(200, jsonEncode([flag])));
       });
 
       expect(() => fs.getFeatureFlags(), throwsA(isA<FlagsmithApiException>()));
     });
 
     test('When fetch user flags, but data are malformed, then fail', () async {
-      final _user = Identity(identifier: 'test_another_user');
-      final _data = [
+      final user = Identity(identifier: 'test_another_user');
+      final data = [
         TraitWithIdentity(
-          identity: _user,
+          identity: user,
           key: 'age',
           value: '21',
         ),
         TraitWithIdentity(
-          identity: _user,
+          identity: user,
           key: 'age2',
           value: '21',
         )
@@ -180,11 +180,11 @@ void main() {
       fs = setupSyncClientAdapter(StorageType.inMemory);
       setupEmptyAdapter(fs, cb: (config, adapter) {
         adapter.onGet(config.identitiesURI,
-            (server) => server.reply(200, jsonDecode(jsonEncode([_data]))),
-            queryParameters: _user.toJson());
+            (server) => server.reply(200, jsonDecode(jsonEncode([data]))),
+            queryParameters: user.toJson());
       });
 
-      expect(() => fs.getFeatureFlags(user: _user),
+      expect(() => fs.getFeatureFlags(user: user),
           throwsA(isA<FlagsmithApiException>()));
     });
   });
