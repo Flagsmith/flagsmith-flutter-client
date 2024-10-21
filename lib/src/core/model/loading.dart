@@ -1,0 +1,1 @@
+enum FlagsmithLoading { loading, loaded }

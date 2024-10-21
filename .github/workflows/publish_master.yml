@@ -4,40 +4,25 @@ on:
     tags:
       - "*"
 
+env:
+  FLUTTER_VERSION: '3.x'
+
 jobs:
   analyze:
     runs-on: ubuntu-latest
     name: Dart Analyze
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.x'
-          channel: 'stable'
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
       - run: flutter pub get
       - run: flutter analyze
 
   # TODO https://github.com/Flagsmith/flagsmith-flutter-client/issues/57
 
-  publishing:
-    runs-on: ubuntu-latest
-    container:
-      image: google/dart:latest
-    name: Dart Publish Package
-    needs: analyze
-    steps:
-      - uses: actions/checkout@v1
-      - name: Setup credentials
-        run: |
-          mkdir -p ~/.pub-cache
-          cat <<EOF > ~/.pub-cache/credentials.json
-          {
-            "accessToken":"${{ secrets.OAUTH_ACCESS_TOKEN }}",
-            "refreshToken":"${{ secrets.OAUTH_REFRESH_TOKEN }}",
-            "tokenEndpoint":"https://accounts.google.com/o/oauth2/token",
-            "scopes": [ "openid", "https://www.googleapis.com/auth/userinfo.email" ],
-            "expiration": 1649072931936
-          }
-          EOF
-      - name: Publish package
-        run: pub publish -f
+  publish:
+    permissions:
+      id-token: write
+    uses: dart-lang/setup-dart/.github/workflows/publish.yml@v1

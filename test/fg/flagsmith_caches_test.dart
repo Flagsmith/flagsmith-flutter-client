@@ -14,12 +14,12 @@ void main() {
       fs.close();
     });
     test('When caches not enabled then fail', () async {
-      expect(() => fs.hasCachedFeatureFlag(notImplmentedFeature),
+      expect(() => fs.hasCachedFeatureFlag(notImplementedFeatureName),
           throwsA(isA<FlagsmithConfigException>()));
     });
 
     test('When caches not enabled and get cached flag then fail', () async {
-      expect(() => fs.getCachedFeatureFlagValue(notImplmentedFeature),
+      expect(() => fs.getCachedFeatureFlagValue(notImplementedFeatureName),
           throwsA(isA<FlagsmithConfigException>()));
     });
   });
@@ -35,31 +35,31 @@ void main() {
     });
     test('When caches enabled then enabled', () async {
       await fs.getFeatureFlags();
-      final _value = fs.hasCachedFeatureFlag(notImplmentedFeature);
-      expect(_value, false);
+      final value = fs.hasCachedFeatureFlag(notImplementedFeatureName);
+      expect(value, false);
     });
 
     test('When caches enabled then get value', () async {
       await fs.getFeatureFlags();
-      final _value = fs.hasCachedFeatureFlag(notImplmentedFeature);
-      expect(_value, false);
+      final value = fs.hasCachedFeatureFlag(notImplementedFeatureName);
+      expect(value, false);
 
-      final _flagValue = fs.getCachedFeatureFlagValue('min_version');
-      expect(_flagValue, '2.0.0');
+      final flagValue = fs.getCachedFeatureFlagValue('min_version');
+      expect(flagValue, '2.0.0');
     });
 
     test('When feature flag remove then success', () async {
-      final _featureName = 'my_feature';
+      final featureName = 'my_feature';
       await fs.reset();
 
-      final _current = await fs.hasFeatureFlag(_featureName);
-      expect(_current, true);
+      final current = await fs.hasFeatureFlag(featureName);
+      expect(current, true);
 
-      var result = await fs.removeFeatureFlag(_featureName);
+      var result = await fs.removeFeatureFlag(featureName);
       expect(result, true);
 
-      final _removed = await fs.hasFeatureFlag(_featureName);
-      expect(_removed, false);
+      final removed = await fs.hasFeatureFlag(featureName);
+      expect(removed, false);
     });
 
     test('When cache is not empty', () async {

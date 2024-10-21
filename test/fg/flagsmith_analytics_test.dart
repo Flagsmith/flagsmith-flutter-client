@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flagsmith/flagsmith.dart';
-import 'package:http_mock_adapter/http_mock_adapter.dart';
 import 'package:test/test.dart';
 
 import '../shared.dart';
@@ -10,13 +9,12 @@ import '../shared.dart';
 void main() {
   group('[Analytics] Settings', () {
     late FlagsmithClient fs;
-    late DioAdapter _adapter;
     setUp(() async {
       fs = setupSyncClientAdapter(StorageType.inMemory,
           caches: true, isDebug: true);
       setupAdapter(fs, cb: (config, adapter) {
-        _adapter = adapter;
-        _adapter.onPost(fs.config.analyticsURI, (server) {
+        adapter = adapter;
+        adapter.onPost(fs.config.analyticsURI, (server) {
           return server.reply(200, jsonDecode(analyticsData));
         }, data: jsonDecode(analyticsData));
       });
@@ -67,8 +65,8 @@ void main() {
       await fs.getFeatureFlagValue('my_feature');
       expect(fs.flagAnalytics.containsKey('my_feature'), isTrue);
       expect(fs.flagAnalytics['my_feature'], 2);
-      final _response = await fs.syncAnalyticsData();
-      expect(_response?.statusCode, 200);
+      final response = await fs.syncAnalyticsData();
+      expect(response?.statusCode, 200);
       expect(fs.flagAnalytics.isEmpty, isTrue);
     });
     test('When analytics was sent and failed, then current store is not empty',

@@ -10,16 +10,19 @@ on:
             - reopened
             - ready_for_review
 
+env:
+  FLUTTER_VERSION: '3.x'
+
 jobs:
   analyze:
     runs-on: ubuntu-latest
     name: Dart Analyze
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.x'
-          channel: 'stable'
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
       - run: flutter pub get
       - run: flutter analyze
 
@@ -27,14 +30,13 @@ jobs:
     runs-on: ubuntu-latest
     name: Flutter Test
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - uses: subosito/flutter-action@v2
       with:
-        flutter-version: '3.x'
-        channel: 'stable'
-
+        flutter-version: ${{ env.FLUTTER_VERSION }}
+        channel: stable
     - run: flutter pub get
-    - run: flutter pub test
+    - run: flutter test
 
   # TODO https://github.com/Flagsmith/flagsmith-flutter-client/issues/57
 
@@ -46,8 +48,6 @@ jobs:
     - uses: actions/checkout@v3
     - uses: subosito/flutter-action@v2
       with:
-        flutter-version: '3.x'
-        channel: 'stable'
-
+        flutter-version: ${{ env.FLUTTER_VERSION }}
+        channel: stable
     - run: flutter pub publish --dry-run
-

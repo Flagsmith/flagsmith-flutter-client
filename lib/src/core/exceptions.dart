@@ -38,5 +38,5 @@ class FlagsmithApiException extends DioException {
 /// FlagsmithConfigException
 /// - When client is misconfigured
 class FlagsmithConfigException extends FlagsmithException {
-  FlagsmithConfigException(Exception e) : super(e);
+  FlagsmithConfigException(Exception super.e);
 }

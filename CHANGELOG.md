@@ -1,4 +1,19 @@
 # Changelog
+## [6.0.0]
+
+Breaking Changes:
+
+- Drop Flutter 2 support
+
+Features:
+
+- Support transient identities and traits
+
+Other:
+
+- Integrate `flagsmith_core` and `flagsmith_storage_sharedpreferences`
+- Minor unit test improvements
+
 ## [5.0.1]
 
 - Change the base url to https://edge.api.flagsmith.com/api/v1/

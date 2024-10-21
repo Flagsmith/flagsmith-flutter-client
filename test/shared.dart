@@ -31,9 +31,10 @@ final seeds = [
   Flag.seed('enabled_feature', enabled: true),
   Flag.seed('enabled_value', enabled: true, value: '2.0.0')
 ];
-const notImplmentedFeature = 'not_implemented_flag';
-const myFeature = 'my_feature';
-final fakeMallformedResponse = r'''[
+final notImplementedFeatureName = 'not_implemented_flag';
+final myFeatureName = 'my_feature';
+
+final malformedResponseData = r'''[
     {
         "id": 48540,
         "feature": {
@@ -52,7 +53,8 @@ final fakeMallformedResponse = r'''[
         "feature_segment": null,
     },
 ]''';
-final fakeResponse = r'''[
+
+final flagsResponseData = r'''[
     {
         "id": 48540,
         "feature": {
@@ -531,7 +533,8 @@ final fakeResponse = r'''[
         "feature_segment": null
     }
 ]''';
-final fakeIdentitiesResponse = r'''{
+
+final identitiesResponseData = r'''{
     "flags": [
         {
           "id": 48540,
@@ -682,7 +685,24 @@ final fakeIdentitiesResponse = r'''{
     ]
 }''';
 
-final bulkTraitUpdateResponse = '''{
+final bulkTraitUpdateResponseData = '''[
+  {
+      "identity": {
+          "identifier": "test_another_user"
+      },
+      "trait_key": "age",
+      "trait_value": "21"
+  },
+  {
+    "identity": {
+        "identifier": "test_another_user"
+    },
+    "trait_key": "age2",
+    "trait_value": "21"
+  }
+]''';
+
+final identitiesRequestData = '''{
     "identifier": "test_another_user",
     "traits": [
       {
@@ -704,7 +724,22 @@ final bulkTraitUpdateResponse = '''{
     ]
 }''';
 
-final createTraitRequest = '''{
+final identitiesRequestWithTransientTraitData = '''{
+    "identifier": "test_another_user",
+    "traits": [
+      {
+        "transient": true,
+        "trait_key": "transient_trait",
+        "trait_value": "value"
+      },
+      {
+        "trait_key": "normal_trait",
+        "trait_value": "value"
+      }
+    ]
+}''';
+
+final createTraitRequestData = '''{
   "identifier": "test_another_user"
   "flags":[
     {
@@ -777,10 +812,10 @@ void setupAdapter(FlagsmithClient fs,
   final config = fs.config;
 
   final dioAdapter = DioAdapter(dio: fs.client);
-  dioAdapter.onGet(
-      config.flagsURI, (server) => server.reply(200, jsonDecode(fakeResponse)));
-  dioAdapter.onGet(config.identitiesURI,
-      (server) => server.reply(200, jsonDecode(fakeIdentitiesResponse)));
+  dioAdapter.onGet(config.flagsURI,
+      (server) => server.reply(200, jsonDecode(flagsResponseData)));
+  dioAdapter.onPost(config.identitiesURI,
+      (server) => server.reply(200, jsonDecode(identitiesResponseData)));
 
   if (cb != null) {
     cb(config, dioAdapter);

@@ -17,13 +17,13 @@ void main() {
       fs.close();
     });
     test('When caches not enabled then fail', () async {
-      expect(() => fs.hasCachedFeatureFlag(notImplmentedFeature),
+      expect(() => fs.hasCachedFeatureFlag(notImplementedFeatureName),
           throwsA(isA<FlagsmithConfigException>()));
     });
   });
   group('[Init] streams', () {
-    final _flag =
-        Flag.named(feature: Feature.named(name: myFeature), enabled: false);
+    final flag =
+        Flag.named(feature: Feature.named(name: myFeatureName), enabled: false);
 
     setUp(() async {
       fs = setupSyncClientAdapter(
@@ -31,7 +31,7 @@ void main() {
         isDebug: true,
       );
       setupEmptyAdapter(fs, cb: (config, adapter) {
-        adapter.onGet(config.flagsURI, (server) => server.reply(200, [_flag]));
+        adapter.onGet(config.flagsURI, (server) => server.reply(200, [flag]));
       });
       await fs.initialize();
     });
@@ -39,10 +39,10 @@ void main() {
       fs.close();
     });
     test('When change flag value, stream is updated', () async {
-      final _updated = _flag.copyWith(enabled: true);
-      expect(fs.stream(myFeature), emitsInOrder(<Flag>[_flag, _updated]));
+      final updated = flag.copyWith(enabled: true);
+      expect(fs.stream(myFeatureName), emitsInOrder(<Flag>[flag, updated]));
       await fs.getFeatureFlags(reload: true);
-      await fs.testToggle(myFeature);
+      await fs.testToggle(myFeatureName);
     });
   }, skip: true);
 }

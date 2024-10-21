@@ -5,58 +5,48 @@ import '../shared.dart';
 
 void main() {
   group('[Streams]', () {
-    late FlagsmithClient fs;
+    StorageProvider store = StorageProvider(InMemoryStorage(),
+        password: 'pa5w0rD', logEnabled: true);
     setUp(() async {
-      fs = await setupClientAdapter(StorageType.inMemory, caches: true);
-      setupAdapter(fs, cb: (config, adapter) {});
+      await store.seed(items: seeds);
     });
-    tearDown(() {
-      fs.close();
-    });
-
-    test('Loading state changing during reloading of flags', () async {
-      expect(
-          fs.loading,
-          emitsInOrder(<FlagsmithLoading>[
-            FlagsmithLoading.loading,
-            FlagsmithLoading.loaded
-          ]));
-      await fs.getFeatureFlags(reload: true);
-    });
+    tearDown(() {});
 
     test('Stream successfuly changed when flag was updated', () async {
-      await fs.reset();
-      expect(await fs.isFeatureFlagEnabled(myFeatureName), true);
       expect(
-          fs.stream(myFeatureName),
+          store.stream(myFeatureName),
           emitsInOrder([
-            TypeMatcher<Flag>()
+            const TypeMatcher<Flag>()
                 .having((s) => s.enabled, '$myFeatureName is enabled', true),
-            TypeMatcher<Flag>().having(
+            const TypeMatcher<Flag>().having(
                 (s) => s.enabled, '$myFeatureName is not enabled', false),
           ]));
-      await fs.testToggle(myFeatureName);
+      final toggled = await store.togggleFeature(myFeatureName);
+      expect(toggled, isTrue);
     });
 
     test('Subject value changed when flag was changed.', () async {
-      await fs.reset();
-      expect(await fs.isFeatureFlagEnabled(myFeatureName), true);
-      expect(fs.subject(myFeatureName)?.stream.valueOrNull?.enabled, true);
+      await store.clear();
+      await store.seed(items: seeds);
+      final feature = await store.read(myFeatureName);
+      expect(feature, isNotNull);
+      expect(feature!.enabled, isTrue);
+      expect(store.subject(myFeatureName)?.stream.valueOrNull?.enabled, true);
 
       expect(
-          fs.subject(myFeatureName)?.stream,
+          store.subject(myFeatureName)?.stream,
           emitsInOrder([
-            TypeMatcher<Flag>()
+            const TypeMatcher<Flag>()
                 .having((s) => s.enabled, '$myFeatureName is enabled', true)
                 .having((s) => s.feature.name, 'feature name is $myFeatureName',
                     myFeatureName),
-            TypeMatcher<Flag>()
+            const TypeMatcher<Flag>()
                 .having(
                     (s) => s.enabled, '$myFeatureName is not enabled', false)
                 .having((s) => s.feature.name, 'feature name is $myFeatureName',
                     myFeatureName),
           ]));
-      fs.subject(myFeatureName)?.add(Flag.named(
+      store.subject(myFeatureName)?.add(Flag.named(
           feature: Feature.named(name: myFeatureName), enabled: false));
     });
   });
