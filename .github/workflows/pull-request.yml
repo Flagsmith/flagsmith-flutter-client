@@ -40,7 +40,7 @@ jobs:
 
   # TODO https://github.com/Flagsmith/flagsmith-flutter-client/issues/57
 
-  publishing:
+  publish-dry-run:
     runs-on: ubuntu-latest
     name: Dart Publish Package Test
     needs: tests

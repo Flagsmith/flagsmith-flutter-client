@@ -1,0 +1,44 @@
+name: Analyze, test and publish
+on:
+  push:
+    tags:
+      - "*"
+
+env:
+  FLUTTER_VERSION: '3.x'
+
+jobs:
+  # TODO https://github.com/Flagsmith/flagsmith-flutter-client/issues/57
+  analyze:
+    runs-on: ubuntu-latest
+    name: Dart Analyze
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+      - run: flutter pub get
+      - run: flutter analyze
+
+  publish:
+    permissions:
+      id-token: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+
+      - name: Get pub.dev token
+        uses: actions/github-script@v6
+        with:
+          script: |
+            let pub_token = await core.getIDToken('https://pub.dev')
+            core.exportVariable('PUB_TOKEN', pub_token)
+
+      - name: Publish
+        run: |
+          flutter pub pub token add https://pub.dev --env-var PUB_TOKEN
+          flutter pub publish
