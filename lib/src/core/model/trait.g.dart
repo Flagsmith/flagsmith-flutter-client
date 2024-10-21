@@ -16,9 +16,7 @@ Trait _$TraitFromJson(Map<String, dynamic> json) => Trait(
     );
 
 Map<String, dynamic> _$TraitToJson(Trait instance) {
-  final val = <String, dynamic>{
-    'id': instance.id,
-  };
+  final val = <String, dynamic>{};
 
   void writeNotNull(String key, dynamic value) {
     if (value != null) {
@@ -26,6 +24,7 @@ Map<String, dynamic> _$TraitToJson(Trait instance) {
     }
   }
 
+  writeNotNull('id', instance.id);
   writeNotNull('transient', instance.transient);
   val['trait_key'] = instance.key;
   val['trait_value'] = Trait._toJson(instance.value);

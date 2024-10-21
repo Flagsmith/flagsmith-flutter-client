@@ -30,3 +30,5 @@ dev_dependencies:
   http_mock_adapter: ^0.6.1
   mockito: ^5.4.2
   test_coverage_badge: ^0.3.2
+  build_runner: ^2.4.13
+  json_serializable: ^6.8.0

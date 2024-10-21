@@ -248,8 +248,38 @@ void main() {
           return server.reply(200, null);
         }, data: data.toJson());
       });
-      final result0 = await fs.createTrait(value: data);
-      expect(result0, isNull);
+      final result = await fs.createTrait(value: data);
+      expect(result, isNull);
+    });
+
+    test('When get flags with traits request expected', () async {
+      var user = Identity(identifier: 'test_another_user');
+      var traits = [
+        Trait(key: 'transient_trait', value: 'value', transient: true),
+        Trait(key: 'normal_trait', value: 'value'),
+      ];
+      fs = await setupClientAdapter(StorageType.inMemory);
+      setupEmptyAdapter(fs, cb: (config, adapter) {
+        adapter.onPost(fs.config.identitiesURI, (server) {
+          return server.reply(200, jsonDecode(identitiesResponseData));
+        }, data: jsonDecode(identitiesRequestWithTransientTraitData));
+      });
+      final result = await fs.getFeatureFlags(user: user, traits: traits);
+      expect(result, isNotNull);
+      expect(result, isNotEmpty);
+    });
+
+    test('When get flags for transient identity request expected', () async {
+      var user = Identity(identifier: 'test_another_user', transient: true);
+      fs = await setupClientAdapter(StorageType.inMemory);
+      setupEmptyAdapter(fs, cb: (config, adapter) {
+        adapter.onPost(fs.config.identitiesURI, (server) {
+          return server.reply(200, jsonDecode(identitiesResponseData));
+        }, data: user.toJson());
+      });
+      final result = await fs.getFeatureFlags(user: user);
+      expect(result, isNotNull);
+      expect(result, isNotEmpty);
     });
   });
 }

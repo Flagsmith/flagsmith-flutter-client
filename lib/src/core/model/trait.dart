@@ -7,6 +7,7 @@ part 'trait.g.dart';
 
 @JsonSerializable()
 class Trait {
+  @JsonKey(includeIfNull: false)
   final int? id;
   @JsonKey(includeIfNull: false)
   final bool? transient;

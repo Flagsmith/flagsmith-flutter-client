@@ -401,7 +401,7 @@ class FlagsmithClient {
       cachedUser = user;
       var identityData = user.toJson();
       if (traits != null && traits.isNotEmpty) {
-        identityData['traits'] = traits.map((t) => t.toJson());
+        identityData['traits'] = traits.map((t) => t.toJson()).toList();
       }
 
       var response = await _api.post(config.identitiesURI, data: identityData);

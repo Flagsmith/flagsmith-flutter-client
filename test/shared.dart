@@ -724,6 +724,21 @@ final identitiesRequestData = '''{
     ]
 }''';
 
+final identitiesRequestWithTransientTraitData = '''{
+    "identifier": "test_another_user",
+    "traits": [
+      {
+        "transient": true,
+        "trait_key": "transient_trait",
+        "trait_value": "value"
+      },
+      {
+        "trait_key": "normal_trait",
+        "trait_value": "value"
+      }
+    ]
+}''';
+
 final createTraitRequestData = '''{
   "identifier": "test_another_user"
   "flags":[
