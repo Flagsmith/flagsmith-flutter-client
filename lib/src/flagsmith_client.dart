@@ -166,7 +166,10 @@ class FlagsmithClient {
     } else {
       switch (config.storageType) {
         case StorageType.custom:
-          store = storage!;
+          if (storage == null) {
+            throw FlagsmithConfigException(Exception('When using StorageType.custom, a storage implementation must be provided'));
+          }
+          store = storage;
           break;
         default:
           store = InMemoryStorage();
