@@ -50,7 +50,7 @@ void main() {
             Flag.seed('feature', enabled: true),
           ],
         ),
-        throwsA(isA<Error>()),
+        throwsA(isA<FlagsmithConfigException>()),
       );
     });
 
