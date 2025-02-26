@@ -181,7 +181,6 @@ class FlagsmithClient {
   ///
   ///
   Future<void> initialize() async {
-    storageProvider = prepareStorage(storage: storage, config: config);
     await initStore(seeds: seeds);
   }
 
@@ -198,7 +197,8 @@ class FlagsmithClient {
       config: config,
       apiKey: apiKey,
       seeds: seeds,
-    )..storageProvider = prepareStorage(storage: storage, config: config);
+      storage: storage,
+    );
     await client.initStore(seeds: seeds);
     return client;
   }
