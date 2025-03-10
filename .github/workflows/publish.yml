@@ -3,6 +3,7 @@ on:
   push:
     tags:
       - "*"
+  workflow_dispatch:
 
 env:
   FLUTTER_VERSION: '3.x'
