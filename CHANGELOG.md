@@ -1,4 +1,8 @@
 # Changelog
+## [6.0.1]
+
+- Fix custom storage
+
 ## [6.0.0]
 
 Breaking Changes:
