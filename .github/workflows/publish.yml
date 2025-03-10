@@ -41,4 +41,4 @@ jobs:
       - name: Publish
         run: |
           flutter pub pub token add https://pub.dev --env-var PUB_TOKEN
-          flutter pub publish
+          flutter pub publish --force
