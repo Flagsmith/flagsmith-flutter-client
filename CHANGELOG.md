@@ -1,156 +1,278 @@
-<a id="v6.0.1"></a>
-# [v6.0.1](https://github.com/Flagsmith/flagsmith-flutter-client/releases/tag/v6.0.1) - 2025-03-10
+# Changelog
+## [6.0.1]
 
-## What's Changed
-* fix: Fix custom storage by [@rolodato](https://github.com/rolodato) in [#71](https://github.com/Flagsmith/flagsmith-flutter-client/pull/71)
-* docs: Upgrade example dependencies to match SDK, fix macOS web access by [@rolodato](https://github.com/rolodato) in [#70](https://github.com/Flagsmith/flagsmith-flutter-client/pull/70)
+- Fix custom storage
 
+## [6.0.0]
 
-**Full Changelog**: https://github.com/Flagsmith/flagsmith-flutter-client/compare/v6.0.0...v6.0.1
+Breaking Changes:
 
-[Changes][v6.0.1]
+- Drop Flutter 2 support
 
+Features:
 
-<a id="v6.0.0"></a>
-# [v6.0.0](https://github.com/Flagsmith/flagsmith-flutter-client/releases/tag/v6.0.0) - 2024-10-21
+- Support transient identities and traits
 
-## What's Changed
-* feat!: Support transient identities and traits by [@khvn26](https://github.com/khvn26) in [#65](https://github.com/Flagsmith/flagsmith-flutter-client/pull/65)
+Other:
 
-## New Contributors
-* [@khvn26](https://github.com/khvn26) made their first contribution in [#65](https://github.com/Flagsmith/flagsmith-flutter-client/pull/65)
+- Integrate `flagsmith_core` and `flagsmith_storage_sharedpreferences`
+- Minor unit test improvements
 
-**Full Changelog**: https://github.com/Flagsmith/flagsmith-flutter-client/compare/v5.0.1...v6.0.0
+## [5.0.1]
 
-[Changes][v6.0.0]
+- Change the base url to https://edge.api.flagsmith.com/api/v1/
 
 
-<a id="v5.0.1"></a>
-# [v5.0.1](https://github.com/Flagsmith/flagsmith-flutter-client/releases/tag/v5.0.1) - 2023-10-16
+## [5.0.0]
 
-## What's Changed
-* fix(base_url): Use edge url by [@gagantrivedi](https://github.com/gagantrivedi) in [#61](https://github.com/Flagsmith/flagsmith-flutter-client/pull/61)
+- Realtime flags
 
+## [4.0.0]
 
-**Full Changelog**: https://github.com/Flagsmith/flagsmith-flutter-client/compare/v5.0.0...v5.0.1
+- trait/value: Add support for int,float, bool and string
+- Upgrade [flagsmith_core](https://pub.dev/packages/flagsmith_core)
 
-[Changes][v5.0.1]
+## [3.1.0]
 
+- Upgrade dio
+- Github Workflows improvements
 
-<a id="v5.0.0"></a>
-# [Version 5.0.0 (v5.0.0)](https://github.com/Flagsmith/flagsmith-flutter-client/releases/tag/v5.0.0) - 2023-09-19
+## [3.0.3]
 
-## What's Changed
-* Realtime Updates Implementation by [@jackforesightmobile](https://github.com/jackforesightmobile) in [#59](https://github.com/Flagsmith/flagsmith-flutter-client/pull/59)
+- Upgrade rxdart dependency
 
-## Breaking Changes
-* While we aren't explicitly dropping support for flutter 2.x, this release removes it from our testing cycle and implements dependencies which would need overriding to work with flutter 2.x. 
+## [3.0.2]
 
+- Only call analytics if there are feature evaluations to track
 
-**Full Changelog**: https://github.com/Flagsmith/flagsmith-flutter-client/compare/v4.0.0...v5.0.0
+## [3.0.1]
 
-[Changes][v5.0.0]
+- Expose `reload` option on all methods for retrieving flag information for a user
+- Fix `updateTraits` method following move to edge (which deprecated `/traits/bulk/` endpoint)
 
+## [3.0.0]
 
-<a id="v4.0.0"></a>
-# [v4.0.0](https://github.com/Flagsmith/flagsmith-flutter-client/releases/tag/v4.0.0) - 2023-06-22
+- Update default URL to Edge API.
 
-## What's Changed
-* feat(trait/value)! Add support for int, float,bool and string types by [@gagantrivedi](https://github.com/gagantrivedi) in [#55](https://github.com/Flagsmith/flagsmith-flutter-client/pull/55)
+## [2.3.0]
 
-## New Contributors
-* [@gagantrivedi](https://github.com/gagantrivedi) made their first contribution in [#55](https://github.com/Flagsmith/flagsmith-flutter-client/pull/55)
+- Refactor to rely on https://github.com/Flagsmith/flagsmith-flutter-core
 
-**Full Changelog**: https://github.com/Flagsmith/flagsmith-flutter-client/compare/v3.1.0...v4.0.0
+## [2.2.0-beta.1]- 17/10/2021
 
-[Changes][v4.0.0]
+Features:
 
+- new function **getCachedFeatureFlagValue**
+- adding analytics test, refac. of api request
 
-<a id="v3.1.0"></a>
-# [Version 3.1.0 (v3.1.0)](https://github.com/Flagsmith/flagsmith-flutter-client/releases/tag/v3.1.0) - 2023-03-16
+Fixes:
 
-## What's Changed
-* Update rxdart dependency and bump version number by [@jackforesightmobile](https://github.com/jackforesightmobile) in [#42](https://github.com/Flagsmith/flagsmith-flutter-client/pull/42)
-* Bugfix/lock dio version use working version in example by [@jdde](https://github.com/jdde) in [#46](https://github.com/Flagsmith/flagsmith-flutter-client/pull/46)
-* Workflows improvements by [@matthewelwell](https://github.com/matthewelwell) in [#49](https://github.com/Flagsmith/flagsmith-flutter-client/pull/49)
-* Don't run publish test on PRs from forks by [@matthewelwell](https://github.com/matthewelwell) in [#51](https://github.com/Flagsmith/flagsmith-flutter-client/pull/51)
-* Migrate on dio5 by [@dkrutskikh](https://github.com/dkrutskikh) in [#48](https://github.com/Flagsmith/flagsmith-flutter-client/pull/48)
-* Release version 3.1.0 by [@matthewelwell](https://github.com/matthewelwell) in [#52](https://github.com/Flagsmith/flagsmith-flutter-client/pull/52)
+- cancel timer on close
+- reloading of caches
 
-## New Contributors
-* [@jdde](https://github.com/jdde) made their first contribution in [#46](https://github.com/Flagsmith/flagsmith-flutter-client/pull/46)
-* [@dkrutskikh](https://github.com/dkrutskikh) made their first contribution in [#48](https://github.com/Flagsmith/flagsmith-flutter-client/pull/48)
+## [2.2.0-beta.0]- 13/10/2021
 
-**Full Changelog**: https://github.com/Flagsmith/flagsmith-flutter-client/compare/v3.0.3...v3.1.0
+Features:
 
-[Changes][v3.1.0]
+- [Flag Analytics](https://docs.flagsmith.com/advanced-use/flag-analytics)
 
+## [2.1.0-alpha.0]- 24/09/2021
 
-<a id="v3.0.3"></a>
-# [Version 3.0.3 (v3.0.3)](https://github.com/Flagsmith/flagsmith-flutter-client/releases/tag/v3.0.3) - 2023-03-15
+Fixes:
 
-## What's Changed
-* Updated example app to use new storage plugin by [@jackforesightmobile](https://github.com/jackforesightmobile) in [#40](https://github.com/Flagsmith/flagsmith-flutter-client/pull/40)
+- adding support for flutter web with pana score
 
+### Breaking Changes
 
-**Full Changelog**: https://github.com/Flagsmith/flagsmith-flutter-client/compare/v3.0.2...v3.0.3
+- storage was moved to the separate package
+- [flagsmith_core](https://pub.dev/packages/flagsmith_core) is a new package with models and storage implementation
+- persistent storage is available as custom package
+  [flagsmith_storage_sharedpreferences](https://pub.dev/packages/flagsmith_storage_sharedpreferences)
 
-[Changes][v3.0.3]
+## [2.0.1+2]- 20/08/2021
 
+Fixes:
 
-<a id="v3.0.2"></a>
-# [Version 3.0.2 (v3.0.2)](https://github.com/Flagsmith/flagsmith-flutter-client/releases/tag/v3.0.2) - 2023-03-15
+- removing isolate
 
-## What's Changed
-* Now only making analytics call if there is a value greater than 0 in … by [@jackforesightmobile](https://github.com/jackforesightmobile) in [#37](https://github.com/Flagsmith/flagsmith-flutter-client/pull/37)
-* Release 3.0.2 by [@matthewelwell](https://github.com/matthewelwell) in [#38](https://github.com/Flagsmith/flagsmith-flutter-client/pull/38)
+## [2.0.1+1]- 20/08/2021
 
+Fixes:
 
-**Full Changelog**: https://github.com/Flagsmith/flagsmith-flutter-client/compare/v3.0.1...v3.0.2
+- adding support for flutter web
 
-[Changes][v3.0.2]
+## [2.0.1]- 09/08/2021
 
+Breaking Changes:
 
-<a id="v3.0.1"></a>
-# [Version 3.0.1 (v3.0.1)](https://github.com/Flagsmith/flagsmith-flutter-client/releases/tag/v3.0.1) - 2022-06-14
+- removing async update from constructor (anti-pattern)
+- removing FlagsmithException(type) and replacing with
+- FlagsmithApiException
+- FlagsmithConfigException
+- FlagsmithFormatException
+- FlagsmithException
 
-## What's Changed
-* Allow users to configure the reload argument on all methods by [@matthewelwell](https://github.com/matthewelwell) in [#32](https://github.com/Flagsmith/flagsmith-flutter-client/pull/32)
-* Changed updateTraits method to use new endpoint, fixed unit tests. by [@jackforesightmobile](https://github.com/jackforesightmobile) in [#33](https://github.com/Flagsmith/flagsmith-flutter-client/pull/33)
-* Version bump 3.0.1 by [@matthewelwell](https://github.com/matthewelwell) in [#34](https://github.com/Flagsmith/flagsmith-flutter-client/pull/34)
+Features:
 
+- response conversion in isolate
+- adding json_serializable dependency
+- support for
 
-**Full Changelog**: https://github.com/Flagsmith/flagsmith-flutter-client/compare/v3.0.0...v3.0.1
+### Fixes
 
-[Changes][v3.0.1]
+- fixing InMemoryStorage return values instead of exceptions
+- fixing update caches
+- fixing name conversion
+- adding missing tests
 
+## [2.0.0]- 06/20/2021
 
-<a id="v3.0.0"></a>
-# [Version 3.0.0 (v3.0.0)](https://github.com/Flagsmith/flagsmith-flutter-client/releases/tag/v3.0.0) - 2022-06-07
+- first official null-safety release of Flagsmith SDK for Flutter
+- expose Dio client `FlagsmithClient.client`
 
+## [2.0.0-nullsafety.1]- 06/17/2021
 
+- remove reliance on `type` attribute of feature
+- minor fixes to example app
+- FeatureUser replaced by Identity model
+- new Trait function for create / bulk
+- fixing example app
 
-[Changes][v3.0.0]
+## [2.0.0-nullsafety.0]- 03/27/2021
 
+- init version of nullsafety version
 
-<a id="v1.0.1"></a>
-# [Flagsmith (v1.0.1)](https://github.com/Flagsmith/flagsmith-flutter-client/releases/tag/v1.0.1) - 2021-03-29
+## [1.1.0]- 14/04/2021
 
+- remove reliance on type attribute of feature
+- minor fixes to example app
 
+## [1.0.1]- 03/27/2021
 
-[Changes][v1.0.1]
+- minor update
 
+## [1.0.0-prev.0]- 03/27/2021
 
-[v6.0.1]: https://github.com/Flagsmith/flagsmith-flutter-client/compare/v6.0.0...v6.0.1
-[v6.0.0]: https://github.com/Flagsmith/flagsmith-flutter-client/compare/v5.0.1...v6.0.0
-[v5.0.1]: https://github.com/Flagsmith/flagsmith-flutter-client/compare/v5.0.0...v5.0.1
-[v5.0.0]: https://github.com/Flagsmith/flagsmith-flutter-client/compare/v4.0.0...v5.0.0
-[v4.0.0]: https://github.com/Flagsmith/flagsmith-flutter-client/compare/v3.1.0...v4.0.0
-[v3.1.0]: https://github.com/Flagsmith/flagsmith-flutter-client/compare/v3.0.3...v3.1.0
-[v3.0.3]: https://github.com/Flagsmith/flagsmith-flutter-client/compare/v3.0.2...v3.0.3
-[v3.0.2]: https://github.com/Flagsmith/flagsmith-flutter-client/compare/v3.0.1...v3.0.2
-[v3.0.1]: https://github.com/Flagsmith/flagsmith-flutter-client/compare/v3.0.0...v3.0.1
-[v3.0.0]: https://github.com/Flagsmith/flagsmith-flutter-client/compare/v1.0.1...v3.0.0
-[v1.0.1]: https://github.com/Flagsmith/flagsmith-flutter-client/tree/v1.0.1
+_Bullet train client_ is **Flagsmith**
 
-<!-- Generated by https://github.com/rhysd/changelog-from-release v3.9.0 -->
+- rebranding to **_Flagsmith_**
+- `isDebug` logs exceptions to console with prefix _Flagsmith:_.
+
+Client:
+
+- adding `client.loading` stream [loading] [loaded] for detection api request state
+- adding `FlagsmithClient({ bool update = false})` for update from api directly after init
+- adding async init
+  `FlagsmithClient.init({FlagsmithConfig config = const FlagsmithConfig(),@required String apiKey,List<Flag> seeds,bool update = false})`
+- adding `Flag.seed(String featureName, {bool enabled, String value})`
+
+Config:
+
+- adding `caches` with default value `false`
+- adding caches to client and new `bool hasCachedFeatureFlag(String featureName, {FeatureUser user})`
+
+## [0.1.5]- 11/26/2020
+
+- fix getFeatureFlagValue
+
+## [0.1.4]- 10/26/2020
+
+- replace imports for using models in integration tests
+
+## [0.1.3]- 10/21/2020
+
+- fixing seed function
+- extending default values for timeouts
+
+## [0.1.2]- 010/04/2020
+
+- adding new attr to config `isSelfSigned` for overriding self-signed cert issues
+
+## [0.1.1]- 09/24/2020
+
+- adding support for streams from storage
+- breaking change in storing values
+- implementing equatable
+- config: new isDebug attr for toggle logging to console
+
+## [0.1.0+2]- 09/22/2020
+
+- rxdart range
+
+## [0.1.0+1]- 09/21/2020
+
+- minor fixes
+
+## [0.1.0]- 09/21/2020
+
+- securing storages
+- change persistent storage
+- changing config attributes for storage
+- minor fixes
+
+## [0.0.4+3]- 09/15/2020
+
+- added missing initial value field in Feature
+
+## [0.0.4+2]- 09/12/2020
+
+- dependency package
+
+## [0.0.4+1]- 09/12/2020
+
+- path as a parameter in Persistent storage
+
+## [0.0.4+0]- 09/12/2020
+
+- removed freezed from library
+- removed dio logging interceptor
+- removed builder
+- fixing persistent storage
+- full page example
+
+## [0.0.3+1]- 09/11/2020
+
+- switch to pedantic
+
+## [0.0.3]- 09/11/2020
+
+- Reading from InMemoryStorage
+- Added persistent storage
+- Handling errors with custom Exception
+- fixing freezed issue
+
+## [0.0.2+6]- 09/10/2020
+
+- Reading from InMemoryStorage
+- Added persistent storage
+- Handling errors with custom Exception
+- fixing freezed issue
+
+## [0.0.2+5]- 09/08/2020
+
+- Fixing readme
+
+## [0.0.2+4]- 09/08/2020
+
+- Fixing dartfm
+
+## [0.0.2+3]- 09/08/2020
+
+- Fixing control_flow_in_finally
+
+## [0.0.2+2]- 09/08/2020
+
+- Fixing flutter web support
+
+## [0.0.2+1]- 09/08/2020
+
+- Updated readme
+
+## [0.0.2]- 09/08/2020
+
+- Added unit tests
+- Fixed user and traits
+
+## [0.0.1]- 09/07/2020
+
+- TODO: Describe the initial release.
