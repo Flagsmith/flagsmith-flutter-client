@@ -1,5 +1,7 @@
-import '../flagsmith.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
+
+import '../flagsmith.dart';
 
 /// Default definition of connection to API
 class FlagsmithConfig {
@@ -76,6 +78,6 @@ class FlagsmithConfig {
         baseUrl: baseURI,
         connectTimeout: Duration(milliseconds: connectTimeout),
         receiveTimeout: Duration(milliseconds: receiveTimeout),
-        sendTimeout: Duration(milliseconds: sendTimeout),
+        sendTimeout: kIsWeb ? null : Duration(milliseconds: sendTimeout),
       );
 }
