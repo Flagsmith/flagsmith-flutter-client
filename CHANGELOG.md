@@ -1,18 +1,15 @@
 # Changelog
 
-## [6.0.3](https://github.com/Flagsmith/flagsmith-flutter-client/compare/v6.0.2...v6.0.3) (2025-07-08)
-
-
-### Bug Fixes
-
-* Prevent dio warning logs on Web
-
 ## [6.0.2](https://github.com/Flagsmith/flagsmith-flutter-client/compare/v6.0.1...v6.0.2) (2025-07-07)
 
 
 ### CI
 
 * add release please configuration ([#75](https://github.com/Flagsmith/flagsmith-flutter-client/issues/75)) ([6583788](https://github.com/Flagsmith/flagsmith-flutter-client/commit/6583788bb649c424f213ffefe0ab3256e687dc5e))
+
+
+### Bug Fixes
+* Prevent dio warning logs on Web
 
 ## [6.0.1]
 
