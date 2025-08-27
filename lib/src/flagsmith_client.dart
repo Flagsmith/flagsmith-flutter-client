@@ -578,11 +578,10 @@ class FlagsmithClient {
   ///
   Future<bool> testToggle(String featureName) async {
     final result = await storageProvider.togggleFeature(featureName);
-    final value = await storageProvider.read(featureName);
     if (config.caches) {
-      _flags.removeWhere((key, _) => key == featureName);
+      final value = await storageProvider.read(featureName);
       if (value != null) {
-        _flags[value.feature.name] = value;
+        _flags[featureName] = value;
       }
     }
     return result;
