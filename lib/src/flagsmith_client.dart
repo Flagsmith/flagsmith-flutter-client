@@ -356,7 +356,7 @@ class FlagsmithClient {
   Future<bool> removeFeatureFlag(String featureName) async {
     var result = await storageProvider.delete(featureName);
     if (config.caches) {
-      _flags.removeWhere((key, _) => key == featureName);
+      _flags.remove(featureName);
     }
     return result;
   }
