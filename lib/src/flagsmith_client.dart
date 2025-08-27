@@ -541,14 +541,8 @@ class FlagsmithClient {
     if (!config.caches) {
       return;
     }
-    final newData = <String, Flag>{};
-    for (var element in list) {
-      newData[element.feature.name] = element;
-    }
-
-    _flags
-      ..clear()
-      ..addAll(newData);
+    _flags.clear();
+    _flags.addEntries(list.map((flag) => MapEntry(flag.feature.name, flag)));
   }
 
   /// clear all data from storage
