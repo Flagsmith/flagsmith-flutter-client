@@ -1,5 +1,17 @@
 # Changelog
 
+## [6.0.3](https://github.com/Flagsmith/flagsmith-flutter-client/compare/v6.0.2...v6.0.3) (2025-08-28)
+
+
+### Refactoring
+
+* Improve local cache speed ([#68](https://github.com/Flagsmith/flagsmith-flutter-client/issues/68)) ([2f9a6d9](https://github.com/Flagsmith/flagsmith-flutter-client/commit/2f9a6d9e3862db1f22990228c081e575e9df0f8b))
+
+
+### Other
+
+* add root CODEOWNERS ([#80](https://github.com/Flagsmith/flagsmith-flutter-client/issues/80)) ([3c74420](https://github.com/Flagsmith/flagsmith-flutter-client/commit/3c74420a321eee54331747f24197a06da7929acc))
+
 ## [6.0.2](https://github.com/Flagsmith/flagsmith-flutter-client/compare/v6.0.1...v6.0.2) (2025-07-07)
 
 
