@@ -57,6 +57,7 @@ void main() {
 
       var result = await fs.removeFeatureFlag(featureName);
       expect(result, true);
+      expect(fs.cachedFlags.containsKey(featureName), false);
 
       final removed = await fs.hasFeatureFlag(featureName);
       expect(removed, false);
