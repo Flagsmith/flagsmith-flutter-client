@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.1.0](https://github.com/Flagsmith/flagsmith-flutter-client/compare/v6.0.3...v6.1.0) (2025-11-07)
+
+
+### Features
+
+* add User-Agent header with SDK version ([#85](https://github.com/Flagsmith/flagsmith-flutter-client/issues/85)) ([38bdc83](https://github.com/Flagsmith/flagsmith-flutter-client/commit/38bdc83a2940b55f1c0107f94101d138097e0c02)), closes [#82](https://github.com/Flagsmith/flagsmith-flutter-client/issues/82)
+
 ## [6.0.3](https://github.com/Flagsmith/flagsmith-flutter-client/compare/v6.0.2...v6.0.3) (2025-08-28)
 
 
