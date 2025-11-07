@@ -8,6 +8,7 @@ import 'package:flutter_client_sse/flutter_client_sse.dart';
 import 'package:rxdart/subjects.dart';
 
 import '../flagsmith.dart';
+import 'version.dart';
 
 /// Flagsmith client initialization
 ///
@@ -233,6 +234,7 @@ class FlagsmithClient {
     var dio = Dio(config.clientOptions)
       ..options.headers[authHeader] = apiKey
       ..options.headers[acceptHeader] = applicationJson
+      ..options.headers[userAgentHeader] = getUserAgent()
       ..options.followRedirects = true;
 
     if (config.isDebug) {
