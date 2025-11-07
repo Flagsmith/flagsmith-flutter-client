@@ -19,7 +19,7 @@ void main() {
 
     test('Should set User-Agent header with correct SDK version', () {
       // x-release-please-start-version
-      final expectedVersion = '6.0.3';
+      final expectedVersion = '6.1.0';
       // x-release-please-end
       
       final userAgent = fs.client.options.headers[FlagsmithClient.userAgentHeader];
