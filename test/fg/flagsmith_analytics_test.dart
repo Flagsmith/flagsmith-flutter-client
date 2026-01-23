@@ -69,7 +69,7 @@ void main() {
       expect(response?.statusCode, 200);
       expect(fs.flagAnalytics.isEmpty, isTrue);
     });
-    test('When analytics was sent and failed, then current store is not empty',
+    test('When analytics sync fails due to network error, it does not throw and preserves data',
         () async {
       setupEmptyAdapter(fs, cb: (config, adapter) {
         adapter.onPost(fs.config.analyticsURI, (server) {
@@ -86,9 +86,8 @@ void main() {
       await fs.getFeatureFlagValue('my_feature');
       expect(fs.flagAnalytics.containsKey('my_feature'), isTrue);
       expect(fs.flagAnalytics['my_feature'], 2);
-      expect(
-          () => fs.syncAnalyticsData(), throwsA(isA<FlagsmithApiException>()));
-
+      final response = await fs.syncAnalyticsData();
+      expect(response, isNull);
       expect(fs.flagAnalytics.isEmpty, isFalse);
     });
   });
