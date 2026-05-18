@@ -20,7 +20,7 @@ dependencies:
   rxdart: ^0.28.0
   shared_preferences: ^2.3.2
   json_annotation: ^4.9.0
-  encrypt: ^5.0.3
+  pointycastle: ^4.0.0
   crypto: ^3.0.6
 dev_dependencies:
   test: ^1.24.6
