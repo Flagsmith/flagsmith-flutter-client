@@ -1,5 +1,13 @@
 # Changelog
 
+## [6.1.1](https://github.com/Flagsmith/flagsmith-flutter-client/compare/v6.1.0...v6.1.1) (2026-05-18)
+
+
+### Other
+
+* Drop archived 'encrypt' dep, use pointycastle directly ([#92](https://github.com/Flagsmith/flagsmith-flutter-client/issues/92)) ([6bcd7e8](https://github.com/Flagsmith/flagsmith-flutter-client/commit/6bcd7e8d3680097f9418009ba461d2f3ab666ea2))
+* Remove amannn/action-semantic-pull-request workflow ([#88](https://github.com/Flagsmith/flagsmith-flutter-client/issues/88)) ([de261f6](https://github.com/Flagsmith/flagsmith-flutter-client/commit/de261f67f0a40ee58f5990cd65866f7a72dd7264))
+
 ## [6.1.0](https://github.com/Flagsmith/flagsmith-flutter-client/compare/v6.0.3...v6.1.0) (2025-11-07)
 
 
