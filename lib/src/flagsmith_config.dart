@@ -27,6 +27,11 @@ class FlagsmithConfig {
   final String realtimeUpdatesBaseURI;
   final int reconnectToSSEInterval;
 
+  final bool enableEvents;
+  final String eventsURI;
+  final int eventsFlushInterval;
+  final int eventsMaxBuffer;
+
   /// Flagsmith config initialization
   /// change only if you have self-hosted Flagsmith
   /// [baseURI], [flagsURI], [identitiesURI], [traitsURI], [analyticsURI]
@@ -51,6 +56,9 @@ class FlagsmithConfig {
   /// If you would like to use realtime updates, set [enableRealtimeUpdates] to *true*
   ///
   /// You can configure the realtime updates source URL by setting the [realtimeUpdatesBaseURI] parameter
+  ///
+  /// Set [enableEvents] to *true* to batch experiment events to [eventsURI],
+  /// flushed every [eventsFlushInterval] ms or at [eventsMaxBuffer] events
 
   const FlagsmithConfig({
     this.baseURI = 'https://edge.api.flagsmith.com/api/v1/',
@@ -71,6 +79,10 @@ class FlagsmithConfig {
     this.realtimeUpdatesBaseURI =
         'https://realtime.flagsmith.com/sse/environments/',
     this.reconnectToSSEInterval = 29000,
+    this.enableEvents = false,
+    this.eventsURI = 'https://events.api.flagsmith.com/',
+    this.eventsFlushInterval = 10000,
+    this.eventsMaxBuffer = 1000,
   });
 
   /// Client options from config

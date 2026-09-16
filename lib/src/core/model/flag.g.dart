@@ -16,14 +16,30 @@ Flag _$FlagFromJson(Map<String, dynamic> json) => Flag(
       environment: (json['environment'] as num?)?.toInt(),
       identity: (json['identity'] as num?)?.toInt(),
       featureSegment: (json['feature_segment'] as num?)?.toInt(),
+      variant: json['variant'] as String?,
+      reason: json['reason'] as String?,
+      experiment: experimentFromMetadata(json['metadata']),
     );
 
-Map<String, dynamic> _$FlagToJson(Flag instance) => <String, dynamic>{
-      'id': instance.id,
-      'feature': instance.feature.toJson(),
-      'feature_state_value': stringToJson(instance.stateValue),
-      'enabled': instance.enabled,
-      'environment': instance.environment,
-      'identity': instance.identity,
-      'feature_segment': instance.featureSegment,
-    };
+Map<String, dynamic> _$FlagToJson(Flag instance) {
+  final val = <String, dynamic>{
+    'id': instance.id,
+    'feature': instance.feature.toJson(),
+    'feature_state_value': stringToJson(instance.stateValue),
+    'enabled': instance.enabled,
+    'environment': instance.environment,
+    'identity': instance.identity,
+    'feature_segment': instance.featureSegment,
+    'variant': instance.variant,
+    'reason': instance.reason,
+  };
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('metadata', experimentToMetadata(instance.experiment));
+  return val;
+}
