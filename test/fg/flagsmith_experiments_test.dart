@@ -147,11 +147,46 @@ void main() {
       expect(fs.eventProcessor!.buffer, isEmpty);
     });
 
-    test('When user param is given, then it wins over cachedUser', () async {
-      await fs.getExperimentFlag(experimentFeatureName,
+    test('When user param is given, then its flags are fetched and it wins',
+        () async {
+      // other_user gets a different variant from the server than user_42.
+      final identityPosts = <String>[];
+      fs.client.interceptors.add(InterceptorsWrapper(onRequest: (o, h) {
+        if (o.path == fs.config.identitiesURI) {
+          final id = (o.data as Map)['identifier'] as String;
+          identityPosts.add(id);
+          if (id == 'other_user') {
+            final body = jsonDecode(identitiesResponseData);
+            for (final f in body['flags'] as List) {
+              if (f['feature']['name'] == experimentFeatureName) {
+                f['variant'] = 'treatment-b';
+              }
+            }
+            h.resolve(Response(requestOptions: o, statusCode: 200, data: body));
+            return;
+          }
+        }
+        h.next(o);
+      }));
+
+      final flag = await fs.getExperimentFlag(experimentFeatureName,
           user: const Identity(identifier: 'other_user'));
-      expect(fs.eventProcessor!.buffer.single['identifier'], 'other_user');
+
+      expect(identityPosts, ['other_user'],
+          reason: 'must fetch B, not reuse A');
+      expect(flag!.variant, 'treatment-b');
+      final event = fs.eventProcessor!.buffer.single;
+      expect(event['identifier'], 'other_user');
+      expect(event['value'], 'treatment-b');
       expect(fs.cachedUser?.identifier, 'other_user');
+    });
+
+    test('When user param is given with reload false, then storage is used',
+        () async {
+      final flag = await fs.getExperimentFlag(experimentFeatureName,
+          user: const Identity(identifier: 'other_user'), reload: false);
+      expect(flag!.variant, experimentVariant);
+      expect(fs.eventProcessor!.buffer.single['identifier'], 'other_user');
     });
 
     test('When called twice in a window, then exposure is deduped', () async {

@@ -182,7 +182,8 @@ class FlagsmithClient {
       switch (config.storageType) {
         case StorageType.custom:
           if (storage == null) {
-            throw FlagsmithConfigException(Exception('When using StorageType.custom, a storage implementation must be provided'));
+            throw FlagsmithConfigException(Exception(
+                'When using StorageType.custom, a storage implementation must be provided'));
           }
           store = storage;
           break;
@@ -364,6 +365,10 @@ class FlagsmithClient {
   /// Resolve a flag for [user] (or [cachedUser]) and fire one `$flag_exposure`
   /// event with the variant as value. Skipped unless events are enabled, the
   /// flag is enabled and `flag.experiment.inExperiment` is true.
+  ///
+  /// When [user] is supplied the flags are fetched for that identity unless
+  /// [reload] is explicitly false, so the exposure never reuses another
+  /// identity's stored assignment. Without [user], stored flags are used.
   Future<Flag?> getExperimentFlag(String featureName,
       {Identity? user, List<Trait>? traits, bool? reload}) async {
     final identity = user ?? cachedUser;
@@ -371,9 +376,9 @@ class FlagsmithClient {
       cachedUser = identity;
     }
     final flags = await getFeatureFlags(
-        user: identity, traits: traits, reload: reload ?? false);
-    final flag =
-        flags.firstWhereOrNull((element) => element.feature.name == featureName);
+        user: identity, traits: traits, reload: reload ?? (user != null));
+    final flag = flags
+        .firstWhereOrNull((element) => element.feature.name == featureName);
     _incrementFlagAnalytics(flag);
 
     if (_eventProcessor == null) {
@@ -419,7 +424,7 @@ class FlagsmithClient {
           event,
           'event',
           r'event names starting with "$" are reserved; '
-          'use trackExposureEvent to record an exposure');
+              'use trackExposureEvent to record an exposure');
     }
     final processor = _eventProcessor;
     if (processor == null) {
