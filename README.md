@@ -43,8 +43,11 @@ Anything else is logged and skipped, so it is safe to call against environments 
 If you evaluate in one place and render in another, call `trackExposureEvent` at the point of display instead:
 
 ```dart
-flagsmith.trackExposureEvent('checkout_button', value: flag.variant,
-    metadata: {'experiment_id': flag.experiment!.id});
+final experiment = flag?.experiment;
+if (flag != null && experiment != null) {
+  flagsmith.trackExposureEvent('checkout_button',
+      value: flag.variant, metadata: {'experiment_id': experiment.id});
+}
 ```
 
 Exposures are deduplicated per identity and variant within a flush window, so recording one more than once is safe.

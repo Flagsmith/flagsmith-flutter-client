@@ -459,6 +459,56 @@ void main() {
       expect(p.buffer.single['event'], 'second');
     });
 
+    test('When max-buffer flush is in flight, then flush awaits its POST',
+        () async {
+      var responses = 0;
+      dio.interceptors.add(InterceptorsWrapper(onResponse: (r, h) {
+        responses++;
+        h.next(r);
+      }));
+      adapter.onPost(eventsEndpoint, (server) {
+        server.reply(200, <String, dynamic>{},
+            delay: const Duration(milliseconds: 80));
+      }, data: Matchers.any);
+
+      final p = EventProcessor(
+          api: dio,
+          apiKey: apiKey,
+          eventsURI: 'https://events.api.flagsmith.com',
+          maxBuffer: 1,
+          flushInterval: 0);
+      p.trackEvent(event: 'auto');
+      expect(p.buffer, isEmpty, reason: 'max buffer triggered a flush');
+      expect(responses, 0);
+
+      await p.flush();
+
+      expect(responses, 1, reason: 'flush must wait for the in-flight POST');
+    });
+
+    test('When timer flush is in flight, then flush awaits its POST', () async {
+      var responses = 0;
+      dio.interceptors.add(InterceptorsWrapper(onResponse: (r, h) {
+        responses++;
+        h.next(r);
+      }));
+      adapter.onPost(eventsEndpoint, (server) {
+        server.reply(200, <String, dynamic>{},
+            delay: const Duration(milliseconds: 80));
+      }, data: Matchers.any);
+
+      final p = processor(flushInterval: 20)..start();
+      p.trackEvent(event: 'timed');
+      await Future<void>.delayed(const Duration(milliseconds: 40));
+      expect(p.buffer, isEmpty, reason: 'timer flushed the buffer');
+      expect(responses, 0);
+
+      p.stop();
+      await p.flush();
+
+      expect(responses, 1);
+    });
+
     test('When stop is called, then timer cancelled and buffer flushed',
         () async {
       adapter.onPost(eventsEndpoint, (server) {

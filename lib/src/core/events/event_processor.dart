@@ -26,6 +26,7 @@ class EventProcessor {
 
   final List<Map<String, dynamic>> _buffer = [];
   final Set<String> _dedupeKeys = {};
+  final Set<Future<void>> _inFlight = {};
   Timer? _timer;
 
   EventProcessor({
@@ -124,15 +125,20 @@ class EventProcessor {
     }
   }
 
-  /// Never throws.
+  /// Posts the buffered events and waits for every upload still in flight,
+  /// including ones started by the timer or the max-buffer trigger, so that
+  /// awaiting it at teardown means the POSTs have completed. Never throws.
   Future<void> flush() async {
-    if (_buffer.isEmpty) {
-      return;
+    if (_buffer.isNotEmpty) {
+      final events = List<Map<String, dynamic>>.from(_buffer);
+      _buffer.clear();
+      _dedupeKeys.clear();
+      late final Future<void> upload;
+      upload =
+          _postBatch(events, 0).whenComplete(() => _inFlight.remove(upload));
+      _inFlight.add(upload);
     }
-    final events = List<Map<String, dynamic>>.from(_buffer);
-    _buffer.clear();
-    _dedupeKeys.clear();
-    await _postBatch(events, 0);
+    await Future.wait(_inFlight.toList());
   }
 
   void start() {
