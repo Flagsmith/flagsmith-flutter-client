@@ -93,7 +93,15 @@ class EventProcessor {
   }) {
     final stringValue = value == null ? null : '$value';
     if (dedupe) {
-      final key = jsonEncode([event, featureName, identifier, stringValue]);
+      // Experiment id is part of the key so a new experiment on the same flag
+      // and variant within one flush window still records its own exposure.
+      final key = jsonEncode([
+        event,
+        featureName,
+        identifier,
+        stringValue,
+        metadata?['experiment_id']
+      ]);
       if (_dedupeKeys.contains(key)) {
         return;
       }
@@ -143,7 +151,8 @@ class EventProcessor {
     unawaited(flush());
   }
 
-  Future<void> _postBatch(List<Map<String, dynamic>> events, int attempt) async {
+  Future<void> _postBatch(
+      List<Map<String, dynamic>> events, int attempt) async {
     try {
       final response = await _api.post<dynamic>(
         endpoint,

@@ -52,10 +52,8 @@ Future<(FlagsmithClient, EventsCapture)> buildClient({
     }, data: Matchers.any);
     adapter.onPost(eventsEndpoint, (server) {
       if (eventsFail) {
-        server.throws(
-            500,
-            DioException(
-                requestOptions: RequestOptions(path: eventsEndpoint)));
+        server.throws(500,
+            DioException(requestOptions: RequestOptions(path: eventsEndpoint)));
         return;
       }
       server.reply(200, <String, dynamic>{});
@@ -269,6 +267,21 @@ void main() {
       expect(fs.eventProcessor!.buffer.length, 3);
       expect(fs.eventProcessor!.buffer.first['event'], r'$flag_exposure');
     });
+
+    test(
+        'When same variant is exposed under a new experiment, then not deduped',
+        () {
+      fs.trackExposureEvent(experimentFeatureName,
+          value: 'treatment-a', metadata: {'experiment_id': 42});
+      fs.trackExposureEvent(experimentFeatureName,
+          value: 'treatment-a', metadata: {'experiment_id': 42});
+      fs.trackExposureEvent(experimentFeatureName,
+          value: 'treatment-a', metadata: {'experiment_id': 43});
+      fs.trackExposureEvent(experimentFeatureName, value: 'treatment-a');
+      expect(
+          fs.eventProcessor!.buffer.map((e) => e['metadata']['experiment_id']),
+          [42, 43, null]);
+    });
   });
 
   group('[Experiments] flush', () {
@@ -397,7 +410,8 @@ void main() {
     test('When events tracked during a flush, then they wait for the next one',
         () async {
       adapter.onPost(eventsEndpoint, (server) {
-        server.reply(200, <String, dynamic>{}, delay: const Duration(milliseconds: 30));
+        server.reply(200, <String, dynamic>{},
+            delay: const Duration(milliseconds: 30));
       }, data: Matchers.any);
 
       final p = processor();
