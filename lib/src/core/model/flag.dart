@@ -4,6 +4,7 @@ import '../extensions/converters.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'dart:math';
 
+import 'experiment.dart';
 import 'feature.dart';
 part 'flag.g.dart';
 
@@ -21,6 +22,17 @@ class Flag {
   final int? identity;
   @JsonKey(name: 'feature_segment')
   final int? featureSegment;
+
+  final String? variant;
+  final String? reason;
+
+  /// Lifted from `metadata.experiment`; null unless an experiment is running.
+  @JsonKey(
+      name: 'metadata',
+      fromJson: experimentFromMetadata,
+      toJson: experimentToMetadata,
+      includeIfNull: false)
+  final Experiment? experiment;
   Flag(
       {this.id,
       required this.feature,
@@ -28,7 +40,10 @@ class Flag {
       this.enabled,
       this.environment,
       this.identity,
-      this.featureSegment});
+      this.featureSegment,
+      this.variant,
+      this.reason,
+      this.experiment});
 
   String get key => feature.name;
   @override
@@ -45,7 +60,10 @@ class Flag {
           bool? enabled,
           int? environment,
           int? identity,
-          int? featureSegment}) =>
+          int? featureSegment,
+          String? variant,
+          String? reason,
+          Experiment? experiment}) =>
       Flag(
         id: id,
         feature: feature,
@@ -54,6 +72,9 @@ class Flag {
         environment: environment,
         identity: identity,
         featureSegment: featureSegment,
+        variant: variant,
+        reason: reason,
+        experiment: experiment,
       );
   factory Flag.seed(String featureName, {bool enabled = true, String? value}) {
     var id = _generateNum(1, 100);
@@ -85,7 +106,10 @@ class Flag {
           bool? enabled,
           int? environment,
           int? identity,
-          int? featureSegment}) =>
+          int? featureSegment,
+          String? variant,
+          String? reason,
+          Experiment? experiment}) =>
       Flag(
         id: id ?? this.id,
         feature: feature ?? this.feature,
@@ -94,5 +118,8 @@ class Flag {
         environment: environment ?? this.environment,
         identity: identity ?? this.identity,
         featureSegment: featureSegment ?? this.featureSegment,
+        variant: variant ?? this.variant,
+        reason: reason ?? this.reason,
+        experiment: experiment ?? this.experiment,
       );
 }

@@ -1,5 +1,6 @@
 library;
 
+export 'experiment.dart';
 export 'feature.dart';
 export 'identity.dart';
 export 'flag.dart';
