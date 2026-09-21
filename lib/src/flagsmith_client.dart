@@ -3,11 +3,13 @@ import 'dart:convert';
 
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:flutter_client_sse/constants/sse_request_type_enum.dart';
 import 'package:flutter_client_sse/flutter_client_sse.dart';
 import 'package:rxdart/subjects.dart';
 
 import '../flagsmith.dart';
+import 'core/events/event_processor.dart';
 import 'version.dart';
 
 /// Flagsmith client initialization
@@ -46,6 +48,12 @@ class FlagsmithClient {
   final Map<String, int> flagAnalytics = {};
   Timer? _analyticsTimer;
 
+  EventProcessor? _eventProcessor;
+
+  /// Internal events pipeline; exposed for tests only.
+  @visibleForTesting
+  EventProcessor? get eventProcessor => _eventProcessor;
+
   final StreamController<FlagsmithLoading> _loading =
       StreamController.broadcast();
 
@@ -66,6 +74,16 @@ class FlagsmithClient {
     storageProvider = prepareStorage(storage: storage, config: config);
     if (config.enableAnalytics) {
       _setupAnalyticsTimer(config.analyticsInterval);
+    }
+    if (config.enableEvents) {
+      _eventProcessor = EventProcessor(
+        api: _api,
+        apiKey: apiKey,
+        eventsURI: config.eventsURI,
+        flushInterval: config.eventsFlushInterval,
+        maxBuffer: config.eventsMaxBuffer,
+        log: log,
+      )..start();
     }
     if (config.enableRealtimeUpdates) {
       _setupRealtimeUpdates(config.realtimeUpdatesBaseURI);
@@ -169,7 +187,8 @@ class FlagsmithClient {
       switch (config.storageType) {
         case StorageType.custom:
           if (storage == null) {
-            throw FlagsmithConfigException(Exception('When using StorageType.custom, a storage implementation must be provided'));
+            throw FlagsmithConfigException(Exception(
+                'When using StorageType.custom, a storage implementation must be provided'));
           }
           store = storage;
           break;
@@ -345,6 +364,114 @@ class FlagsmithClient {
     _incrementFlagAnalytics(feature);
     return feature?.stateValue;
   }
+
+  /// EXPERIMENTS
+  ///
+  /// Resolve a flag for [user] (or [cachedUser]) and fire one `$flag_exposure`
+  /// event with the variant as value. Skipped unless events are enabled, the
+  /// flag is enabled and `flag.experiment.inExperiment` is true.
+  ///
+  /// When [user] is supplied the flags are fetched for that identity unless
+  /// [reload] is explicitly false, so the exposure never reuses another
+  /// identity's stored assignment. Without [user], stored flags are used.
+  Future<Flag?> getExperimentFlag(String featureName,
+      {Identity? user, List<Trait>? traits, bool? reload}) async {
+    final identity = user ?? cachedUser;
+    if (identity != null) {
+      cachedUser = identity;
+    }
+    final flags = await getFeatureFlags(
+        user: identity, traits: traits, reload: reload ?? (user != null));
+    final flag = flags
+        .firstWhereOrNull((element) => element.feature.name == featureName);
+    _incrementFlagAnalytics(flag);
+
+    if (_eventProcessor == null) {
+      return flag;
+    }
+    if (identity == null) {
+      log('getExperimentFlag called for "$featureName" without an identity. '
+          'No exposure recorded.');
+      return flag;
+    }
+    if (flag == null) {
+      log('getExperimentFlag called for "$featureName" which does not exist. '
+          'No exposure recorded.');
+      return null;
+    }
+    if (flag.enabled != true) {
+      log('getExperimentFlag called for "$featureName" which is disabled. '
+          'No exposure recorded.');
+      return flag;
+    }
+    final experiment = flag.experiment;
+    if (experiment == null || !experiment.inExperiment) {
+      log('getExperimentFlag called for "$featureName" but this identity is '
+          'not enrolled in a running experiment for it. No exposure recorded.');
+      return flag;
+    }
+    trackExposureEvent(featureName,
+        user: identity,
+        value: flag.variant,
+        metadata: <String, dynamic>{'experiment_id': experiment.id});
+    return flag;
+  }
+
+  /// Record a conversion event. No-op unless events are enabled; names
+  /// starting with `$` are reserved and throw [ArgumentError].
+  void trackEvent(String event,
+      {Identity? user,
+      Object? value,
+      Map<String, dynamic>? traits,
+      Map<String, dynamic>? metadata}) {
+    if (event.startsWith(r'$')) {
+      throw ArgumentError.value(
+          event,
+          'event',
+          r'event names starting with "$" are reserved; '
+              'use trackExposureEvent to record an exposure');
+    }
+    final processor = _eventProcessor;
+    if (processor == null) {
+      return;
+    }
+    processor.trackEvent(
+      event: event,
+      identifier: (user ?? cachedUser)?.identifier,
+      value: value,
+      traits: traits,
+      metadata: metadata,
+    );
+  }
+
+  /// Record a `$flag_exposure` event at the point of display. No-op unless
+  /// events are enabled; requires an identity ([user] or [cachedUser]).
+  void trackExposureEvent(String featureName,
+      {Identity? user,
+      Object? value,
+      Map<String, dynamic>? traits,
+      Map<String, dynamic>? metadata}) {
+    final processor = _eventProcessor;
+    if (processor == null) {
+      return;
+    }
+    final identifier = (user ?? cachedUser)?.identifier;
+    if (identifier == null) {
+      log('trackExposureEvent called for "$featureName" without an identity. '
+          'No exposure recorded.');
+      return;
+    }
+    processor.trackExposureEvent(
+      featureName: featureName,
+      identifier: identifier,
+      value: value,
+      traits: traits,
+      metadata: metadata,
+    );
+  }
+
+  /// Flush buffered events and await the POST. Never throws.
+  Future<void> flushEvents() => _eventProcessor?.flush() ?? Future.value();
 
   /// Internal function for collecting analytical data on flag usage
   void _incrementFlagAnalytics(Flag? flag) {
@@ -569,6 +696,7 @@ class FlagsmithClient {
 
   void close() {
     _analyticsTimer?.cancel();
+    _eventProcessor?.stop();
     SSEClient.unsubscribeFromSSE();
     _loading.close();
   }

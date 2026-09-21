@@ -93,6 +93,110 @@ void main() {
     });
   });
 
+  group('[Experiment]', () {
+    Map<String, dynamic> flagJson({Object? metadata, bool withKey = true}) =>
+        <String, dynamic>{
+          'id': 7,
+          'feature': {'id': 7, 'name': 'checkout_cta'},
+          'enabled': true,
+          'feature_state_value': 'buy-now',
+          'variant': 'treatment-a',
+          'reason': 'SPLIT; weight=50',
+          if (withKey) 'metadata': metadata,
+        };
+
+    test('When metadata.experiment present, then experiment is populated', () {
+      final flag = Flag.fromJson(flagJson(metadata: {
+        'experiment': {
+          'id': 42,
+          'name': 'New checkout CTA',
+          'in_experiment': true
+        }
+      }));
+      expect(flag.variant, 'treatment-a');
+      expect(flag.reason, 'SPLIT; weight=50');
+      expect(flag.experiment, isNotNull);
+      expect(flag.experiment!.id, 42);
+      expect(flag.experiment!.name, 'New checkout CTA');
+      expect(flag.experiment!.inExperiment, isTrue);
+    });
+
+    test('When in_experiment false, then inExperiment is false', () {
+      final flag = Flag.fromJson(flagJson(metadata: {
+        'experiment': {'id': 42, 'name': 'x', 'in_experiment': false}
+      }));
+      expect(flag.experiment!.inExperiment, isFalse);
+    });
+
+    test('When metadata absent or null, then experiment is null', () {
+      expect(Flag.fromJson(flagJson(withKey: false)).experiment, isNull);
+      expect(Flag.fromJson(flagJson(metadata: null)).experiment, isNull);
+    });
+
+    test('When metadata has only unknown keys, then experiment is null', () {
+      final flag = Flag.fromJson(flagJson(metadata: {
+        'something_else': {'id': 1}
+      }));
+      expect(flag.experiment, isNull);
+    });
+
+    test('When experiment is malformed, then parsing still succeeds', () {
+      final flag = Flag.fromJson(flagJson(metadata: {
+        'experiment': {'name': 'missing id'}
+      }));
+      expect(flag.experiment, isNull);
+      expect(flag.variant, 'treatment-a');
+    });
+
+    test('When old server omits variant and reason, then both are null', () {
+      final flag = Flag.fromJson(<String, dynamic>{
+        'feature': {'id': 7, 'name': 'checkout_cta'},
+        'enabled': true,
+        'feature_state_value': null,
+      });
+      expect(flag.variant, isNull);
+      expect(flag.reason, isNull);
+      expect(flag.experiment, isNull);
+      expect(flag.toJson().containsKey('metadata'), isFalse);
+    });
+
+    test('When flag round-trips through toJson, then experiment survives', () {
+      final original = Flag.fromJson(flagJson(metadata: {
+        'experiment': {
+          'id': 42,
+          'name': 'New checkout CTA',
+          'in_experiment': true
+        },
+        'unknown_key': 1,
+      }));
+      final json = original.toJson();
+      expect(json['metadata'], {
+        'experiment': {
+          'id': 42,
+          'name': 'New checkout CTA',
+          'in_experiment': true
+        }
+      });
+
+      final restored = Flag.fromJson(jsonDecode(jsonEncode(json)));
+      expect(restored.variant, original.variant);
+      expect(restored.reason, original.reason);
+      expect(restored.experiment!.id, 42);
+      expect(restored.experiment!.name, 'New checkout CTA');
+      expect(restored.experiment!.inExperiment, isTrue);
+    });
+
+    test('When copyWith sets experiment, then other fields are kept', () {
+      final flag = Flag.fromJson(flagJson(withKey: false));
+      final copy = flag.copyWith(
+          experiment:
+              const ExperimentMetadata(id: 1, name: 'e', inExperiment: true));
+      expect(copy.experiment!.id, 1);
+      expect(copy.variant, 'treatment-a');
+      expect(flag.experiment, isNull);
+    });
+  });
+
   group('[FlagAndTraits]', () {
     test('When response successfuly parsed', () {
       final identity = FlagsAndTraits.fromJson(

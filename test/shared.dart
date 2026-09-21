@@ -534,8 +534,99 @@ final flagsResponseData = r'''[
     }
 ]''';
 
+final experimentFeatureName = 'experiment_enrolled';
+final experimentNotEnrolledFeatureName = 'experiment_not_enrolled';
+final experimentNoMetadataFeatureName = 'experiment_no_metadata';
+final experimentDisabledFeatureName = 'experiment_disabled';
+final experimentId = 42;
+final experimentVariant = 'treatment-a';
+
 final identitiesResponseData = r'''{
     "flags": [
+        {
+          "id": 90001,
+          "feature": {
+              "id": 7001,
+              "name": "experiment_enrolled",
+              "created_date": "2026-09-01T08:38:29.203517Z",
+              "description": "Running experiment, identity enrolled",
+              "initial_value": null,
+              "default_enabled": false,
+              "type": "MULTIVARIATE"
+          },
+          "feature_state_value": "buy-now",
+          "enabled": true,
+          "environment": 7822,
+          "identity": null,
+          "feature_segment": null,
+          "variant": "treatment-a",
+          "reason": "SPLIT; weight=50",
+          "metadata": {
+              "experiment": {"id": 42, "name": "New checkout CTA", "in_experiment": true},
+              "unknown_key": {"ignored": true}
+          }
+        },
+        {
+          "id": 90002,
+          "feature": {
+              "id": 7002,
+              "name": "experiment_not_enrolled",
+              "created_date": "2026-09-01T08:38:29.203517Z",
+              "description": "Running experiment, identity not enrolled",
+              "initial_value": null,
+              "default_enabled": false,
+              "type": "MULTIVARIATE"
+          },
+          "feature_state_value": "control-value",
+          "enabled": true,
+          "environment": 7822,
+          "identity": null,
+          "feature_segment": null,
+          "variant": "control",
+          "reason": "DEFAULT",
+          "metadata": {
+              "experiment": {"id": 43, "name": "Not enrolled experiment", "in_experiment": false}
+          }
+        },
+        {
+          "id": 90003,
+          "feature": {
+              "id": 7003,
+              "name": "experiment_no_metadata",
+              "created_date": "2026-09-01T08:38:29.203517Z",
+              "description": "Multivariate flag with no experiment",
+              "initial_value": null,
+              "default_enabled": false,
+              "type": "MULTIVARIATE"
+          },
+          "feature_state_value": "control-value",
+          "enabled": true,
+          "environment": 7822,
+          "identity": null,
+          "feature_segment": null,
+          "variant": "control"
+        },
+        {
+          "id": 90004,
+          "feature": {
+              "id": 7004,
+              "name": "experiment_disabled",
+              "created_date": "2026-09-01T08:38:29.203517Z",
+              "description": "Disabled flag inside a running experiment",
+              "initial_value": null,
+              "default_enabled": false,
+              "type": "MULTIVARIATE"
+          },
+          "feature_state_value": null,
+          "enabled": false,
+          "environment": 7822,
+          "identity": null,
+          "feature_segment": null,
+          "variant": "treatment-a",
+          "metadata": {
+              "experiment": {"id": 44, "name": "Disabled experiment", "in_experiment": true}
+          }
+        },
         {
           "id": 48540,
           "feature": {
