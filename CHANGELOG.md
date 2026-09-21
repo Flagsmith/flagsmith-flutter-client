@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.2.0](https://github.com/Flagsmith/flagsmith-flutter-client/compare/v6.1.1...v6.2.0) (2026-09-21)
+
+
+### Features
+
+* surface experiment metadata on flags and add event tracking ([#94](https://github.com/Flagsmith/flagsmith-flutter-client/issues/94)) ([bc6077c](https://github.com/Flagsmith/flagsmith-flutter-client/commit/bc6077c7a82c7a01cd7aa5a2a795329b37354845))
+
 ## [6.1.1](https://github.com/Flagsmith/flagsmith-flutter-client/compare/v6.1.0...v6.1.1) (2026-05-18)
 
 
