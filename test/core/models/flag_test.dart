@@ -107,7 +107,11 @@ void main() {
 
     test('When metadata.experiment present, then experiment is populated', () {
       final flag = Flag.fromJson(flagJson(metadata: {
-        'experiment': {'id': 42, 'name': 'New checkout CTA', 'in_experiment': true}
+        'experiment': {
+          'id': 42,
+          'name': 'New checkout CTA',
+          'in_experiment': true
+        }
       }));
       expect(flag.variant, 'treatment-a');
       expect(flag.reason, 'SPLIT; weight=50');
@@ -158,12 +162,20 @@ void main() {
 
     test('When flag round-trips through toJson, then experiment survives', () {
       final original = Flag.fromJson(flagJson(metadata: {
-        'experiment': {'id': 42, 'name': 'New checkout CTA', 'in_experiment': true},
+        'experiment': {
+          'id': 42,
+          'name': 'New checkout CTA',
+          'in_experiment': true
+        },
         'unknown_key': 1,
       }));
       final json = original.toJson();
       expect(json['metadata'], {
-        'experiment': {'id': 42, 'name': 'New checkout CTA', 'in_experiment': true}
+        'experiment': {
+          'id': 42,
+          'name': 'New checkout CTA',
+          'in_experiment': true
+        }
       });
 
       final restored = Flag.fromJson(jsonDecode(jsonEncode(json)));
@@ -177,7 +189,8 @@ void main() {
     test('When copyWith sets experiment, then other fields are kept', () {
       final flag = Flag.fromJson(flagJson(withKey: false));
       final copy = flag.copyWith(
-          experiment: const Experiment(id: 1, name: 'e', inExperiment: true));
+          experiment:
+              const ExperimentMetadata(id: 1, name: 'e', inExperiment: true));
       expect(copy.experiment!.id, 1);
       expect(copy.variant, 'treatment-a');
       expect(flag.experiment, isNull);

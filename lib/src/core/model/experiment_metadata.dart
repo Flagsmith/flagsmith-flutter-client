@@ -1,10 +1,10 @@
 import 'package:json_annotation/json_annotation.dart';
 
-part 'experiment.g.dart';
+part 'experiment_metadata.g.dart';
 
 /// The running experiment a flag was evaluated under; identity evaluations only.
 @JsonSerializable()
-class Experiment {
+class ExperimentMetadata {
   final int id;
   final String name;
 
@@ -12,23 +12,24 @@ class Experiment {
   @JsonKey(name: 'in_experiment', defaultValue: false)
   final bool inExperiment;
 
-  const Experiment({
+  const ExperimentMetadata({
     required this.id,
     required this.name,
     this.inExperiment = false,
   });
 
-  factory Experiment.fromJson(Map<String, dynamic> json) =>
-      _$ExperimentFromJson(json);
+  factory ExperimentMetadata.fromJson(Map<String, dynamic> json) =>
+      _$ExperimentMetadataFromJson(json);
 
-  Map<String, dynamic> toJson() => _$ExperimentToJson(this);
+  Map<String, dynamic> toJson() => _$ExperimentMetadataToJson(this);
 
   @override
-  String toString() => 'Experiment($id:$name, inExperiment=$inExperiment)';
+  String toString() =>
+      'ExperimentMetadata($id:$name, inExperiment=$inExperiment)';
 }
 
-/// `metadata.experiment` -> [Experiment]; null when absent or malformed.
-Experiment? experimentFromMetadata(Object? metadata) {
+/// `metadata.experiment` -> [ExperimentMetadata]; null when absent or malformed.
+ExperimentMetadata? experimentFromMetadata(Object? metadata) {
   if (metadata is! Map) {
     return null;
   }
@@ -37,13 +38,13 @@ Experiment? experimentFromMetadata(Object? metadata) {
     return null;
   }
   try {
-    return Experiment.fromJson(Map<String, dynamic>.from(experiment));
+    return ExperimentMetadata.fromJson(Map<String, dynamic>.from(experiment));
   } catch (_) {
     return null;
   }
 }
 
-Map<String, dynamic>? experimentToMetadata(Experiment? experiment) {
+Map<String, dynamic>? experimentToMetadata(ExperimentMetadata? experiment) {
   if (experiment == null) {
     return null;
   }

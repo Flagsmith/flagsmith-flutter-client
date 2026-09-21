@@ -4,7 +4,7 @@ import '../extensions/converters.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'dart:math';
 
-import 'experiment.dart';
+import 'experiment_metadata.dart';
 import 'feature.dart';
 part 'flag.g.dart';
 
@@ -32,7 +32,7 @@ class Flag {
       fromJson: experimentFromMetadata,
       toJson: experimentToMetadata,
       includeIfNull: false)
-  final Experiment? experiment;
+  final ExperimentMetadata? experiment;
   Flag(
       {this.id,
       required this.feature,
@@ -63,7 +63,7 @@ class Flag {
           int? featureSegment,
           String? variant,
           String? reason,
-          Experiment? experiment}) =>
+          ExperimentMetadata? experiment}) =>
       Flag(
         id: id,
         feature: feature,
@@ -109,7 +109,7 @@ class Flag {
           int? featureSegment,
           String? variant,
           String? reason,
-          Experiment? experiment}) =>
+          ExperimentMetadata? experiment}) =>
       Flag(
         id: id ?? this.id,
         feature: feature ?? this.feature,
