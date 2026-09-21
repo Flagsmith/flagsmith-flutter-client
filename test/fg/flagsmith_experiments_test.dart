@@ -190,6 +190,122 @@ void main() {
       expect(fs.eventProcessor!.buffer.single['identifier'], 'other_user');
     });
 
+    test('When user matches the stored flags, then no request is made',
+        () async {
+      var posts = 0;
+      fs.client.interceptors.add(InterceptorsWrapper(onRequest: (o, h) {
+        if (o.path == fs.config.identitiesURI) {
+          posts++;
+        }
+        h.next(o);
+      }));
+
+      final flag =
+          await fs.getExperimentFlag(experimentFeatureName, user: user);
+
+      expect(posts, 0, reason: 'storage already holds this identity');
+      expect(flag!.variant, experimentVariant);
+      expect(fs.eventProcessor!.buffer.single['identifier'], user.identifier);
+    });
+
+    test('When storage holds environment flags, then identity is fetched',
+        () async {
+      await fs.getFeatureFlags();
+      var posts = 0;
+      fs.client.interceptors.add(InterceptorsWrapper(onRequest: (o, h) {
+        if (o.path == fs.config.identitiesURI) {
+          posts++;
+        }
+        h.next(o);
+      }));
+
+      await fs.getExperimentFlag(experimentFeatureName);
+
+      expect(posts, 1, reason: 'cachedUser flags are no longer in storage');
+    });
+
+    test('When hasFeatureFlag is called for another identity, then it fetches',
+        () async {
+      var posts = 0;
+      fs.client.interceptors.add(InterceptorsWrapper(onRequest: (o, h) {
+        if (o.path == fs.config.identitiesURI) {
+          posts++;
+        }
+        h.next(o);
+      }));
+
+      await fs.hasFeatureFlag(experimentFeatureName, user: user);
+      expect(posts, 0);
+      await fs.hasFeatureFlag(experimentFeatureName,
+          user: const Identity(identifier: 'other_user'));
+      expect(posts, 1);
+      await fs.hasFeatureFlag(experimentFeatureName,
+          user: const Identity(identifier: 'other_user'));
+      expect(posts, 1, reason: 'other_user is now the stored identity');
+    });
+
+    test('When traits are given for the stored identity, then it fetches',
+        () async {
+      var posts = 0;
+      fs.client.interceptors.add(InterceptorsWrapper(onRequest: (o, h) {
+        if (o.path == fs.config.identitiesURI) {
+          posts++;
+        }
+        h.next(o);
+      }));
+
+      await fs.getExperimentFlag(experimentFeatureName,
+          user: user, traits: [Trait(key: 'plan', value: 'pro')]);
+
+      expect(posts, 1, reason: 'traits must reach the server');
+    });
+
+    test('When a flag is read without a user, then the identity is kept',
+        () async {
+      await fs.hasFeatureFlag(experimentFeatureName);
+
+      expect(fs.cachedUser, user);
+      await fs.getExperimentFlag(experimentFeatureName);
+      expect(fs.eventProcessor!.buffer.single['identifier'], user.identifier);
+    });
+
+    test('When storage is cleared, then the identity is fetched again',
+        () async {
+      var posts = 0;
+      fs.client.interceptors.add(InterceptorsWrapper(onRequest: (o, h) {
+        if (o.path == fs.config.identitiesURI) {
+          posts++;
+        }
+        h.next(o);
+      }));
+
+      await fs.clearStore();
+      await fs.hasFeatureFlag(experimentFeatureName, user: user);
+      expect(posts, 1);
+
+      await fs.initStore(clear: true, seeds: seeds);
+      await fs.hasFeatureFlag(experimentFeatureName, user: user);
+      expect(posts, 2);
+    });
+
+    test(
+        'When the identity was evaluated as transient, then a plain read fetches',
+        () async {
+      var posts = 0;
+      fs.client.interceptors.add(InterceptorsWrapper(onRequest: (o, h) {
+        if (o.path == fs.config.identitiesURI) {
+          posts++;
+        }
+        h.next(o);
+      }));
+
+      await fs.getFeatureFlags(
+          user: Identity(identifier: user.identifier, transient: true));
+      expect(posts, 1);
+      await fs.hasFeatureFlag(experimentFeatureName, user: user);
+      expect(posts, 2, reason: 'transient flags are not a baseline');
+    });
+
     test('When called twice in a window, then exposure is deduped', () async {
       await fs.getExperimentFlag(experimentFeatureName);
       await fs.getExperimentFlag(experimentFeatureName);

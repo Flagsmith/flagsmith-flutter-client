@@ -64,6 +64,12 @@ class FlagsmithClient {
   double? lastGetFlags;
   Identity? cachedUser;
 
+  /// Identifier whose flags are in storage; null for environment flags.
+  String? _storedIdentifier;
+
+  bool _needsFetch(Identity? user) =>
+      user != null && user.identifier != _storedIdentifier;
+
   FlagsmithClient(
       {this.config = const FlagsmithConfig(),
       required this.apiKey,
@@ -231,6 +237,7 @@ class FlagsmithClient {
       {List<Flag> seeds = const <Flag>[], bool clear = false}) async {
     if (clear) {
       await storageProvider.clear();
+      _storedIdentifier = null;
     }
     await storageProvider.seed(items: seeds);
     final items = await storageProvider.getAll();
@@ -244,6 +251,7 @@ class FlagsmithClient {
   Future<bool> reset() async {
     await storageProvider.clear();
     await storageProvider.seed(items: seeds);
+    _storedIdentifier = null;
     _updateCaches(list: seeds);
     return true;
   }
@@ -343,8 +351,11 @@ class FlagsmithClient {
 
   Future<Flag?> _getFlagByName(String featureName,
       {Identity? user, bool? reload}) async {
-    cachedUser = user;
-    var flags = await getFeatureFlags(user: user, reload: reload ?? false);
+    if (user != null) {
+      cachedUser = user;
+    }
+    var flags =
+        await getFeatureFlags(user: user, reload: reload ?? _needsFetch(user));
     var flag = flags
         .firstWhereOrNull((element) => element.feature.name == featureName);
     _incrementFlagAnalytics(flag);
@@ -371,9 +382,8 @@ class FlagsmithClient {
   /// event with the variant as value. Skipped unless events are enabled, the
   /// flag is enabled and `flag.experiment.inExperiment` is true.
   ///
-  /// When [user] is supplied the flags are fetched for that identity unless
-  /// [reload] is explicitly false, so the exposure never reuses another
-  /// identity's stored assignment. Without [user], stored flags are used.
+  /// Fetches only when storage holds another identity's flags;
+  /// [reload] overrides this.
   Future<Flag?> getExperimentFlag(String featureName,
       {Identity? user, List<Trait>? traits, bool? reload}) async {
     final identity = user ?? cachedUser;
@@ -381,7 +391,10 @@ class FlagsmithClient {
       cachedUser = identity;
     }
     final flags = await getFeatureFlags(
-        user: identity, traits: traits, reload: reload ?? (user != null));
+        user: identity,
+        traits: traits,
+        reload:
+            reload ?? (_needsFetch(identity) || (traits?.isNotEmpty ?? false)));
     final flag = flags
         .firstWhereOrNull((element) => element.feature.name == featureName);
     _incrementFlagAnalytics(flag);
@@ -510,6 +523,7 @@ class FlagsmithClient {
             .toList();
 
         await storageProvider.saveAll(list);
+        _storedIdentifier = null;
         final saved = await storageProvider.getAll()
           ..sort((a, b) => a.feature.name.compareTo(b.feature.name));
         _updateCaches(list: saved);
@@ -550,6 +564,9 @@ class FlagsmithClient {
         }
 
         await storageProvider.saveAll(data);
+        final transient = user.transient == true ||
+            (traits?.any((t) => t.transient == true) ?? false);
+        _storedIdentifier = transient ? null : user.identifier;
         final saved = await storageProvider.getAll()
           ..sort((a, b) => a.feature.name.compareTo(b.feature.name));
         _updateCaches(list: saved);
@@ -682,6 +699,7 @@ class FlagsmithClient {
     if (config.caches) {
       _flags.clear();
     }
+    _storedIdentifier = null;
     return storageProvider.clear();
   }
 
