@@ -1,6 +1,5 @@
 export 'crud_storage.dart';
 export 'datetime_x.dart';
-export 'events/event_processor.dart';
 export 'exceptions.dart';
 export 'extensions/converters.dart';
 export 'model/index.dart';

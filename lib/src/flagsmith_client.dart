@@ -3,11 +3,13 @@ import 'dart:convert';
 
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:flutter_client_sse/constants/sse_request_type_enum.dart';
 import 'package:flutter_client_sse/flutter_client_sse.dart';
 import 'package:rxdart/subjects.dart';
 
 import '../flagsmith.dart';
+import 'core/events/event_processor.dart';
 import 'version.dart';
 
 /// Flagsmith client initialization
@@ -47,6 +49,9 @@ class FlagsmithClient {
   Timer? _analyticsTimer;
 
   EventProcessor? _eventProcessor;
+
+  /// Internal events pipeline; exposed for tests only.
+  @visibleForTesting
   EventProcessor? get eventProcessor => _eventProcessor;
 
   final StreamController<FlagsmithLoading> _loading =
