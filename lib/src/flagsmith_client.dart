@@ -112,7 +112,6 @@ class FlagsmithClient {
       }
     } on DioException catch (e) {
       log('_setupAnalyticsTimer dioError: ${e.error}');
-      throw FlagsmithApiException(e);
     } catch (e) {
       log('Exception: _setupAnalyticsTimer $e');
       throw FlagsmithException(e);
