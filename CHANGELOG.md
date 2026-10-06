@@ -1,5 +1,13 @@
 # Changelog
 
+## [6.2.1](https://github.com/Flagsmith/flagsmith-flutter-client/compare/v6.2.0...v6.2.1) (2026-10-06)
+
+
+### Bug Fixes
+
+* drop events tracked after close() ([#97](https://github.com/Flagsmith/flagsmith-flutter-client/issues/97)) ([b8af810](https://github.com/Flagsmith/flagsmith-flutter-client/commit/b8af810cbed53b24a1a26a84b9eba3a68e8c569d))
+* fetch flags only when storage holds another identity's flags ([#95](https://github.com/Flagsmith/flagsmith-flutter-client/issues/95)) ([b848eff](https://github.com/Flagsmith/flagsmith-flutter-client/commit/b848eff5173415d3ce754f747c1b923d4414e768))
+
 ## [6.2.0](https://github.com/Flagsmith/flagsmith-flutter-client/compare/v6.1.1...v6.2.0) (2026-09-21)
 
 
