@@ -28,6 +28,7 @@ class EventProcessor {
   final Set<String> _dedupeKeys = {};
   final Set<Future<void>> _inFlight = {};
   Timer? _timer;
+  bool _stopped = false;
 
   EventProcessor({
     required Dio api,
@@ -92,6 +93,10 @@ class EventProcessor {
     required Map<String, dynamic>? metadata,
     required bool dedupe,
   }) {
+    if (_stopped) {
+      _log('Events: processor stopped, dropping "$event"');
+      return;
+    }
     final stringValue = value == null ? null : '$value';
     if (dedupe) {
       // Experiment id is part of the key so a new experiment on the same flag
@@ -142,6 +147,7 @@ class EventProcessor {
   }
 
   void start() {
+    _stopped = false;
     _timer?.cancel();
     _timer = null;
     if (flushInterval > 0) {
@@ -151,7 +157,9 @@ class EventProcessor {
   }
 
   /// Cancels the timer and flushes without awaiting; await [flush] for teardown.
+  /// Events tracked after this are dropped until [start] is called again.
   void stop() {
+    _stopped = true;
     _timer?.cancel();
     _timer = null;
     unawaited(flush());

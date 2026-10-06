@@ -477,6 +477,33 @@ void main() {
       expect(capture.events.single['event'], 'purchase');
     });
 
+    test('When client is closed, then pending buffer is still flushed',
+        () async {
+      final (fs, capture) = await buildClient();
+      fs.trackEvent('purchase');
+      fs.close();
+
+      await expectLater(fs.flushEvents(), completes);
+      expect(capture.requests.length, 1);
+      expect(capture.events.single['event'], 'purchase');
+      expect(fs.eventProcessor!.buffer, isEmpty);
+    });
+
+    test('When client is closed, then later events are dropped', () async {
+      final (fs, capture) = await buildClient();
+      fs.close();
+
+      fs.trackEvent('purchase');
+      fs.trackExposureEvent(experimentFeatureName, value: 'treatment-a');
+      final flag =
+          await fs.getExperimentFlag(experimentFeatureName, reload: false);
+
+      expect(flag, isNotNull);
+      expect(fs.eventProcessor!.buffer, isEmpty);
+      await fs.flushEvents();
+      expect(capture.requests, isEmpty);
+    });
+
     test('When POST fails, then flushEvents does not throw and drops batch',
         () async {
       final (fs, capture) = await buildClient(eventsFail: true);
@@ -641,6 +668,17 @@ void main() {
       p.trackEvent(event: 'after_stop');
       await Future<void>.delayed(const Duration(milliseconds: 60));
       expect(capture.requests.length, 1, reason: 'timer must be cancelled');
+    });
+
+    test('When restarted after stop, then events are buffered again', () {
+      final p = processor()..stop();
+      p.trackEvent(event: 'stopped');
+      expect(p.buffer, isEmpty);
+      expect(logs, contains('Events: processor stopped, dropping "stopped"'));
+
+      p.start();
+      p.trackEvent(event: 'restarted');
+      expect(p.buffer.single['event'], 'restarted');
     });
   });
 }
