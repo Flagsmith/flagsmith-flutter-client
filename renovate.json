@@ -1,0 +1,23 @@
+{
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "extends": ["config:recommended"],
+    "enabledManagers": ["custom.regex"],
+    "customManagers": [
+        {
+            "customType": "regex",
+            "managerFilePatterns": ["/^\\.github/workflows/sdk-spec\\.yml$/"],
+            "matchStrings": [
+                "uses: Flagsmith/sdk-spec/\\.github/workflows/run-spec\\.yml@(?<currentValue>v[\\d.]+)",
+                "spec-ref: (?<currentValue>v[\\d.]+)"
+            ],
+            "depNameTemplate": "Flagsmith/sdk-spec",
+            "datasourceTemplate": "github-tags"
+        }
+    ],
+    "packageRules": [
+        {
+            "matchPackageNames": ["Flagsmith/sdk-spec"],
+            "groupName": "SDK spec"
+        }
+    ]
+}
