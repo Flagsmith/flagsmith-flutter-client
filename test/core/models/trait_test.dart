@@ -124,6 +124,23 @@ void main() {
       expect(mapped.containsKey('trait_value'), isTrue);
       expect(TraitWithIdentity.fromJson(mapped).value, isNull);
     });
+
+    test('When copyWith sets value to null, then value is null', () {
+      final trait = Trait(key: 'plan', value: 'premium');
+      expect(trait.copyWith(value: null).value, isNull);
+      expect(trait.copyWith(key: 'tier').value, 'premium');
+    });
+
+    test(
+        'When trait with identity copyWith sets value to null, then value '
+        'is null', () {
+      final trait = TraitWithIdentity(
+          identity: Identity(identifier: 'user'),
+          key: 'plan',
+          value: 'premium');
+      expect(trait.copyWith(value: null).value, isNull);
+      expect(trait.copyWith(key: 'tier').value, 'premium');
+    });
   });
 
   group('[Trait] - copyWith', () {

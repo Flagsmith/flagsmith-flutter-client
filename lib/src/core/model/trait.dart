@@ -5,6 +5,9 @@ import 'package:json_annotation/json_annotation.dart';
 import 'identity.dart';
 part 'trait.g.dart';
 
+// Default for copyWith's value, so that an explicit null can be told apart.
+const _unset = Object();
+
 @JsonSerializable()
 class Trait {
   @JsonKey(includeIfNull: false)
@@ -32,12 +35,12 @@ class Trait {
   Trait copyWith({
     int? id,
     String? key,
-    dynamic value,
+    dynamic value = _unset,
   }) =>
       Trait(
         id: id ?? this.id,
         key: key ?? this.key,
-        value: value ?? this.value,
+        value: identical(value, _unset) ? this.value : value,
       );
 
   static dynamic _fromJson(dynamic jsonValue) {
@@ -94,12 +97,12 @@ class TraitWithIdentity {
   TraitWithIdentity copyWith({
     Identity? identity,
     String? key,
-    dynamic value,
+    dynamic value = _unset,
   }) =>
       TraitWithIdentity(
         identity: identity ?? this.identity,
         key: key ?? this.key,
-        value: value ?? this.value,
+        value: identical(value, _unset) ? this.value : value,
       );
 
   static dynamic _fromJson(dynamic jsonValue) {
