@@ -106,7 +106,6 @@ class Flag {
   factory Flag.fromJson(Map<String, dynamic> json) =>
       _$FlagFromJson(json).copyWith(value: json['feature_state_value']);
 
-  /// Writes [value] with its type, so that [Flag.fromJson] restores it.
   Map<String, dynamic> toJson() =>
       _$FlagToJson(this)..['feature_state_value'] = value;
   String asString() => jsonEncode(toJson());
@@ -127,7 +126,7 @@ class Flag {
         id: id ?? this.id,
         feature: feature ?? this.feature,
         stateValue: stateValue ?? this.stateValue,
-        // A new stateValue without a value replaces the old value too.
+        // A new stateValue also replaces value.
         value: value ?? (stateValue == null ? this.value : null),
         enabled: enabled ?? this.enabled,
         environment: environment ?? this.environment,
