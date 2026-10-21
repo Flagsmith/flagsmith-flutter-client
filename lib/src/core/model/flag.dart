@@ -17,6 +17,11 @@ class Flag {
       fromJson: stringFromJson,
       toJson: stringToJson)
   final String? stateValue;
+
+  /// The flag's value with its JSON type: a String, num, bool or null.
+  /// Falls back to [stateValue] when the flag was not parsed from JSON.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  final Object? value;
   final bool? enabled;
   final int? environment;
   final int? identity;
@@ -37,13 +42,15 @@ class Flag {
       {this.id,
       required this.feature,
       this.stateValue,
+      Object? value,
       this.enabled,
       this.environment,
       this.identity,
       this.featureSegment,
       this.variant,
       this.reason,
-      this.experiment});
+      this.experiment})
+      : value = value ?? stateValue;
 
   String get key => feature.name;
   @override
@@ -57,6 +64,7 @@ class Flag {
           {int? id,
           required Feature feature,
           String? stateValue,
+          Object? value,
           bool? enabled,
           int? environment,
           int? identity,
@@ -68,6 +76,7 @@ class Flag {
         id: id,
         feature: feature,
         stateValue: stateValue,
+        value: value,
         enabled: enabled,
         environment: environment,
         identity: identity,
@@ -94,15 +103,19 @@ class Flag {
         enabled: enabled);
   }
 
-  factory Flag.fromJson(Map<String, dynamic> json) => _$FlagFromJson(json);
+  factory Flag.fromJson(Map<String, dynamic> json) =>
+      _$FlagFromJson(json).copyWith(value: json['feature_state_value']);
 
-  Map<String, dynamic> toJson() => _$FlagToJson(this);
+  /// Writes [value] with its type, so that [Flag.fromJson] restores it.
+  Map<String, dynamic> toJson() =>
+      _$FlagToJson(this)..['feature_state_value'] = value;
   String asString() => jsonEncode(toJson());
 
   Flag copyWith(
           {int? id,
           Feature? feature,
           String? stateValue,
+          Object? value,
           bool? enabled,
           int? environment,
           int? identity,
@@ -114,6 +127,8 @@ class Flag {
         id: id ?? this.id,
         feature: feature ?? this.feature,
         stateValue: stateValue ?? this.stateValue,
+        // A new stateValue without a value replaces the old value too.
+        value: value ?? (stateValue == null ? this.value : null),
         enabled: enabled ?? this.enabled,
         environment: environment ?? this.environment,
         identity: identity ?? this.identity,

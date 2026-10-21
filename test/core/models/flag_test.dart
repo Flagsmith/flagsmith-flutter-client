@@ -197,6 +197,71 @@ void main() {
     });
   });
 
+  group('[Typed value]', () {
+    Map<String, dynamic> flagJson(Object? value) => <String, dynamic>{
+          'feature': {'id': 1, 'name': 'max_items'},
+          'enabled': true,
+          'feature_state_value': value,
+        };
+
+    for (final (value, stateValue) in [
+      (42, '42'),
+      (1.5, '1.5'),
+      (true, 'true'),
+      ('welcome', 'welcome'),
+      (null, null),
+    ]) {
+      test(
+          'When feature_state_value is ${value.runtimeType}, then value '
+          'keeps its type', () {
+        final flag = Flag.fromJson(flagJson(value));
+        expect(flag.value, value);
+        expect(flag.value.runtimeType, value.runtimeType);
+        expect(flag.stateValue, stateValue);
+      });
+
+      test(
+          'When a ${value.runtimeType} flag round-trips through toJson, '
+          'then value keeps its type', () {
+        final restored = Flag.fromJson(
+            jsonDecode(Flag.fromJson(flagJson(value)).asString())
+                as Map<String, dynamic>);
+        expect(restored.value, value);
+        expect(restored.value.runtimeType, value.runtimeType);
+        expect(restored.stateValue, stateValue);
+      });
+    }
+
+    test('When a flag is restored from storage, then value keeps its type',
+        () async {
+      final store = StorageProvider(InMemoryStorage(), password: 'pa5w0rD');
+      await store.saveAll([Flag.fromJson(flagJson(42))]);
+      final restored = await store.read('max_items');
+      expect(restored!.value, 42);
+      expect(restored.stateValue, '42');
+    });
+
+    test('When cached before typed values, then value is the cached string',
+        () {
+      final flag = Flag.fromJson(flagJson('42'));
+      expect(flag.value, '42');
+      expect(flag.stateValue, '42');
+    });
+
+    test('When a flag is created without a value, then value is stateValue',
+        () {
+      expect(Flag.seed('feature', value: '1.0.0').value, '1.0.0');
+      expect(Flag.seed('feature').value, isNull);
+    });
+
+    test('When copyWith sets only stateValue, then value follows it', () {
+      final flag = Flag.fromJson(flagJson(42));
+      expect(flag.copyWith(stateValue: '43').value, '43');
+      expect(flag.copyWith(enabled: false).value, 42);
+      expect(flag.copyWith(value: 43).value, 43);
+    });
+  });
+
   group('[FlagAndTraits]', () {
     test('When response successfuly parsed', () {
       final identity = FlagsAndTraits.fromJson(
