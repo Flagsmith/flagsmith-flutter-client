@@ -18,7 +18,7 @@ class Flag {
       toJson: stringToJson)
   final String? stateValue;
 
-  /// The flag's value with its JSON type: a String, num, bool or null.
+  /// The flag's value with its JSON type.
   /// Falls back to [stateValue] when the flag was not parsed from JSON.
   @JsonKey(includeFromJson: false, includeToJson: false)
   final Object? value;
