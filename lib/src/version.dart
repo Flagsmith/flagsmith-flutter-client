@@ -3,7 +3,7 @@
 
 /// The SDK version
 // x-release-please-start-version
-const String sdkVersion = '6.2.1';
+const String sdkVersion = '6.3.0';
 // x-release-please-end
 
 /// Gets the User-Agent header value for the SDK

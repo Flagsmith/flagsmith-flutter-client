@@ -1,5 +1,22 @@
 # Changelog
 
+## [6.3.0](https://github.com/Flagsmith/flagsmith-flutter-client/compare/v6.2.1...v6.3.0) (2026-10-21)
+
+
+### Features
+
+* Expose flag values with their JSON type ([#100](https://github.com/Flagsmith/flagsmith-flutter-client/issues/100)) ([f7798e5](https://github.com/Flagsmith/flagsmith-flutter-client/commit/f7798e59629a7ffe0e5a45d708e007cbeddca04d))
+
+
+### Bug Fixes
+
+* Allow null trait values ([#101](https://github.com/Flagsmith/flagsmith-flutter-client/issues/101)) ([7487076](https://github.com/Flagsmith/flagsmith-flutter-client/commit/74870765dc3ba1cf82233fe63cd00deffd196db3))
+
+
+### CI
+
+* Run the Flagsmith SDK behavioural spec ([#99](https://github.com/Flagsmith/flagsmith-flutter-client/issues/99)) ([62c2442](https://github.com/Flagsmith/flagsmith-flutter-client/commit/62c2442a09ef8ea6b9f076d25fce3adf1e83fec1))
+
 ## [6.2.1](https://github.com/Flagsmith/flagsmith-flutter-client/compare/v6.2.0...v6.2.1) (2026-10-06)
 
 
