@@ -47,14 +47,19 @@ class Trait {
       } else {
         return jsonValue.toDouble(); // Treat as double if it's a decimal
       }
-    } else if (jsonValue is String || jsonValue is bool) {
+    } else if (jsonValue == null || jsonValue is String || jsonValue is bool) {
       return jsonValue;
     }
     throw ArgumentError('Invalid value type');
   }
 
   static dynamic _toJson(dynamic value) {
-    if (value is double || value is int || value is String || value is bool) {
+    // A null value deletes the trait in Flagsmith.
+    if (value == null ||
+        value is double ||
+        value is int ||
+        value is String ||
+        value is bool) {
       return value;
     }
     throw ArgumentError('Invalid value type');
@@ -104,14 +109,19 @@ class TraitWithIdentity {
       } else {
         return jsonValue.toDouble(); // Treat as double if it's a decimal
       }
-    } else if (jsonValue is String || jsonValue is bool) {
+    } else if (jsonValue == null || jsonValue is String || jsonValue is bool) {
       return jsonValue;
     }
     throw ArgumentError('Invalid value type');
   }
 
   static dynamic _toJson(dynamic value) {
-    if (value is double || value is int || value is String || value is bool) {
+    // A null value deletes the trait in Flagsmith.
+    if (value == null ||
+        value is double ||
+        value is int ||
+        value is String ||
+        value is bool) {
       return value;
     }
     throw ArgumentError('Invalid value type');

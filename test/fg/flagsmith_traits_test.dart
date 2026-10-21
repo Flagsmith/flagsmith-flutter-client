@@ -269,6 +269,24 @@ void main() {
       expect(result, isNotEmpty);
     });
 
+    test('When get flags with a null trait, then it is sent as null', () async {
+      var user = Identity(identifier: 'test_another_user');
+      fs = await setupClientAdapter(StorageType.inMemory);
+      setupEmptyAdapter(fs, cb: (config, adapter) {
+        adapter.onPost(fs.config.identitiesURI, (server) {
+          return server.reply(200, jsonDecode(identitiesResponseData));
+        }, data: {
+          'identifier': 'test_another_user',
+          'traits': [
+            {'trait_key': 'plan', 'trait_value': null},
+          ],
+        });
+      });
+      final result = await fs.getFeatureFlags(
+          user: user, traits: [Trait(key: 'plan', value: null)]);
+      expect(result, isNotEmpty);
+    });
+
     test('When get flags for transient identity request expected', () async {
       var user = Identity(identifier: 'test_another_user', transient: true);
       fs = await setupClientAdapter(StorageType.inMemory);

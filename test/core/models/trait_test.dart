@@ -104,6 +104,28 @@ void main() {
       expect(mapped['trait_value'], 'value');
     });
   });
+  group('[Trait] - null value', () {
+    test('When trait value is null, then it is parsed as null', () {
+      final trait = Trait.fromJson({'trait_key': 'plan', 'trait_value': null});
+      expect(trait.value, isNull);
+    });
+
+    test('When trait value is null, then it is serialised as null', () {
+      final mapped = Trait(key: 'plan', value: null).toJson();
+      expect(mapped, {'trait_key': 'plan', 'trait_value': null});
+      expect(Trait.fromJson(jsonDecode(jsonEncode(mapped))).value, isNull);
+    });
+
+    test('When trait with identity value is null, then it round-trips', () {
+      final trait = TraitWithIdentity(
+          identity: Identity(identifier: 'user'), key: 'plan', value: null);
+      final mapped = trait.toJson();
+      expect(mapped['trait_value'], isNull);
+      expect(mapped.containsKey('trait_value'), isTrue);
+      expect(TraitWithIdentity.fromJson(mapped).value, isNull);
+    });
+  });
+
   group('[Trait] - copyWith', () {
     test('as a developer want to use with new data', () {
       final trait = Trait.fromJson(decodedTraitStringValue);
