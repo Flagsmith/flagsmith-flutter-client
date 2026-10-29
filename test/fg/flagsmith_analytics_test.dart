@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
@@ -106,12 +107,16 @@ void main() {
         ),
       );
       addTearDown(scheduled.close);
-      var attempts = 0;
-      scheduled.client.interceptors.add(InterceptorsWrapper(onRequest: (o, h) {
-        if (o.path == scheduled.config.analyticsURI) {
-          attempts++;
+      var failures = 0;
+      final secondFailure = Completer<void>();
+      scheduled.client.interceptors.add(InterceptorsWrapper(onError: (e, h) {
+        if (e.requestOptions.path == scheduled.config.analyticsURI) {
+          failures++;
+          if (failures == 2) {
+            secondFailure.complete();
+          }
         }
-        h.next(o);
+        h.next(e);
       }));
       setupEmptyAdapter(scheduled, cb: (config, adapter) {
         adapter.onPost(config.analyticsURI, (server) {
@@ -126,10 +131,9 @@ void main() {
 
       // When
       await scheduled.getFeatureFlagValue('my_feature');
-      await Future<void>.delayed(const Duration(milliseconds: 100));
+      await secondFailure.future.timeout(const Duration(seconds: 1));
 
       // Then
-      expect(attempts, greaterThan(1));
       expect(scheduled.flagAnalytics['my_feature'], 1);
     });
   });
