@@ -98,8 +98,9 @@ class FlagsmithClient {
 
   Future<void> _setupAnalyticsTimer(int analyticsInterval) async {
     _analyticsTimer?.cancel();
-    _analyticsTimer = Timer.periodic(
-        Duration(milliseconds: analyticsInterval), (_) => syncAnalyticsData());
+    // Failures are logged, and the analytics are resent on the next tick.
+    _analyticsTimer = Timer.periodic(Duration(milliseconds: analyticsInterval),
+        (_) => syncAnalyticsData().ignore());
   }
 
   Future<Response<dynamic>?> syncAnalyticsData() async {

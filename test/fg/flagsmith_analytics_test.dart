@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flagsmith/flagsmith.dart';
+import 'package:http_mock_adapter/http_mock_adapter.dart';
 import 'package:test/test.dart';
 
 import '../shared.dart';
@@ -90,6 +91,46 @@ void main() {
           () => fs.syncAnalyticsData(), throwsA(isA<FlagsmithApiException>()));
 
       expect(fs.flagAnalytics.isEmpty, isFalse);
+    });
+    test(
+        'When scheduled analytics fail to send, then the app keeps running '
+        'and keeps the analytics', () async {
+      // Given
+      final scheduled = await FlagsmithClient.init(
+        apiKey: apiKey,
+        seeds: seeds,
+        config: const FlagsmithConfig(
+          baseURI: 'https://offline.net/',
+          caches: true,
+          analyticsInterval: 10,
+        ),
+      );
+      addTearDown(scheduled.close);
+      var attempts = 0;
+      scheduled.client.interceptors.add(InterceptorsWrapper(onRequest: (o, h) {
+        if (o.path == scheduled.config.analyticsURI) {
+          attempts++;
+        }
+        h.next(o);
+      }));
+      setupEmptyAdapter(scheduled, cb: (config, adapter) {
+        adapter.onPost(config.analyticsURI, (server) {
+          return server.throws(
+            404,
+            DioException(
+              requestOptions: RequestOptions(path: config.analyticsURI),
+            ),
+          );
+        }, data: Matchers.any);
+      });
+
+      // When
+      await scheduled.getFeatureFlagValue('my_feature');
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+
+      // Then
+      expect(attempts, greaterThan(1));
+      expect(scheduled.flagAnalytics['my_feature'], 1);
     });
   });
 }
