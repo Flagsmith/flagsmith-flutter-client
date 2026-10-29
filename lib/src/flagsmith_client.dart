@@ -380,8 +380,9 @@ class FlagsmithClient {
   /// EXPERIMENTS
   ///
   /// Resolve a flag for [user] (or [cachedUser]) and fire one `$flag_exposure`
-  /// event with the variant as value. Skipped unless events are enabled, the
-  /// flag is enabled and `flag.experiment.inExperiment` is true.
+  /// event with the variant as value and [traits] attached. Skipped unless
+  /// events are enabled, the flag is enabled and
+  /// `flag.experiment.inExperiment` is true.
   ///
   /// Fetches only when storage holds another identity's flags;
   /// [reload] overrides this.
@@ -427,6 +428,9 @@ class FlagsmithClient {
     trackExposureEvent(featureName,
         user: identity,
         value: flag.variant,
+        traits: traits == null || traits.isEmpty
+            ? null
+            : {for (final trait in traits) trait.key: trait.value},
         metadata: <String, dynamic>{'experiment_id': experiment.id});
     return flag;
   }

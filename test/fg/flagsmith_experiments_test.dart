@@ -113,6 +113,27 @@ void main() {
       expect(fs.eventProcessor!.buffer, isEmpty);
     });
 
+    test('When identity is enrolled with traits, then exposure carries them',
+        () async {
+      // Given
+      final traits = [
+        Trait(key: 'plan', value: 'premium'),
+        Trait(key: 'age', value: 30),
+      ];
+
+      // When
+      await fs.getExperimentFlag(experimentFeatureName,
+          user: user, traits: traits);
+      await fs.flushEvents();
+
+      // Then
+      final event = capture.events.single;
+      expect(event['event'], r'$flag_exposure');
+      expect(event['identifier'], user.identifier);
+      expect(event['value'], experimentVariant);
+      expect(event['traits'], {'plan': 'premium', 'age': 30});
+    });
+
     test('When identity is not enrolled, then no exposure', () async {
       final flag = await fs.getExperimentFlag(experimentNotEnrolledFeatureName);
       expect(flag!.variant, 'control');
