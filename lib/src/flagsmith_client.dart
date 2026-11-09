@@ -103,9 +103,15 @@ class FlagsmithClient {
   /// Flushes events when the app goes to the background. Skipped when the
   /// client is created before the Flutter binding is initialised.
   void _observeLifecycle() {
+    final binding = _widgetsBindingOrNull();
+    if (binding == null) {
+      log('Events: Flutter binding not initialised, so events will not be '
+          'flushed when the app goes to the background');
+      return;
+    }
     final observer = _EventsLifecycleObserver(
         () => unawaited(_eventProcessor?.flush()));
-    _widgetsBindingOrNull()?.addObserver(observer);
+    binding.addObserver(observer);
     _lifecycleObserver = observer;
   }
 

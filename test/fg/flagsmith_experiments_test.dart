@@ -584,25 +584,40 @@ void main() {
       test('When app becomes ${state.name}, then buffered events are flushed',
           () async {
         final (fs, capture) = await buildClient();
+        addTearDown(fs.close);
         fs.trackEvent('purchase');
 
         binding.handleAppLifecycleStateChanged(state);
 
         expect(fs.eventProcessor!.buffer, isEmpty);
-        await fs.close();
+        await fs.flushEvents();
         expect(capture.events.single['event'], 'purchase');
       });
     }
 
     test('When app becomes inactive, then events stay buffered', () async {
       final (fs, capture) = await buildClient();
+      addTearDown(fs.close);
       fs.trackEvent('purchase');
 
       binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
 
       expect(fs.eventProcessor!.buffer.length, 1);
       expect(capture.requests, isEmpty);
+    });
+
+    test('When client is closed, then backgrounding no longer flushes',
+        () async {
+      final (fs, _) = await buildClient();
       await fs.close();
+      // Restart the processor so a leaked listener would show as a flush.
+      final processor = fs.eventProcessor!..start();
+      addTearDown(processor.stop);
+      fs.trackEvent('purchase');
+
+      binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+
+      expect(processor.buffer.length, 1);
     });
   });
 
