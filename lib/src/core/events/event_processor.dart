@@ -7,7 +7,7 @@ import '../../version.dart';
 
 /// Batches experimentation events to `{eventsURI}v1/events`.
 ///
-/// Flushes on a timer, at [maxBuffer], on [flush] and best-effort on [stop].
+/// Flushes on a timer, at [maxBuffer], on [flush] and on [stop].
 /// Exposures dedupe within a flush window; a failed POST retries once then drops.
 class EventProcessor {
   static const String flagExposureEvent = r'$flag_exposure';
@@ -156,13 +156,14 @@ class EventProcessor {
     }
   }
 
-  /// Cancels the timer and flushes without awaiting; await [flush] for teardown.
+  /// Cancels the timer and flushes. The returned future completes once every
+  /// upload in flight has finished, and never throws.
   /// Events tracked after this are dropped until [start] is called again.
-  void stop() {
+  Future<void> stop() {
     _stopped = true;
     _timer?.cancel();
     _timer = null;
-    unawaited(flush());
+    return flush();
   }
 
   Future<void> _postBatch(

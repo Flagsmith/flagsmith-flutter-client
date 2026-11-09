@@ -4,6 +4,8 @@ import 'package:dio/dio.dart';
 import 'package:flagsmith/flagsmith.dart';
 import 'package:flagsmith/src/core/events/event_processor.dart';
 import 'package:flagsmith/src/version.dart';
+import 'package:flutter/widgets.dart' show AppLifecycleState;
+import 'package:flutter_test/flutter_test.dart' show TestWidgetsFlutterBinding;
 import 'package:http_mock_adapter/http_mock_adapter.dart';
 import 'package:test/test.dart';
 
@@ -33,6 +35,7 @@ Future<(FlagsmithClient, EventsCapture)> buildClient({
   int flushInterval = 60000,
   int maxBuffer = 1000,
   bool eventsFail = false,
+  Duration eventsDelay = Duration.zero,
   bool loadUserFlags = true,
 }) async {
   final fs = FlagsmithClient(
@@ -57,7 +60,7 @@ Future<(FlagsmithClient, EventsCapture)> buildClient({
             DioException(requestOptions: RequestOptions(path: eventsEndpoint)));
         return;
       }
-      server.reply(200, <String, dynamic>{});
+      server.reply(200, <String, dynamic>{}, delay: eventsDelay);
     }, data: Matchers.any);
   });
   await fs.initialize();
@@ -510,6 +513,36 @@ void main() {
       expect(fs.eventProcessor!.buffer, isEmpty);
     });
 
+    test('When close is awaited, then it returns after the final POST',
+        () async {
+      final (fs, capture) =
+          await buildClient(eventsDelay: const Duration(milliseconds: 50));
+      var responses = 0;
+      fs.client.interceptors.add(InterceptorsWrapper(onResponse: (r, h) {
+        responses++;
+        h.next(r);
+      }));
+      fs.trackEvent('purchase');
+
+      await fs.close();
+
+      expect(capture.events.single['event'], 'purchase');
+      expect(responses, 1);
+    });
+
+    test('When final POST outlasts the timeout, then close returns anyway',
+        () async {
+      final (fs, capture) =
+          await buildClient(eventsDelay: const Duration(seconds: 2));
+      fs.trackEvent('purchase');
+      final watch = Stopwatch()..start();
+
+      await fs.close(timeout: const Duration(milliseconds: 50));
+
+      expect(watch.elapsedMilliseconds, lessThan(1000));
+      expect(capture.requests.length, 1, reason: 'POST was started');
+    });
+
     test('When client is closed, then later events are dropped', () async {
       final (fs, capture) = await buildClient();
       fs.close();
@@ -534,6 +567,42 @@ void main() {
       expect(capture.requests.length, 2, reason: 'one retry then drop');
       expect(fs.eventProcessor!.buffer, isEmpty);
       fs.close();
+    });
+  });
+
+  group('[Experiments] app lifecycle', () {
+    late TestWidgetsFlutterBinding binding;
+    setUpAll(() => binding = TestWidgetsFlutterBinding.ensureInitialized());
+    tearDown(() =>
+        binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed));
+
+    for (final state in [
+      AppLifecycleState.hidden,
+      AppLifecycleState.paused,
+      AppLifecycleState.detached,
+    ]) {
+      test('When app becomes ${state.name}, then buffered events are flushed',
+          () async {
+        final (fs, capture) = await buildClient();
+        fs.trackEvent('purchase');
+
+        binding.handleAppLifecycleStateChanged(state);
+
+        expect(fs.eventProcessor!.buffer, isEmpty);
+        await fs.close();
+        expect(capture.events.single['event'], 'purchase');
+      });
+    }
+
+    test('When app becomes inactive, then events stay buffered', () async {
+      final (fs, capture) = await buildClient();
+      fs.trackEvent('purchase');
+
+      binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+
+      expect(fs.eventProcessor!.buffer.length, 1);
+      expect(capture.requests, isEmpty);
+      await fs.close();
     });
   });
 
