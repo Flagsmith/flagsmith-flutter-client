@@ -59,9 +59,15 @@ reserved. The event name is case-sensitive and must match the metric's configure
 
 ### Flushing
 
-Events are buffered and posted to `eventsURI` every `eventsFlushInterval` ms (10 s) or when `eventsMaxBuffer` (1000)
-events are queued. `close()` flushes best-effort; await `flushEvents()` when you need the POST to complete, e.g. before
-the app is torn down. Network failures are retried once, then logged and dropped; they never throw.
+Events are buffered and posted to `eventsURI` every `eventsFlushInterval` ms (10 s), when `eventsMaxBuffer` (1000)
+events are queued, and when the app goes to the background (`hidden`, `paused` or `detached`). The background flush
+needs the Flutter binding initialised before the client is created, and is best effort: iOS may suspend the app before
+the POST completes, and nothing is sent on force-quit or web page unload. Network failures are retried once, then
+logged and dropped; they never throw.
+
+`await close()` stops the client and returns once the final POST completes or the timeout (10 s by default) passes. To
+send events without closing the client, await `flushEvents()`. `close()` now returns `Future<void>`, so subclasses that
+override it must update their signature.
 
 ## Contributing
 

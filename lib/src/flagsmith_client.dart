@@ -4,6 +4,8 @@ import 'dart:convert';
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart' show visibleForTesting;
+import 'package:flutter/widgets.dart'
+    show AppLifecycleState, WidgetsBinding, WidgetsBindingObserver;
 import 'package:flutter_client_sse/constants/sse_request_type_enum.dart';
 import 'package:flutter_client_sse/flutter_client_sse.dart';
 import 'package:rxdart/subjects.dart';
@@ -49,6 +51,7 @@ class FlagsmithClient {
   Timer? _analyticsTimer;
 
   EventProcessor? _eventProcessor;
+  _EventsLifecycleObserver? _lifecycleObserver;
 
   /// Internal events pipeline; exposed for tests only.
   @visibleForTesting
@@ -90,9 +93,35 @@ class FlagsmithClient {
         maxBuffer: config.eventsMaxBuffer,
         log: log,
       )..start();
+      _observeLifecycle();
     }
     if (config.enableRealtimeUpdates) {
       _setupRealtimeUpdates(config.realtimeUpdatesBaseURI);
+    }
+  }
+
+  /// Flushes events when the app goes to the background. Skipped when the
+  /// client is created before the Flutter binding is initialised.
+  void _observeLifecycle() {
+    final binding = _widgetsBindingOrNull();
+    if (binding == null) {
+      log('Events: Flutter binding not initialised, so events will not be '
+          'flushed when the app goes to the background');
+      return;
+    }
+    final observer = _EventsLifecycleObserver(
+        () => unawaited(_eventProcessor?.flush()));
+    binding.addObserver(observer);
+    _lifecycleObserver = observer;
+  }
+
+  static WidgetsBinding? _widgetsBindingOrNull() {
+    // The getter throws until runApp() or ensureInitialized() has run: a
+    // FlutterError in debug builds, a TypeError in release builds.
+    try {
+      return WidgetsBinding.instance;
+    } catch (_) {
+      return null;
     }
   }
 
@@ -717,11 +746,29 @@ class FlagsmithClient {
   // Loading from API
   Stream<FlagsmithLoading> get loading => _loading.stream;
 
-  void close() {
+  /// Stops the client and flushes buffered events. The returned future
+  /// completes once the final POST finishes or [timeout] passes, whichever
+  /// comes first; it never throws. On timeout the POST carries on in the
+  /// background. Events tracked after this are dropped.
+  Future<void> close({Duration timeout = const Duration(seconds: 10)}) async {
+    final flushing = _eventProcessor?.stop();
     _analyticsTimer?.cancel();
-    _eventProcessor?.stop();
+    final observer = _lifecycleObserver;
+    if (observer != null) {
+      _widgetsBindingOrNull()?.removeObserver(observer);
+      _lifecycleObserver = null;
+    }
     SSEClient.unsubscribeFromSSE();
-    _loading.close();
+    unawaited(_loading.close());
+    if (flushing == null) {
+      return;
+    }
+    try {
+      await flushing.timeout(timeout);
+    } on TimeoutException {
+      log('Events: close() timed out after ${timeout.inMilliseconds} ms; '
+          'the final POST continues in the background');
+    }
   }
 
   /// test toggle feature
@@ -735,5 +782,25 @@ class FlagsmithClient {
       }
     }
     return result;
+  }
+}
+
+class _EventsLifecycleObserver with WidgetsBindingObserver {
+  _EventsLifecycleObserver(this._onBackground);
+
+  final void Function() _onBackground;
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      // hidden is the only signal on web; paused and detached on mobile.
+      case AppLifecycleState.hidden:
+      case AppLifecycleState.paused:
+      case AppLifecycleState.detached:
+        _onBackground();
+      case AppLifecycleState.resumed:
+      case AppLifecycleState.inactive:
+        break;
+    }
   }
 }
