@@ -953,7 +953,8 @@ void main() {
                 reason: 'offline'));
       }, data: Matchers.any);
 
-      final p = processor(retryBackoff: 100);
+      // The longest jittered wait, so the swap below lands within it.
+      final p = processor(retryBackoff: 100, random: MaxRandom());
       p.trackEvent(event: 'purchase', identifier: 'u1');
       final flushing = p.flush();
 
