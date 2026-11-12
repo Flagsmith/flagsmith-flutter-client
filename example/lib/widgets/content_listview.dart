@@ -1,6 +1,9 @@
 import '../bloc/flag_bloc.dart';
 import '../models/loading_state.dart';
 import 'package:flagsmith/flagsmith.dart';
+// Deprecated for package:material_ui since Flutter 3.47, which this example
+// does not require yet.
+// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

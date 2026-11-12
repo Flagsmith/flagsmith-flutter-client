@@ -1,4 +1,8 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
+import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:flagsmith/flagsmith.dart';
@@ -30,11 +34,65 @@ class EventsCapture {
       });
 }
 
+/// Answers each events request with the next scripted response: a status
+/// code, [reset] (the connection drops) or [hang] (no answer until cancelled).
+/// Requests beyond the script get a 202.
+class ScriptedAdapter implements HttpClientAdapter {
+  static const reset = 'reset';
+  static const hang = 'hang';
+
+  ScriptedAdapter(this.script);
+
+  final List<Object> script;
+  final List<Duration> cancelledAfter = [];
+  Completer<void>? gate;
+
+  @override
+  Future<ResponseBody> fetch(RequestOptions options,
+      Stream<Uint8List>? requestStream, Future<void>? cancelFuture) async {
+    final response = script.isEmpty ? 202 : script.removeAt(0);
+    await gate?.future;
+    if (response == reset) {
+      throw const SocketException('Connection reset by peer');
+    }
+    if (response == hang) {
+      final watch = Stopwatch()..start();
+      await cancelFuture;
+      cancelledAfter.add(watch.elapsed);
+      throw StateError('cancelled');
+    }
+    return ResponseBody.fromString('{}', response as int,
+        headers: <String, List<String>>{
+          Headers.contentTypeHeader: [Headers.jsonContentType],
+        });
+  }
+
+  @override
+  void close({bool force = false}) {}
+}
+
+/// Always picks the longest wait, and records the bounds it was given.
+class MaxRandom implements Random {
+  final List<int> bounds = [];
+
+  @override
+  int nextInt(int max) {
+    bounds.add(max);
+    return max - 1;
+  }
+
+  @override
+  double nextDouble() => 1;
+
+  @override
+  bool nextBool() => true;
+}
+
 Future<(FlagsmithClient, EventsCapture)> buildClient({
   bool enableEvents = true,
   int flushInterval = 60000,
   int maxBuffer = 1000,
-  bool eventsFail = false,
+  bool eventsRejected = false,
   Duration eventsDelay = Duration.zero,
   bool loadUserFlags = true,
 }) async {
@@ -55,9 +113,8 @@ Future<(FlagsmithClient, EventsCapture)> buildClient({
       server.reply(200, jsonDecode(identitiesResponseData));
     }, data: Matchers.any);
     adapter.onPost(eventsEndpoint, (server) {
-      if (eventsFail) {
-        server.throws(500,
-            DioException(requestOptions: RequestOptions(path: eventsEndpoint)));
+      if (eventsRejected) {
+        server.reply(400, <String, dynamic>{});
         return;
       }
       server.reply(200, <String, dynamic>{}, delay: eventsDelay);
@@ -558,13 +615,13 @@ void main() {
       expect(capture.requests, isEmpty);
     });
 
-    test('When POST fails, then flushEvents does not throw and drops batch',
+    test('When POST is rejected, then flushEvents does not throw, drops batch',
         () async {
-      final (fs, capture) = await buildClient(eventsFail: true);
+      final (fs, capture) = await buildClient(eventsRejected: true);
       fs.trackEvent('purchase');
 
       await expectLater(fs.flushEvents(), completes);
-      expect(capture.requests.length, 2, reason: 'one retry then drop');
+      expect(capture.requests.length, 1, reason: 'a rejection is final');
       expect(fs.eventProcessor!.buffer, isEmpty);
       fs.close();
     });
@@ -635,22 +692,39 @@ void main() {
       logs = [];
     });
 
-    EventProcessor processor({int retryBackoff = 10, int flushInterval = 0}) =>
+    EventProcessor processor(
+            {int retryBackoff = 10,
+            int flushInterval = 0,
+            int maxBuffer = 1000,
+            int requestTimeout = 3000,
+            Random? random}) =>
         EventProcessor(
           api: dio,
           apiKey: apiKey,
           eventsURI: 'https://events.api.flagsmith.com',
           retryBackoff: retryBackoff,
           flushInterval: flushInterval,
+          maxBuffer: maxBuffer,
+          requestTimeout: requestTimeout,
           log: logs.add,
+          random: random,
         );
+
+    ScriptedAdapter script(List<Object> responses) =>
+        dio.httpClientAdapter = ScriptedAdapter(responses);
+
+    List<List<Object?>> sentBatches() => [
+          for (final request in capture.requests)
+            [for (final e in request.data['events'] as List) e['event']],
+        ];
 
     test('When eventsURI lacks trailing slash, then endpoint is normalised',
         () {
       expect(processor().endpoint, eventsEndpoint);
     });
 
-    test('When POST returns non-2xx, then retried once and dropped', () async {
+    test('When every attempt gets a 500, then 3 attempts and dropped',
+        () async {
       adapter.onPost(eventsEndpoint, (server) {
         server.reply(500, <String, dynamic>{});
       }, data: Matchers.any);
@@ -659,10 +733,214 @@ void main() {
       p.trackEvent(event: 'purchase', identifier: 'u1');
       await p.flush();
 
-      expect(capture.requests.length, 2);
+      expect(capture.requests.length, EventProcessor.maxAttempts);
       expect(p.buffer, isEmpty);
-      expect(logs.where((l) => l.contains('retrying')).length, 1);
+      expect(logs.where((l) => l.contains('retrying')).length, 2);
       expect(logs.where((l) => l.contains('dropping')).length, 1);
+    });
+
+    test('When transient failures precede success, then batch is delivered',
+        () async {
+      script([503, ScriptedAdapter.reset]);
+
+      final p = processor();
+      p.trackEvent(event: 'checkout');
+      await p.flush();
+
+      expect(sentBatches(), [
+        ['checkout'],
+        ['checkout'],
+        ['checkout'],
+      ]);
+      expect(p.buffer, isEmpty);
+    });
+
+    for (final status in [408, 429, 502, 503, 504]) {
+      test('When every attempt gets a $status, then batch is kept', () async {
+        script([status, status, status]);
+
+        final p = processor();
+        p.trackEvent(event: 'purchase');
+        await p.flush();
+
+        expect(capture.requests.length, EventProcessor.maxAttempts);
+        expect(p.buffer.single['event'], 'purchase');
+      });
+    }
+
+    test('When a kept batch is flushed again, then it goes ahead of new events',
+        () async {
+      script([503, 503, 503]);
+
+      final p = processor();
+      p.trackEvent(event: 'add_to_cart');
+      await p.flush();
+      p.trackEvent(event: 'checkout');
+      await p.flush();
+
+      expect(sentBatches(), [
+        ['add_to_cart'],
+        ['add_to_cart'],
+        ['add_to_cart'],
+        ['add_to_cart', 'checkout'],
+      ]);
+      expect(p.buffer, isEmpty);
+    });
+
+    test('When the last attempt gets a 500, then batch is dropped', () async {
+      script([503, 503, 500]);
+
+      final p = processor();
+      p.trackEvent(event: 'add_to_cart');
+      await p.flush();
+      p.trackEvent(event: 'checkout');
+      await p.flush();
+
+      expect(sentBatches().last, ['checkout']);
+      expect(capture.requests.length, 4);
+    });
+
+    test('When the last attempt fails transiently after 500s, then kept',
+        () async {
+      script([500, 500, 503]);
+
+      final p = processor();
+      p.trackEvent(event: 'add_to_cart');
+      await p.flush();
+
+      expect(capture.requests.length, 3);
+      expect(p.buffer.single['event'], 'add_to_cart');
+    });
+
+    test('When POST is rejected with 400, then dropped without retry',
+        () async {
+      script([400]);
+
+      final p = processor();
+      p.trackEvent(event: 'add_to_cart');
+      await p.flush();
+      p.trackEvent(event: 'checkout');
+      await p.flush();
+
+      expect(sentBatches(), [
+        ['add_to_cart'],
+        ['checkout'],
+      ]);
+    });
+
+    for (final status in [401, 403]) {
+      test(
+          'When the environment key is refused with $status, then tracking '
+          'stops', () async {
+        script([status]);
+
+        final p = processor();
+        p.trackEvent(event: 'add_to_cart');
+        p.trackEvent(event: 'pending');
+        final flushing = p.flush();
+        p.trackEvent(event: 'during_send');
+        await flushing;
+        p.trackEvent(event: 'checkout');
+        await p.flush();
+
+        expect(sentBatches(), [
+          ['add_to_cart', 'pending'],
+        ]);
+        expect(p.unauthorised, isTrue);
+        expect(p.buffer, isEmpty);
+        expect(
+            logs,
+            contains('Events: environment key refused, dropping '
+                '"checkout"'));
+      });
+    }
+
+    test('When a request is not answered, then it times out and is retried',
+        () async {
+      final scripted = script([ScriptedAdapter.hang]);
+
+      final p = processor(requestTimeout: 100);
+      p.trackEvent(event: 'checkout');
+      await p.flush();
+
+      expect(scripted.cancelledAfter.single.inMilliseconds,
+          inInclusiveRange(90, 500));
+      expect(sentBatches(), [
+        ['checkout'],
+        ['checkout'],
+      ]);
+      expect(p.buffer, isEmpty);
+    });
+
+    test('When retrying, then the wait is jittered up to a doubling backoff',
+        () async {
+      script([503, 503, 503]);
+      final random = MaxRandom();
+
+      final p = processor(retryBackoff: 10, random: random);
+      p.trackEvent(event: 'purchase');
+      await p.flush();
+
+      // nextInt is exclusive: a wait of up to 10 ms, then up to 20 ms.
+      expect(random.bounds, [11, 21]);
+    });
+
+    test('When the buffer is full, then the oldest event is dropped', () async {
+      // Hold the batch the full buffer flushes in flight, so the buffer
+      // fills up again behind it.
+      final scripted = script([])..gate = Completer<void>();
+
+      final p = processor(maxBuffer: 3);
+      for (var i = 1; i <= 3; i++) {
+        p.trackEvent(event: 'in_flight_$i');
+      }
+      expect(p.buffer, isEmpty, reason: 'max buffer triggered a flush');
+      for (var i = 1; i <= 4; i++) {
+        p.trackEvent(event: 'event_$i');
+      }
+
+      expect(
+          p.buffer.map((e) => e['event']), ['event_2', 'event_3', 'event_4']);
+      scripted.gate!.complete();
+      await p.flush();
+      expect(sentBatches().last, ['event_2', 'event_3', 'event_4']);
+    });
+
+    test('When a kept batch overflows the buffer, then the oldest are dropped',
+        () async {
+      final scripted = script([503, 503, 503])..gate = Completer<void>();
+
+      final p = processor(maxBuffer: 3);
+      p.trackEvent(event: 'kept_1');
+      p.trackEvent(event: 'kept_2');
+      final flushing = p.flush();
+      p.trackEvent(event: 'new_1');
+      p.trackEvent(event: 'new_2');
+      scripted.gate!.complete();
+      await flushing;
+
+      expect(p.buffer.map((e) => e['event']), ['kept_2', 'new_1', 'new_2']);
+    });
+
+    test('When a batch is in flight, then the next one waits for it', () async {
+      final scripted = script([503])..gate = Completer<void>();
+
+      final p = processor();
+      p.trackEvent(event: 'first');
+      final first = p.flush();
+      p.trackEvent(event: 'second');
+      final second = p.flush();
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+      expect(capture.requests.length, 1, reason: 'one batch in flight');
+
+      scripted.gate!.complete();
+      await Future.wait([first, second]);
+
+      expect(sentBatches(), [
+        ['first'],
+        ['first'],
+        ['second'],
+      ]);
     });
 
     test('When POST fails once then succeeds, then batch is delivered',

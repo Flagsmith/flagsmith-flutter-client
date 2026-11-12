@@ -62,8 +62,15 @@ reserved. The event name is case-sensitive and must match the metric's configure
 Events are buffered and posted to `eventsURI` every `eventsFlushInterval` ms (10 s), when `eventsMaxBuffer` (1000)
 events are queued, and when the app goes to the background (`hidden`, `paused` or `detached`). The background flush
 needs the Flutter binding initialised before the client is created, and is best effort: iOS may suspend the app before
-the POST completes, and nothing is sent on force-quit or web page unload. Network failures are retried once, then
-logged and dropped; they never throw.
+the POST completes, and nothing is sent on force-quit or web page unload. Delivery failures never throw:
+
+- One batch is sent at a time, and each request times out after 3 s.
+- Network errors, timeouts and 5xx, 408 or 429 responses are retried, up to 3 attempts, after a random wait of up to 1 s,
+  then 2 s. A batch whose last attempt fails with a 500 (or another 5xx outside 502, 503 and 504) is dropped; otherwise
+  it is kept for the next flush, ahead of newer events.
+- Any other error response, such as 400, drops the batch.
+- A 401 or 403 drops the buffered events and stops event tracking: the environment key is not accepted.
+- The buffer holds `eventsMaxBuffer` events and drops the oldest when full.
 
 `await close()` stops the client and returns once the final POST completes or the timeout (10 s by default) passes. To
 send events without closing the client, await `flushEvents()`. `close()` now returns `Future<void>`, so subclasses that

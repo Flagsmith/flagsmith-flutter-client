@@ -70,6 +70,21 @@ void trackExposureEvent(FlagsmithClient flagsmith, String feature,
       metadata: metadata,
     );
 
+// When the application tracks events "event_{first}" to "event_{last}" for identity "{identifier}"
+void trackEvents(
+    FlagsmithClient flagsmith, int first, int last, String identifier) {
+  for (var i = first; i <= last; i++) {
+    flagsmith.trackEvent('event_$i', user: Identity(identifier: identifier));
+  }
+}
+
+// When the application flushes events
+Future<void> flushEvents(FlagsmithClient flagsmith) => flagsmith.flushEvents();
+
+// When the application closes the client with a timeout of {timeout} seconds
+Future<void> close(FlagsmithClient flagsmith, num timeout) =>
+    flagsmith.close(timeout: Duration(milliseconds: (timeout * 1000).round()));
+
 List<Map<String, Object?>> asSpecFlags(List<Flag> flags) => [
       for (final flag in flags)
         {
