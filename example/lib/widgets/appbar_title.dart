@@ -2,6 +2,9 @@ import '../di.dart';
 import 'package:flagsmith/flagsmith.dart';
 
 import '../bloc/flag_bloc.dart';
+// Deprecated for package:material_ui since Flutter 3.47, which this example
+// does not require yet.
+// ignore: deprecated_member_use
 import 'package:flutter/material.dart';
 
 class AppbarTitle extends StatelessWidget {
