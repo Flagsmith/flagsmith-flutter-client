@@ -922,6 +922,111 @@ void main() {
       expect(p.buffer.map((e) => e['event']), ['kept_2', 'new_1', 'new_2']);
     });
 
+    test('When max buffer is 0, then each event is sent on its own', () async {
+      final p = processor(maxBuffer: 0);
+      script([]);
+
+      p.trackEvent(event: 'purchase');
+      p.trackExposureEvent(featureName: 'banner', identifier: 'u1');
+      await p.flush();
+
+      expect(p.maxBuffer, 1);
+      expect(sentBatches(), [
+        ['purchase'],
+        [EventProcessor.flagExposureEvent],
+      ]);
+    });
+
+    test('When a batch cannot be encoded, then it is dropped at once',
+        () async {
+      script([]);
+
+      final p = processor();
+      p.trackEvent(event: 'bad', metadata: {'at': DateTime(2026)});
+      await p.flush();
+      p.trackEvent(event: 'good');
+      await p.flush();
+
+      expect(p.buffer, isEmpty);
+      expect(capture.requests.length, 2, reason: 'no retry of the bad batch');
+      expect(sentBatches().last, ['good']);
+    });
+
+    test('When a kept batch fills the buffer, then tracking does not resend it',
+        () async {
+      script([503, 503, 503]);
+
+      final p = processor(maxBuffer: 2);
+      p.trackEvent(event: 'a');
+      p.trackEvent(event: 'b');
+      await p.flush();
+      expect(capture.requests.length, 3);
+      expect(p.buffer.length, 2, reason: 'the batch is kept');
+
+      p.trackEvent(event: 'c');
+      p.trackEvent(event: 'd');
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      expect(capture.requests.length, 3, reason: 'held until the next flush');
+
+      await p.flush();
+      expect(sentBatches().last, ['c', 'd']);
+    });
+
+    test('When a kept batch fills the buffer, then the next tick sends it',
+        () async {
+      script([503, 503, 503]);
+
+      final p = processor(maxBuffer: 1, flushInterval: 100)..start();
+      addTearDown(p.stop);
+      p.trackEvent(event: 'a');
+      await Future<void>.delayed(const Duration(milliseconds: 60));
+      expect(capture.requests.length, 3);
+      p.trackEvent(event: 'b');
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+      expect(capture.requests.length, 3, reason: 'held until the tick');
+
+      await Future<void>.delayed(const Duration(milliseconds: 150));
+      expect(sentBatches().last, ['b']);
+    });
+
+    test('When the buffer fills during a send, then it is sent after it',
+        () async {
+      final scripted = script([])..gate = Completer<void>();
+
+      final p = processor(maxBuffer: 2);
+      p.trackEvent(event: 'a');
+      p.trackEvent(event: 'b');
+      p.trackEvent(event: 'c');
+      p.trackEvent(event: 'd');
+      scripted.gate!.complete();
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+
+      expect(sentBatches(), [
+        ['a', 'b'],
+        ['c', 'd'],
+      ]);
+      expect(p.buffer, isEmpty);
+    });
+
+    test('When an exposure is evicted, then it can be tracked again', () async {
+      final scripted = script([])..gate = Completer<void>();
+
+      final p = processor(maxBuffer: 2);
+      p.trackEvent(event: 'a');
+      p.trackEvent(event: 'b');
+      p.trackExposureEvent(featureName: 'banner', identifier: 'u1');
+      p.trackEvent(event: 'c');
+      p.trackEvent(event: 'd');
+      expect(p.buffer.map((e) => e['event']), ['c', 'd'], reason: 'evicted');
+
+      p.trackExposureEvent(featureName: 'banner', identifier: 'u1');
+
+      expect(p.buffer.map((e) => e['event']),
+          ['d', EventProcessor.flagExposureEvent]);
+      scripted.gate!.complete();
+      await p.flush();
+    });
+
     test('When a batch is in flight, then the next one waits for it', () async {
       final scripted = script([503])..gate = Completer<void>();
 

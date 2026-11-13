@@ -68,9 +68,11 @@ the POST completes, and nothing is sent on force-quit or web page unload. Delive
 - Network errors, timeouts and 5xx, 408 or 429 responses are retried, up to 3 attempts, after a random wait of up to 1 s,
   then 2 s. A batch whose last attempt fails with a 500 (or another 5xx outside 502, 503 and 504) is dropped; otherwise
   it is kept for the next flush, ahead of newer events.
-- Any other error response, such as 400, drops the batch.
+- Any other error response, such as 400, drops the batch, as does any error other than a network error or timeout, such
+  as an event that cannot be encoded.
 - A 401 or 403 drops the buffered events and stops event tracking: the environment key is not accepted.
-- The buffer holds `eventsMaxBuffer` events and drops the oldest when full.
+- The buffer holds `eventsMaxBuffer` events (at least 1) and drops the oldest when full. While a kept batch waits,
+  filling the buffer no longer flushes it at once: it waits for the next interval or `flushEvents()`.
 
 `await close()` stops the client and returns once the final POST completes or the timeout (10 s by default) passes. To
 send events without closing the client, await `flushEvents()`. `close()` now returns `Future<void>`, so subclasses that

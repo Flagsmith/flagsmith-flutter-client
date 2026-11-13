@@ -22,6 +22,10 @@ import '../../version.dart';
 /// - Any other status, such as 400, drops the batch at once.
 /// - 401 and 403 drop the buffer and stop event tracking for good.
 /// - The buffer holds [maxBuffer] events and drops the oldest when full.
+///   Filling it flushes, unless a kept batch is waiting: then it waits for
+///   the next timer tick or explicit flush rather than retrying at once.
+/// - Errors other than network errors and timeouts, such as an event that
+///   cannot be encoded, drop the batch at once.
 class EventProcessor {
   static const String flagExposureEvent = r'$flag_exposure';
   static const String eventsPath = 'v1/events';
@@ -47,13 +51,17 @@ class EventProcessor {
   Timer? _timer;
   bool _stopped = false;
   bool _unauthorised = false;
+  // Set while a kept batch waits for the next timer tick or explicit flush.
+  bool _holdSizeFlush = false;
+  // Set while a flush for a full buffer waits for the batch in flight.
+  bool _sizeFlushQueued = false;
 
   EventProcessor({
     required Dio api,
     required String apiKey,
     required String eventsURI,
     this.flushInterval = 10000,
-    this.maxBuffer = 1000,
+    int maxBuffer = 1000,
     this.retryBackoff = 1000,
     this.requestTimeout = 3000,
     void Function(String message)? log,
@@ -62,6 +70,8 @@ class EventProcessor {
         _apiKey = apiKey,
         _log = log ?? _noopLog,
         _random = random ?? Random(),
+        // At least one event, so there is always room for the newest.
+        maxBuffer = max(1, maxBuffer),
         endpoint =
             '${eventsURI.endsWith('/') ? eventsURI : '$eventsURI/'}$eventsPath';
 
@@ -130,21 +140,15 @@ class EventProcessor {
     if (dedupe) {
       // Experiment id is part of the key so a new experiment on the same flag
       // and variant within one flush window still records its own exposure.
-      final key = jsonEncode([
-        event,
-        featureName,
-        identifier,
-        stringValue,
-        metadata?['experiment_id']
-      ]);
+      final key = _dedupeKey(event, featureName, identifier, stringValue,
+          metadata?['experiment_id']);
       if (_dedupeKeys.contains(key)) {
         return;
       }
       _dedupeKeys.add(key);
     }
     if (_buffer.length >= maxBuffer) {
-      _buffer.removeAt(0);
-      _log('Events: buffer full, dropping the oldest event');
+      _evictOldest(1);
     }
     _buffer.add(<String, dynamic>{
       'event': event,
@@ -158,23 +162,62 @@ class EventProcessor {
       },
       'timestamp': DateTime.now().millisecondsSinceEpoch,
     });
-    // A full buffer is already on its way unless a batch is in flight; it
-    // goes with the next flush then.
-    if (_buffer.length >= maxBuffer && _inFlight == null) {
-      unawaited(flush());
+    if (_buffer.length >= maxBuffer && !_holdSizeFlush && !_sizeFlushQueued) {
+      // Sent behind the batch in flight, if any.
+      _sizeFlushQueued = true;
+      unawaited(_flush(bySize: true));
     }
+  }
+
+  static String _dedupeKey(String event, String? featureName,
+          String? identifier, String? value, Object? experimentId) =>
+      jsonEncode([event, featureName, identifier, value, experimentId]);
+
+  static String? _dedupeKeyOf(Map<String, dynamic> event) {
+    if (event['event'] != flagExposureEvent) {
+      return null;
+    }
+    return _dedupeKey(
+        event['event'] as String,
+        event['feature_name'] as String?,
+        event['identifier'] as String?,
+        event['value'] as String?,
+        (event['metadata'] as Map<String, dynamic>?)?['experiment_id']);
+  }
+
+  /// Drops the [count] oldest buffered events, and the dedupe keys of evicted
+  /// exposures with no copy left in the buffer, so they can be tracked again.
+  void _evictOldest(int count) {
+    final evicted = _buffer.sublist(0, count);
+    _buffer.removeRange(0, count);
+    final remaining = _buffer.map(_dedupeKeyOf).whereType<String>().toSet();
+    for (final key in evicted.map(_dedupeKeyOf).whereType<String>()) {
+      if (!remaining.contains(key)) {
+        _dedupeKeys.remove(key);
+      }
+    }
+    _log('Events: buffer full, dropping the $count oldest events');
   }
 
   /// Posts the events buffered when it is called, retries included, after
   /// the batch in flight, if any, so that awaiting it at teardown means the
   /// POSTs have completed. A batch kept after failing while in flight waits
   /// for the next flush. Never throws.
-  Future<void> flush() async {
+  Future<void> flush() {
+    _holdSizeFlush = false;
+    return _flush(bySize: false);
+  }
+
+  Future<void> _flush({required bool bySize}) async {
     final hasEvents = _buffer.isNotEmpty;
     while (_inFlight != null) {
       await _inFlight;
     }
-    if (!hasEvents || _buffer.isEmpty) {
+    if (bySize) {
+      _sizeFlushQueued = false;
+    }
+    // A kept batch holds flushes for a full buffer until the next flush.
+    if (!hasEvents || _buffer.isEmpty || (bySize && _holdSizeFlush)) {
       return;
     }
     final events = List<Map<String, dynamic>>.from(_buffer);
@@ -244,10 +287,10 @@ class EventProcessor {
     }
     if (outcome == _Outcome.transient) {
       _buffer.insertAll(0, events);
+      _holdSizeFlush = true;
       final overflow = _buffer.length - maxBuffer;
       if (overflow > 0) {
-        _buffer.removeRange(0, overflow);
-        _log('Events: buffer full, dropping the $overflow oldest events');
+        _evictOldest(overflow);
       }
       _log('Events: flush failed, keeping ${events.length} events for the '
           'next flush');
@@ -268,6 +311,8 @@ class EventProcessor {
         cancelToken: cancelToken,
         options: Options(
           contentType: contentType,
+          // The body is not read, so it cannot fail to decode.
+          responseType: ResponseType.plain,
           headers: <String, dynamic>{
             environmentKeyHeader: _apiKey,
             sdkUserAgentHeader: getUserAgent(),
@@ -277,14 +322,38 @@ class EventProcessor {
       );
       return _outcomeOf(response.statusCode);
     } on DioException catch (e) {
+      _log('Events: request failed: ${e.message ?? e.error ?? e.type.name}');
       final status = e.response?.statusCode;
-      _log('Events: request failed: ${e.message ?? e.type.name}');
-      return status == null ? _Outcome.transient : _outcomeOf(status);
+      if (status != null) {
+        return _outcomeOf(status);
+      }
+      return _isNetworkError(e) ? _Outcome.transient : _Outcome.rejected;
     } catch (e) {
       _log('Events: request failed: $e');
-      return _Outcome.transient;
+      return _Outcome.rejected;
     } finally {
       deadline.cancel();
+    }
+  }
+
+  /// Whether [e] is a network error, timeout or cancellation (the request
+  /// timeout cancels), which a later attempt may get past. Anything else,
+  /// such as an event that cannot be encoded, fails every attempt.
+  static bool _isNetworkError(DioException e) {
+    switch (e.type) {
+      case DioExceptionType.connectionTimeout:
+      case DioExceptionType.sendTimeout:
+      case DioExceptionType.receiveTimeout:
+      case DioExceptionType.connectionError:
+      case DioExceptionType.cancel:
+        return true;
+      case DioExceptionType.unknown:
+        // A connection reset mid-request surfaces as an I/O exception
+        // (SocketException or HttpException); encoding failures are Errors.
+        return e.error is Exception && e.error is! FormatException;
+      case DioExceptionType.badCertificate:
+      case DioExceptionType.badResponse:
+        return false;
     }
   }
 
