@@ -956,7 +956,9 @@ void main() {
         () async {
       script([503, 503, 503]);
 
-      final p = processor(maxBuffer: 2);
+      // The timer lifts the hold, not a cool-down.
+      final p = processor(maxBuffer: 2, flushInterval: 60000)..start();
+      addTearDown(p.stop);
       p.trackEvent(event: 'a');
       p.trackEvent(event: 'b');
       await p.flush();
@@ -987,6 +989,25 @@ void main() {
 
       await Future<void>.delayed(const Duration(milliseconds: 150));
       expect(sentBatches().last, ['b']);
+    });
+
+    test(
+        'When a kept batch fills the buffer without a timer, then the hold '
+        'lifts after a cool-down', () async {
+      script([503, 503, 503]);
+
+      final p = processor(maxBuffer: 1, retryBackoff: 10);
+      expect(p.holdCoolDown, 40);
+      p.trackEvent(event: 'a');
+      await Future<void>.delayed(const Duration(milliseconds: 30));
+      expect(capture.requests.length, 3);
+      p.trackEvent(event: 'b');
+      expect(capture.requests.length, 3, reason: 'held after the kept batch');
+
+      await Future<void>.delayed(const Duration(milliseconds: 150));
+      expect(sentBatches().last, ['b'], reason: 'sent once the hold lifted');
+      expect(capture.requests.length, 4);
+      expect(p.buffer, isEmpty);
     });
 
     test('When the buffer fills during a send, then it is sent after it',

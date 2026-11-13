@@ -72,7 +72,8 @@ the POST completes, and nothing is sent on force-quit or web page unload. Delive
   as an event that cannot be encoded.
 - A 401 or 403 drops the buffered events and stops event tracking: the environment key is not accepted.
 - The buffer holds `eventsMaxBuffer` events (at least 1) and drops the oldest when full. While a kept batch waits,
-  filling the buffer no longer flushes it at once: it waits for the next interval or `flushEvents()`.
+  filling the buffer no longer flushes it at once: it waits for the next interval or `flushEvents()`, or, with
+  `eventsFlushInterval: 0`, for 4 s.
 
 `await close()` stops the client and returns once the final POST completes or the timeout (10 s by default) passes. To
 send events without closing the client, await `flushEvents()`. `close()` now returns `Future<void>`, so subclasses that

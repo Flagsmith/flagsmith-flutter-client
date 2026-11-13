@@ -23,7 +23,8 @@ import '../../version.dart';
 /// - 401 and 403 drop the buffer and stop event tracking for good.
 /// - The buffer holds [maxBuffer] events and drops the oldest when full.
 ///   Filling it flushes, unless a kept batch is waiting: then it waits for
-///   the next timer tick or explicit flush rather than retrying at once.
+///   the next timer tick or explicit flush rather than retrying at once, or
+///   without a timer for [holdCoolDown] ms.
 /// - Errors other than network errors and timeouts, such as an event that
 ///   cannot be encoded, drop the batch at once.
 class EventProcessor {
@@ -51,8 +52,10 @@ class EventProcessor {
   Timer? _timer;
   bool _stopped = false;
   bool _unauthorised = false;
-  // Set while a kept batch waits for the next timer tick or explicit flush.
+  // Set while a kept batch waits for the next timer tick or explicit flush,
+  // or, without a timer, for [_holdTimer].
   bool _holdSizeFlush = false;
+  Timer? _holdTimer;
   // Set while a flush for a full buffer waits for the batch in flight.
   bool _sizeFlushQueued = false;
 
@@ -82,6 +85,10 @@ class EventProcessor {
   /// Whether the events API refused the environment key (401 or 403), which
   /// stops event tracking for the lifetime of this processor.
   bool get unauthorised => _unauthorised;
+
+  /// How long a kept batch holds flushes for a full buffer when there is no
+  /// flush timer to lift the hold: the backoff after the last retry's.
+  int get holdCoolDown => retryBackoff * (1 << (maxAttempts - 1));
 
   void trackEvent({
     required String event,
@@ -162,11 +169,32 @@ class EventProcessor {
       },
       'timestamp': DateTime.now().millisecondsSinceEpoch,
     });
+    _flushIfFull();
+  }
+
+  void _flushIfFull() {
     if (_buffer.length >= maxBuffer && !_holdSizeFlush && !_sizeFlushQueued) {
       // Sent behind the batch in flight, if any.
       _sizeFlushQueued = true;
       unawaited(_flush(bySize: true));
     }
+  }
+
+  void _hold() {
+    _holdSizeFlush = true;
+    if (_timer == null) {
+      _holdTimer?.cancel();
+      _holdTimer = Timer(Duration(milliseconds: holdCoolDown), () {
+        _releaseHold();
+        _flushIfFull();
+      });
+    }
+  }
+
+  void _releaseHold() {
+    _holdSizeFlush = false;
+    _holdTimer?.cancel();
+    _holdTimer = null;
   }
 
   static String _dedupeKey(String event, String? featureName,
@@ -204,7 +232,7 @@ class EventProcessor {
   /// POSTs have completed. A batch kept after failing while in flight waits
   /// for the next flush. Never throws.
   Future<void> flush() {
-    _holdSizeFlush = false;
+    _releaseHold();
     return _flush(bySize: false);
   }
 
@@ -287,7 +315,7 @@ class EventProcessor {
     }
     if (outcome == _Outcome.transient) {
       _buffer.insertAll(0, events);
-      _holdSizeFlush = true;
+      _hold();
       final overflow = _buffer.length - maxBuffer;
       if (overflow > 0) {
         _evictOldest(overflow);
