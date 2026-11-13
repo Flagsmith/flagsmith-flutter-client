@@ -1,5 +1,30 @@
 # Changelog
 
+## [6.3.0](https://github.com/Flagsmith/flagsmith-flutter-client/compare/v6.2.1...v6.3.0) (2026-11-13)
+
+
+### Features
+
+* Attach traits to experiment exposures and run SDK spec v0.7.1 event scenarios ([#109](https://github.com/Flagsmith/flagsmith-flutter-client/issues/109)) ([ad7295e](https://github.com/Flagsmith/flagsmith-flutter-client/commit/ad7295ef7d6bbdad885ee35ed01776d6a7c31505))
+* Expose flag values with their JSON type ([#100](https://github.com/Flagsmith/flagsmith-flutter-client/issues/100)) ([f7798e5](https://github.com/Flagsmith/flagsmith-flutter-client/commit/f7798e59629a7ffe0e5a45d708e007cbeddca04d))
+* flush events on app pause and make close() awaitable ([#110](https://github.com/Flagsmith/flagsmith-flutter-client/issues/110)) ([4931a95](https://github.com/Flagsmith/flagsmith-flutter-client/commit/4931a95befb4655632aefa369ebd3111db9353ad))
+* Retry event delivery and flush on close ([#111](https://github.com/Flagsmith/flagsmith-flutter-client/issues/111)) ([cebd0ff](https://github.com/Flagsmith/flagsmith-flutter-client/commit/cebd0ff020cd5569b9d3f0630db069f1127dafa0))
+
+
+### Bug Fixes
+
+* Allow null trait values ([#101](https://github.com/Flagsmith/flagsmith-flutter-client/issues/101)) ([7487076](https://github.com/Flagsmith/flagsmith-flutter-client/commit/74870765dc3ba1cf82233fe63cd00deffd196db3))
+
+
+### CI
+
+* Run the Flagsmith SDK behavioural spec ([#99](https://github.com/Flagsmith/flagsmith-flutter-client/issues/99)) ([62c2442](https://github.com/Flagsmith/flagsmith-flutter-client/commit/62c2442a09ef8ea6b9f076d25fce3adf1e83fec1))
+
+
+### Other
+
+* Let Renovate keep updating spec bumps the webhook handler commits to ([#106](https://github.com/Flagsmith/flagsmith-flutter-client/issues/106)) ([7d656bb](https://github.com/Flagsmith/flagsmith-flutter-client/commit/7d656bba0a839c80535cfffff5ac282d12e00299))
+
 ## [6.2.1](https://github.com/Flagsmith/flagsmith-flutter-client/compare/v6.2.0...v6.2.1) (2026-10-06)
 
 
