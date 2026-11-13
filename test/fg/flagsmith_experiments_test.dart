@@ -1010,6 +1010,24 @@ void main() {
       expect(p.buffer, isEmpty);
     });
 
+    test('When a batch is kept on stop, then nothing retries after it',
+        () async {
+      script([503, 503, 503]);
+
+      final p = processor(maxBuffer: 1, retryBackoff: 10, flushInterval: 60000)
+        ..start();
+      p.trackEvent(event: 'a');
+      await p.stop();
+      expect(capture.requests.length, 3);
+      expect(p.buffer.single['event'], 'a', reason: 'kept, buffer full');
+
+      await Future<void>.delayed(Duration(milliseconds: p.holdCoolDown * 4));
+      expect(capture.requests.length, 3, reason: 'no cool-down after stop');
+
+      await p.flush();
+      expect(sentBatches().last, ['a'], reason: 'an explicit flush sends it');
+    });
+
     test('When the buffer fills during a send, then it is sent after it',
         () async {
       final scripted = script([])..gate = Completer<void>();

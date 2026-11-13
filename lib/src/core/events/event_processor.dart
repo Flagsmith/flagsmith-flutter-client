@@ -24,7 +24,8 @@ import '../../version.dart';
 /// - The buffer holds [maxBuffer] events and drops the oldest when full.
 ///   Filling it flushes, unless a kept batch is waiting: then it waits for
 ///   the next timer tick or explicit flush rather than retrying at once, or
-///   without a timer for [holdCoolDown] ms.
+///   without a timer for [holdCoolDown] ms. After [stop], it waits for an
+///   explicit flush.
 /// - Errors other than network errors and timeouts, such as an event that
 ///   cannot be encoded, drop the batch at once.
 class EventProcessor {
@@ -182,7 +183,10 @@ class EventProcessor {
 
   void _hold() {
     _holdSizeFlush = true;
-    if (_timer == null) {
+    // Once stopped, a kept batch waits for an explicit flush or a restart:
+    // nothing retries in the background after close. stop() flushes, which
+    // cancels a cool-down armed before it.
+    if (_timer == null && !_stopped) {
       _holdTimer?.cancel();
       _holdTimer = Timer(Duration(milliseconds: holdCoolDown), () {
         _releaseHold();
