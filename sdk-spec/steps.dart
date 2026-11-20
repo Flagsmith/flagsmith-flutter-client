@@ -91,5 +91,6 @@ List<Map<String, Object?>> asSpecFlags(List<Flag> flags) => [
           'feature': flag.feature.name,
           'enabled': flag.enabled,
           'value': flag.value,
+          'reason': flag.reason,
         },
     ];
