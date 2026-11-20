@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.4.0](https://github.com/Flagsmith/flagsmith-flutter-client/compare/v6.3.0...v6.4.0) (2026-11-20)
+
+
+### Features
+
+* Every SDK includes `reason` in responses for identity and environment flags ([#114](https://github.com/Flagsmith/flagsmith-flutter-client/issues/114)) ([6fe215e](https://github.com/Flagsmith/flagsmith-flutter-client/commit/6fe215eac5fc3cfc52dfa4d4db9613b3f4173e98))
+
 ## [6.3.0](https://github.com/Flagsmith/flagsmith-flutter-client/compare/v6.2.1...v6.3.0) (2026-11-13)
 
 
