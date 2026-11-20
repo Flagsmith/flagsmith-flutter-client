@@ -10,6 +10,20 @@ This is the SDK for Flutter for [https://www.flagsmith.com/](https://www.flagsmi
 
 For full documentation visit [https://docs.flagsmith.com/clients/flutter/](https://docs.flagsmith.com/clients/flutter/)
 
+## Flag reasons
+
+Each flag from `getFeatureFlags` carries the `reason` Flagsmith evaluated it to its value with, for environment and
+identity flags alike: `STATIC` for the environment's value, `TARGETING_MATCH; segment=<name>` for a segment override
+the identity matched, `DEFAULT` when no segment matched, and `SPLIT; weight=<n>` for a multivariate split. It is
+`null` when the Flagsmith server does not return reasons (before Flagsmith 2.294.0).
+
+```dart
+final flags = await flagsmith.getFeatureFlags(user: Identity(identifier: 'user_42'));
+for (final flag in flags) {
+  print('${flag.feature.name}: ${flag.reason}');
+}
+```
+
 ## Experiments
 
 Once an experiment is running, Flagsmith serves the variations automatically through the flag. Your application
