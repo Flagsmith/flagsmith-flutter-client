@@ -755,6 +755,66 @@ void main() {
       expect(p.buffer, isEmpty);
     });
 
+    // Resolve by name so these tests also compile with Dio before 5.10.0.
+    for (final type in DioExceptionType.values
+        .where((type) => type.name == 'transformTimeout')) {
+      test('When every response transformation times out, then batch is kept',
+          () async {
+        dio.interceptors.add(InterceptorsWrapper(onRequest: (options, h) {
+          h.reject(DioException(requestOptions: options, type: type));
+        }));
+
+        final p = processor();
+        p.trackEvent(event: 'purchase');
+        await p.flush();
+
+        expect(capture.requests.length, EventProcessor.maxAttempts);
+        expect(p.buffer.single['event'], 'purchase');
+      });
+
+      test('When a transformation timeout precedes success, then delivered',
+          () async {
+        script([]);
+        var attempts = 0;
+        dio.interceptors.add(InterceptorsWrapper(onRequest: (options, h) {
+          if (attempts++ == 0) {
+            h.reject(DioException(requestOptions: options, type: type));
+          } else {
+            h.next(options);
+          }
+        }));
+
+        final p = processor();
+        p.trackEvent(event: 'checkout');
+        await p.flush();
+
+        expect(sentBatches(), [
+          ['checkout'],
+          ['checkout'],
+        ]);
+        expect(p.buffer, isEmpty);
+      });
+    }
+
+    for (final type in [
+      DioExceptionType.badCertificate,
+      DioExceptionType.badResponse,
+    ]) {
+      test('When a request fails with ${type.name}, then dropped without retry',
+          () async {
+        dio.interceptors.add(InterceptorsWrapper(onRequest: (options, h) {
+          h.reject(DioException(requestOptions: options, type: type));
+        }));
+
+        final p = processor();
+        p.trackEvent(event: 'purchase');
+        await p.flush();
+
+        expect(capture.requests.length, 1);
+        expect(p.buffer, isEmpty);
+      });
+    }
+
     for (final status in [408, 429, 502, 503, 504]) {
       test('When every attempt gets a $status, then batch is kept', () async {
         script([status, status, status]);
@@ -999,7 +1059,7 @@ void main() {
       final p = processor(maxBuffer: 1, retryBackoff: 10);
       expect(p.holdCoolDown, 40);
       p.trackEvent(event: 'a');
-      await Future<void>.delayed(const Duration(milliseconds: 30));
+      await p.flush();
       expect(capture.requests.length, 3);
       p.trackEvent(event: 'b');
       expect(capture.requests.length, 3, reason: 'held after the kept batch');

@@ -28,7 +28,10 @@ jobs:
 
   tests:
     runs-on: ubuntu-latest
-    name: Flutter Test
+    name: Flutter Test (Dio ${{ matrix.dio }})
+    strategy:
+      matrix:
+        dio: [locked, latest]
     steps:
     - uses: actions/checkout@v4
     - uses: subosito/flutter-action@v2
@@ -36,6 +39,8 @@ jobs:
         flutter-version: ${{ env.FLUTTER_VERSION }}
         channel: stable
     - run: flutter pub get
+    - run: flutter pub upgrade dio
+      if: matrix.dio == 'latest'
     - run: flutter test
 
   # TODO https://github.com/Flagsmith/flagsmith-flutter-client/issues/57
