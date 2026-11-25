@@ -376,6 +376,7 @@ class EventProcessor {
       case DioExceptionType.connectionTimeout:
       case DioExceptionType.sendTimeout:
       case DioExceptionType.receiveTimeout:
+      case DioExceptionType.transformTimeout:
       case DioExceptionType.connectionError:
       case DioExceptionType.cancel:
         return true;
@@ -383,10 +384,9 @@ class EventProcessor {
         // A connection reset mid-request surfaces as an I/O exception
         // (SocketException or HttpException); encoding failures are Errors.
         return e.error is Exception && e.error is! FormatException;
-      default:
-        // Dio 5.10.0 added transformTimeout. Match by name to keep older
-        // supported Dio versions compiling, and reject other error types.
-        return e.type.name == 'transformTimeout';
+      case DioExceptionType.badCertificate:
+      case DioExceptionType.badResponse:
+        return false;
     }
   }
 
